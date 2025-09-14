@@ -55,7 +55,9 @@ jobs:
         flutter build web --release \
           --verbose \
           --source-maps \
-          --base-href "/doctor-call-web/"
+          --base-href "/doctor-call-web/" \
+          --no-wasm-dry-run \
+          --web-renderer html
 
     - name: Check build output
       run: |
