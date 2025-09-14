@@ -22,7 +22,7 @@ Route::get('/', function () {
 
 Route::get('/login', function(){
     return view('login');
-})->name('login.web');
+})->name('login');
 
 Route::post('/login', function(Request $r){
     $user = User::where('email',$r->email)->first();

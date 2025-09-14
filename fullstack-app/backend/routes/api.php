@@ -10,6 +10,24 @@ use App\Http\Controllers\Api\{HospitalApiController, PatientApiController};
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/register', [AuthController::class, 'register']);
 
+// مسار login إضافي لحل مشكلة التوجه
+Route::get('/login', function() {
+    return response()->json([
+        'error' => 'Unauthorized',
+        'message' => 'Please use POST /api/auth/login to authenticate'
+    ], 401);
+})->name('login');
+
+// مسار اختبار للتأكد من عمل API
+Route::get('/test', function() {
+    return response()->json([
+        'success' => true,
+        'message' => 'API is working!',
+        'timestamp' => now(),
+        'server' => 'flutterhelper.com'
+    ]);
+});
+
 // --- المسارات العامة (مؤقتًا للتطوير) ---
 Route::get('/dashboard/stats', function(Request $r){
     // ملاحظة: في الوضع النهائي، يجب أن يعتمد هذا على المستخدم المسجل دخوله
@@ -34,6 +52,12 @@ Route::get('/dashboard/stats', function(Request $r){
         'users' => $users
     ];
 });
+
+// مسارات عامة للاختبار (بدون حماية)
+Route::get('/patients', [PatientApiController::class, 'index']);
+Route::get('/hospitals', [HospitalApiController::class, 'index']);
+Route::get('/hospitals/{id}', [HospitalApiController::class, 'show']);
+Route::get('/hospitals/{id}/stats', [HospitalApiController::class, 'stats']);
 
 // المسارات المحمية بالتوثيق
 Route::middleware('auth:sanctum')->group(function(){
