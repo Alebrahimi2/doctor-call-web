@@ -1,0 +1,19 @@
+name: error_reporting
+description: Error reporting example using sentry.
+publish_to: none
+
+resolution: workspace
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  sentry_flutter: ^9.6.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

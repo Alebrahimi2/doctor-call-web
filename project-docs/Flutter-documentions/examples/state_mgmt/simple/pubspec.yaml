@@ -1,0 +1,21 @@
+name: state_mgmt
+description: Sample state management code.
+publish_to: none
+
+resolution: workspace
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  provider: ^6.1.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  test: ^1.26.2
+
+flutter:
+  uses-material-design: true

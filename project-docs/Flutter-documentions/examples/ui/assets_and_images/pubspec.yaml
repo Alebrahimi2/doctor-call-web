@@ -1,0 +1,28 @@
+name: assets_and_images
+description: An example project showing how to declare and load assets.
+publish_to: none
+
+resolution: workspace
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  vector_graphics: ^1.1.19
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  vector_graphics_compiler: ^1.1.17
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/my_icon.png
+    - assets/background.png
+    - path: assets/logo.svg
+      transformers:
+        - package: vector_graphics_compiler

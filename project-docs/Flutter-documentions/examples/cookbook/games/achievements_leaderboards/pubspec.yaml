@@ -1,0 +1,16 @@
+name: games_services_example
+description: Games services
+
+resolution: workspace
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  games_services: ^4.1.1
+  logging: ^1.3.0
+
+flutter:
+  uses-material-design: true

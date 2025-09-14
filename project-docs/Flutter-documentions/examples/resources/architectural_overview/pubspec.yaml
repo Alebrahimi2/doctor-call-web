@@ -1,0 +1,15 @@
+name: architectural_overview
+description: Samples for the Flutter architectural overview.
+publish_to: none
+
+resolution: workspace
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  ffi: ^2.1.4
+
+flutter:
+  uses-material-design: true

@@ -1,0 +1,26 @@
+_site
+.cache
+.*-cache
+.*-metadata
+.DS_Store
+.env
+.firebase/
+.idea/
+.vscode/
+*.log
+*.swp
+build
+node_modules
+.pnpm-store/
+./flutter/
+
+# Dart and Flutter, build related
+.dart_tool
+.flutter-plugins
+.flutter-plugins-dependencies
+package-lock.json
+pubspec.lock
+tmp/
+
+# Temporary as codelabs used to be a submodule
+examples/codelabs

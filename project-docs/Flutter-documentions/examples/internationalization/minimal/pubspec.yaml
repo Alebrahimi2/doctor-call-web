@@ -1,0 +1,15 @@
+name: l10n_example
+description: A minimal example of a localized Flutter app
+
+resolution: workspace
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

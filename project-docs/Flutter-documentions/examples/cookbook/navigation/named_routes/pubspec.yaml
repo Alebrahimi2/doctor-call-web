@@ -1,0 +1,13 @@
+name: named_routes
+description: Named route example snippets.
+
+resolution: workspace
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

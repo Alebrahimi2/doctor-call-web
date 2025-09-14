@@ -1,0 +1,21 @@
+name: code_debugging
+description: Examples to illustrate debugging your Flutter code.
+publish_to: none
+
+resolution: workspace
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  integration_test:
+    sdk: flutter
+  flutter_test:
+    sdk: flutter
+
+
+flutter:
+  uses-material-design: true

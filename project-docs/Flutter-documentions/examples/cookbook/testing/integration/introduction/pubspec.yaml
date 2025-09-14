@@ -1,0 +1,21 @@
+name: integration_testing_introduction
+description: Integration testing example snippets.
+publish_to: none
+
+resolution: workspace
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  flutter_test:
+    sdk: flutter
+
+dev_dependencies:
+  test: ^1.26.2
+
+flutter:
+  uses-material-design: true

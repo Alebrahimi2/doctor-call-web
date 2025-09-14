@@ -1,0 +1,23 @@
+name: platform_channels_examples
+description: >-
+  Examples showcasing how to use platform channels to
+  communicate with the underlying native platforms.
+
+publish_to: none
+
+version: 1.0.0+1
+
+resolution: workspace
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

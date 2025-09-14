@@ -1,0 +1,21 @@
+# Settings for GitHub Pages deployment
+
+# GitHub Pages configuration
+baseurl: ""
+url: "https://username.github.io/doctor_call_app_v2"
+
+# Build exclusions
+exclude:
+  - README.md
+  - .gitignore
+  - .github/
+  - android/
+  - ios/
+  - linux/
+  - macos/
+  - windows/
+  - test/
+
+# Include build files
+include:
+  - build/web/

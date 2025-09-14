@@ -1,0 +1,8 @@
+{
+  "info": {"name":"HospitalSim MVP","schema":"https://schema.getpostman.com/json/collection/v2.1.0/collection.json"},
+  "item": [
+    {"name":"Login","request":{"method":"POST","url":"{{API}}/login","body":{"mode":"raw","raw":"{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password\"\n}"}}},
+    {"name":"Get Hospital","request":{"method":"GET","url":"{{API}}/hospital","header":[{"key":"Authorization","value":"Bearer {{TOKEN}}"}]}},
+    {"name":"Accept L1","request":{"method":"POST","url":"{{API}}/missions/accept","header":[{"key":"Authorization","value":"Bearer {{TOKEN}}"}],"body":{"mode":"raw","raw":"{\n  \"code\": \"MASS_CASUALTY_L1\"\n}"}}}
+  ]
+}

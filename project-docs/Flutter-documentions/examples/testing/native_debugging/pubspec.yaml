@@ -1,0 +1,22 @@
+name: native_debugging
+description: Demonstration of native code debugging
+sdk: ^3.9.0
+
+version: 1.0.0+1
+
+resolution: workspace
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  url_launcher: ^6.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

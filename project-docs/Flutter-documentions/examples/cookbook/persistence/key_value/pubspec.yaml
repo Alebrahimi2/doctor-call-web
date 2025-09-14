@@ -1,0 +1,19 @@
+name: key_value
+publish_to: none
+description: >-
+  Examples and code excerpts for a cookbook recipe that
+  shows how to use the shared_preferences package.
+
+resolution: workspace
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  shared_preferences: ^2.5.3
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

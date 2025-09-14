@@ -1,0 +1,15 @@
+version: '3.9'
+services:
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_DATABASE: hospital_sim
+      MYSQL_USER: hs_user
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: root
+    ports: ["3306:3306"]
+    volumes: [dbdata:/var/lib/mysql]
+  redis:
+    image: redis:7
+    ports: ["6379:6379"]
+volumes: { dbdata: {} }

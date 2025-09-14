@@ -1,0 +1,13 @@
+name: opacity_animation
+description: Sample code for cookbook.
+
+resolution: workspace
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

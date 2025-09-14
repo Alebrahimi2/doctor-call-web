@@ -1,0 +1,451 @@
+name: Flutter Web Build and Deploy
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.35.3'
+        channel: 'stable'
+
+    - name: Flutter Doctor (Diagnostic Info)
+      run: flutter doctor -v
+
+    - name: Check Dart/Flutter Environment
+      run: |
+        echo "Flutter version:"
+        flutter --version
+        echo "Dart version:"
+        dart --version
+        echo "Available platforms:"
+        flutter devices
+        echo "Installed packages:"
+        flutter pub deps
+
+    - name: Install dependencies
+      run: flutter pub get
+
+    - name: Generate localizations
+      run: |
+        echo "🌐 Generating localizations..."
+        flutter gen-l10n
+        echo "📋 Generated localization files:"
+        ls -la .dart_tool/flutter_gen/gen_l10n/ || echo "Generated files not found in .dart_tool"
+        ls -la lib/l10n/ || echo "Source l10n files not found"
+        echo "✅ Localization generation completed"
+
+    - name: Check web compatibility
+      run: |
+        echo "🔍 Checking web compatibility of dependencies..."
+        
+        # Check pubspec.yaml for potentially problematic packages
+        echo "📦 Analyzing dependencies in pubspec.yaml:"
+        if grep -E "(path_provider|file_picker|camera|battery|device_info)" pubspec.yaml; then
+          echo "⚠️  Found packages that may require web-specific alternatives"
+        fi
+        
+        # Check for dart:io imports in source code
+        echo "📁 Checking for dart:io imports in source code:"
+        if find lib -name "*.dart" -exec grep -l "import.*dart:io" {} \; 2>/dev/null; then
+          echo "❌ Found dart:io imports in:"
+          find lib -name "*.dart" -exec grep -l "import.*dart:io" {} \; 2>/dev/null
+          echo "🔧 These need to be replaced with web-compatible alternatives"
+        else
+          echo "✅ No dart:io imports found"
+        fi
+        
+        # Check for platform-specific code
+        echo "🖥️  Checking for platform-specific code:"
+        if find lib -name "*.dart" -exec grep -l "Platform\.\|kIsWeb" {} \; 2>/dev/null; then
+          echo "ℹ️  Found platform-specific code in:"
+          find lib -name "*.dart" -exec grep -l "Platform\.\|kIsWeb" {} \; 2>/dev/null
+        fi
+
+    - name: Verify project structure
+      run: |
+        echo "Project structure verification:"
+        echo "📁 lib directory:"
+        find lib -name "*.dart" | head -20
+        echo ""
+        echo "📁 l10n directory:"
+        ls -la lib/l10n/ || echo "l10n directory not found"
+        echo ""
+        echo "📁 Generated localizations:"
+        ls -la .dart_tool/flutter_gen/gen_l10n/ || echo "Generated localizations not found"
+        echo ""
+        echo "� Checking for AppLocalizations import compatibility:"
+        if find lib -name "*.dart" -exec grep -l "flutter_gen/gen_l10n/app_localizations" {} \; 2>/dev/null; then
+          echo "✅ Found flutter_gen imports in:"
+          find lib -name "*.dart" -exec grep -l "flutter_gen/gen_l10n/app_localizations" {} \; 2>/dev/null
+        fi
+        echo ""
+        echo "�📄 Key files:"
+        ls -la lib/main.dart || echo "main.dart not found"
+        ls -la pubspec.yaml || echo "pubspec.yaml not found"
+        ls -la web/index.html || echo "web/index.html not found"
+        ls -la l10n.yaml || echo "l10n.yaml not found"
+        echo ""
+        echo "📦 Dependencies check:"
+        flutter pub deps --style=tree | head -30
+
+    - name: Analyze code
+      run: flutter analyze
+
+    - name: Build web app (with verbose logging)
+      run: |
+        echo "🚀 Starting Flutter web build with verbose logging..."
+        echo "📋 Build configuration:"
+        echo "- Target: Web"
+        echo "- Mode: Release"
+        echo "- Compiler: dart2js"
+        echo "- Verbose: true"
+        echo ""
+        echo "🔍 Starting build process..."
+        
+        # Run with maximum verbosity to catch dart2js compilation issues
+        flutter build web --release --verbose --dart2js-optimization=O0 2>&1 | tee build_log.txt
+        
+        echo "📊 Build process completed with exit code: $?"
+      continue-on-error: true
+
+    - name: Check for specific compilation errors
+      if: always()
+      run: |
+        echo "🔍 Analyzing build log for common issues..."
+        
+        if [ -f "build_log.txt" ]; then
+          echo "📄 Build log file found. Checking for errors..."
+          
+          # Check for dart:io usage (web incompatible)
+          if grep -i "dart:io" build_log.txt; then
+            echo "❌ FOUND: dart:io usage detected (not compatible with web)"
+            echo "🔧 Solution: Replace dart:io with web-compatible alternatives"
+          fi
+          
+          # Check for dart2js compilation errors
+          if grep -i "dart2js.*error\|compilation.*error\|failed.*compile" build_log.txt; then
+            echo "❌ FOUND: dart2js compilation errors"
+            echo "📋 dart2js error details:"
+            grep -A 5 -B 5 -i "dart2js.*error\|compilation.*error\|failed.*compile" build_log.txt
+          fi
+          
+          # Check for missing dependencies
+          if grep -i "not found\|cannot resolve\|undefined" build_log.txt; then
+            echo "❌ FOUND: Missing dependencies or undefined references"
+            echo "📋 Missing dependency details:"
+            grep -A 3 -B 3 -i "not found\|cannot resolve\|undefined" build_log.txt
+          fi
+          
+          # Check for unsupported operations
+          if grep -i "unsupported.*operation\|not supported.*web" build_log.txt; then
+            echo "❌ FOUND: Unsupported web operations"
+            echo "📋 Unsupported operation details:"
+            grep -A 3 -B 3 -i "unsupported.*operation\|not supported.*web" build_log.txt
+          fi
+          
+          # Get last 20 lines for context
+          echo ""
+          echo "📋 Last 20 lines of build log:"
+          tail -20 build_log.txt
+          
+        else
+          echo "❌ Build log file not found"
+        fi
+
+    - name: Upload build log
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: flutter-build-log-${{ github.sha }}
+        path: build_log.txt
+        retention-days: 7
+
+    - name: Check build status and output
+      run: |
+        if [ -f build_log.txt ]; then
+          echo "Build log file created successfully"
+          echo "Last 50 lines of build log:"
+          tail -50 build_log.txt
+          
+          # Check if build was successful
+          if [ -d "build/web" ]; then
+            echo "✅ Build directory created successfully"
+            echo "Build contents:"
+            ls -la build/web/
+          else
+            echo "❌ Build directory not found"
+            echo "Current directory contents:"
+            ls -la
+            echo "Full build log:"
+            cat build_log.txt
+            exit 1
+          fi
+        else
+          echo "❌ Build log file not created"
+          exit 1
+        fi
+
+    - name: Organize build files
+      if: success()
+      run: |
+        echo "Organizing files for deployment..."
+        # Copy additional assets if needed
+        cp -r web/icons build/web/ || true
+        cp web/manifest.json build/web/ || true
+        cp web/favicon.png build/web/ || true
+        echo "Files organized successfully"
+
+    - name: Prepare deployment artifacts
+      if: success()
+      run: |
+        echo "Preparing deployment artifacts..."
+        # Create deployment info
+        echo "Deployment Date: $(date)" > build/web/deployment-info.txt
+        echo "Flutter Version: $(flutter --version | head -1)" >> build/web/deployment-info.txt
+        echo "Commit SHA: ${{ github.sha }}" >> build/web/deployment-info.txt
+        echo "Branch: ${{ github.ref_name }}" >> build/web/deployment-info.txt
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      if: success()
+      with:
+        name: web-build-${{ github.sha }}
+        path: build/web/
+        retention-days: 30
+
+    - name: Create build failure report
+      if: failure()
+      run: |
+        echo "## ❌ Build Failed" >> $GITHUB_STEP_SUMMARY
+        echo "The Flutter web build failed. Check the build log artifact for details." >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 🔍 Debugging Steps:" >> $GITHUB_STEP_SUMMARY
+        echo "1. Download the build log artifact from this workflow run" >> $GITHUB_STEP_SUMMARY
+        echo "2. Check for compilation errors or missing dependencies" >> $GITHUB_STEP_SUMMARY
+        echo "3. Verify that all imports and file paths are correct" >> $GITHUB_STEP_SUMMARY
+        echo "4. Ensure web compatibility of all used packages" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📄 Build Log Location:" >> $GITHUB_STEP_SUMMARY
+        echo "Artifact: flutter-build-log-${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+
+    - name: Deploy to GitHub Pages
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./build/web
+        cname: doctor-call.github.io  # اختياري: اسم النطاق المخصص
+        commit_message: "🚀 Deploy ${{ github.sha }}: ${{ github.event.head_commit.message }}"
+
+    - name: Create deployment summary
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      run: |
+        echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+        echo "- **Build Status**: ✅ Success" >> $GITHUB_STEP_SUMMARY
+        echo "- **Deployment URL**: https://${{ github.repository_owner }}.github.io/doctor_call_app_v2" >> $GITHUB_STEP_SUMMARY
+        echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Deployment Time**: $(date)" >> $GITHUB_STEP_SUMMARY
+
+  # Job for organizing and deploying files to appropriate locations
+  organize-and-deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && needs.build.result == 'success'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: web-build-${{ github.sha }}
+        path: ./build/web
+
+    - name: Create file organization structure
+      run: |
+        echo "Creating organized file structure..."
+        
+        # Create main directories
+        mkdir -p deploy/
+        mkdir -p deploy/web/
+        mkdir -p deploy/assets/
+        mkdir -p deploy/docs/
+        
+        # Move web build to appropriate location
+        cp -r build/web/* deploy/web/
+        
+        # Copy source files for reference
+        cp README.md deploy/docs/
+        cp LICENSE deploy/docs/
+        cp pubspec.yaml deploy/docs/
+        
+        # Create index page for main directory
+        cat > deploy/index.html << 'EOF'
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Doctor Call App v2</title>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+                .container { max-width: 800px; margin: 0 auto; background: white; padding: 40px; border-radius: 8px; }
+                .header { text-align: center; margin-bottom: 40px; }
+                .btn { display: inline-block; padding: 12px 24px; background: #2196F3; color: white; text-decoration: none; border-radius: 6px; margin: 10px; }
+                .btn:hover { background: #1976D2; }
+                .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 30px 0; }
+                .feature { padding: 20px; background: #f8f9fa; border-radius: 6px; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>🏥 Doctor Call App v2</h1>
+                    <p>تطبيق إدارة المستشفيات مع دعم متعدد اللغات</p>
+                </div>
+                
+                <div style="text-align: center;">
+                    <a href="web/" class="btn">🚀 تشغيل التطبيق</a>
+                    <a href="docs/README.md" class="btn">📖 التوثيق</a>
+                    <a href="https://github.com/${{ github.repository }}" class="btn">💻 الكود المصدري</a>
+                </div>
+                
+                <div class="features">
+                    <div class="feature">
+                        <h3>🌍 متعدد اللغات</h3>
+                        <p>دعم العربية والإنجليزية والألمانية مع RTL/LTR</p>
+                    </div>
+                    <div class="feature">
+                        <h3>📊 لوحة تحكم</h3>
+                        <p>إحصائيات شاملة وتقارير مفصلة</p>
+                    </div>
+                    <div class="feature">
+                        <h3>👥 إدارة المرضى</h3>
+                        <p>نظام متكامل لمتابعة المرضى</p>
+                    </div>
+                    <div class="feature">
+                        <h3>🏥 إدارة الأقسام</h3>
+                        <p>تنظيم الأقسام والغرف الطبية</p>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 40px; color: #666;">
+                    <p>آخر تحديث: ${{ github.event.head_commit.timestamp }}</p>
+                    <p>إصدار: ${{ github.sha }}</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        EOF
+        
+        echo "File organization completed successfully!"
+
+    - name: Deploy organized files to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./deploy
+        commit_message: "📁 Organize and deploy files: ${{ github.event.head_commit.message }}"
+
+    - name: Create deployment report
+      run: |
+        echo "## 📁 File Organization Report" >> $GITHUB_STEP_SUMMARY
+        echo "Files have been organized and deployed to their appropriate locations:" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📂 Directory Structure:" >> $GITHUB_STEP_SUMMARY
+        echo "- **Main Page**: https://${{ github.repository_owner }}.github.io/doctor_call_app_v2/" >> $GITHUB_STEP_SUMMARY
+        echo "- **Web App**: https://${{ github.repository_owner }}.github.io/doctor_call_app_v2/web/" >> $GITHUB_STEP_SUMMARY
+        echo "- **Documentation**: https://${{ github.repository_owner }}.github.io/doctor_call_app_v2/docs/" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📋 Deployed Files:" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Flutter Web Application" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Documentation (README, LICENSE)" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Project Configuration (pubspec.yaml)" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Landing Page with Navigation" >> $GITHUB_STEP_SUMMARY
+
+  # Job لتحليل الأخطاء إذا فشل البناء
+  analyze-build-failure:
+    runs-on: ubuntu-latest
+    needs: build
+    if: needs.build.result == 'failure'
+    
+    steps:
+    - name: Download build log
+      uses: actions/download-artifact@v4
+      with:
+        name: flutter-build-log-${{ github.sha }}
+        path: ./logs
+
+    - name: Analyze build failure
+      run: |
+        echo "## 🔍 Build Failure Analysis" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ -f "./logs/build_log.txt" ]; then
+          echo "### 📄 Build Log Analysis:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Check for common error patterns
+          if grep -q "error:" ./logs/build_log.txt; then
+            echo "**❌ Compilation Errors Found:**" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            grep -A 3 -B 1 "error:" ./logs/build_log.txt | head -20 >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if grep -q "dart:io" ./logs/build_log.txt; then
+            echo "**❌ dart:io Usage Detected (Web Incompatible):**" >> $GITHUB_STEP_SUMMARY
+            echo "The code uses dart:io which is not supported in web builds." >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            grep -A 2 -B 2 "dart:io" ./logs/build_log.txt | head -10 >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if grep -q "dart2js.*error\|compilation.*error\|failed.*compile" ./logs/build_log.txt; then
+            echo "**❌ dart2js Compilation Errors:**" >> $GITHUB_STEP_SUMMARY
+            echo "JavaScript compilation failed during dart2js process." >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            grep -A 3 -B 3 "dart2js.*error\|compilation.*error\|failed.*compile" ./logs/build_log.txt | head -15 >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if grep -q "unsupported.*operation\|not supported.*web" ./logs/build_log.txt; then
+            echo "**❌ Unsupported Web Operations:**" >> $GITHUB_STEP_SUMMARY
+            echo "Code contains operations not supported in Flutter Web." >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            grep -A 2 -B 2 "unsupported.*operation\|not supported.*web" ./logs/build_log.txt | head -10 >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if grep -q "FileSystemException" ./logs/build_log.txt; then
+            echo "**⚠️ File System Issues:**" >> $GITHUB_STEP_SUMMARY
+            echo "File system related errors detected." >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if grep -q "package:" ./logs/build_log.txt; then
+            echo "**⚠️ Package Import Issues:**" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            grep "package:" ./logs/build_log.txt | head -10 >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📥 Complete Build Log:" >> $GITHUB_STEP_SUMMARY
+          echo "Download the artifact 'flutter-build-log-${{ github.sha }}' for complete details." >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ Build log file not found in artifacts." >> $GITHUB_STEP_SUMMARY
+        fi

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flutter App Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .links {
+            margin-top: 20px;
+        }
+        .links a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        .links a:hover {
+            background: rgba(255,255,255,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏥 Doctor Call System</h1>
+        <p>تطبيق نظام إدارة المستشفى</p>
+        
+        <div id="status">
+            <div class="loading"></div>
+            <p>جاري فحص التطبيق...</p>
+        </div>
+        
+        <div class="links">
+            <h3>الروابط المتاحة:</h3>
+            <a href="http://localhost:3000" target="_blank">Flutter App (localhost:3000)</a><br>
+            <a href="dashboard_demo.html">Dashboard Demo</a><br>
+            <a href="login_demo.html">Login Demo</a>
+        </div>
+        
+        <div style="margin-top: 30px; font-size: 14px; opacity: 0.8;">
+            <p>إذا كان Flutter App لا يعمل:</p>
+            <ol style="text-align: right; display: inline-block;">
+                <li>تأكد من تشغيل الأمر من المجلد الصحيح</li>
+                <li>تأكد من أن المنفذ 3000 متاح</li>
+                <li>جرب تحديث الصفحة</li>
+                <li>جرب مسح cache المتصفح</li>
+            </ol>
+        </div>
+    </div>
+    
+    <script>
+        // Check if Flutter app is running
+        fetch('http://localhost:3000')
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('status').innerHTML = 
+                        '<p style="color: #4caf50;">✅ Flutter App يعمل بنجاح!</p>';
+                } else {
+                    document.getElementById('status').innerHTML = 
+                        '<p style="color: #f44336;">❌ Flutter App لا يستجيب</p>';
+                }
+            })
+            .catch(error => {
+                document.getElementById('status').innerHTML = 
+                    '<p style="color: #ff9800;">⚠️ Flutter App غير متاح</p>';
+            });
+    </script>
+</body>
+</html>

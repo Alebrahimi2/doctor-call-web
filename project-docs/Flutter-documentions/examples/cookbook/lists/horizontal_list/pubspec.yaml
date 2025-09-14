@@ -1,0 +1,22 @@
+name: horizontal_list
+description: Example for horizontal_list cookbook recipe
+
+publish_to: none
+
+version: 1.0.0+1
+
+resolution: workspace
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

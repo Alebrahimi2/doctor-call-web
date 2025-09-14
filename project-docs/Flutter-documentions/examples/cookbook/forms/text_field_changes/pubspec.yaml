@@ -1,0 +1,13 @@
+name: text_field_changes
+description: Sample code for text_field_changes
+
+resolution: workspace
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

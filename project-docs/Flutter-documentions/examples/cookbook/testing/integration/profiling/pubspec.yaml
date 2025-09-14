@@ -1,0 +1,23 @@
+name: your_integration_test
+description: Integration test profiling examples.
+
+resolution: workspace
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  path_provider: ^2.1.5
+  path: ^1.9.1
+  flutter_test:
+    sdk: flutter
+
+dev_dependencies:
+  integration_test:
+    sdk: flutter
+  flutter_driver:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

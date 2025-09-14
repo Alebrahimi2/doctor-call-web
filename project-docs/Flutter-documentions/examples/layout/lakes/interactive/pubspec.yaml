@@ -1,0 +1,23 @@
+name: lakes_interactive
+description: >-
+  Sample app from "Adding interactivity":
+  https://docs.flutter.dev/ui/interactivity.
+version: 1.0.0
+
+resolution: workspace
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+  assets:
+    - images/lake.jpg

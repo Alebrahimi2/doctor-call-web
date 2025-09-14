@@ -1,0 +1,49 @@
+# Doctor Call - Hospital Emergency Management Game
+
+## Project Files
+*.log
+*.tmp
+temp/
+.env
+.env.local
+.env.*.local
+
+# Backend (Laravel)
+fullstack-app/backend/vendor/
+fullstack-app/backend/.env
+fullstack-app/backend/storage/logs/*
+fullstack-app/backend/storage/framework/cache/*
+fullstack-app/backend/storage/framework/sessions/*
+fullstack-app/backend/storage/framework/views/*
+fullstack-app/backend/bootstrap/cache/*
+fullstack-app/backend/node_modules/
+
+# Frontend (Flutter)
+doctor_call_app_v2/.dart_tool/
+doctor_call_app_v2/.packages
+doctor_call_app_v2/.pub-cache/
+doctor_call_app_v2/.pub/
+doctor_call_app_v2/build/
+doctor_call_app_v2/.flutter-plugins
+doctor_call_app_v2/.flutter-plugins-dependencies
+doctor_call_app_v2/.metadata
+doctor_call_app_v2/pubspec.lock
+
+# Archive folders
+archiv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Development
+*.orig
+*.rej
+*~
+.*.swp

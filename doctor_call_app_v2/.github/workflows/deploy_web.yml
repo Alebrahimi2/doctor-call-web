@@ -1,0 +1,42 @@
+name: Build & Deploy Flutter Web (private -> public)
+
+on:
+  push:
+    branches:
+      - main   # غيّرها إلى master لو كان مشروعك يستخدم master
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Private Repo
+        uses: actions/checkout@v3
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.3'
+          channel: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Web
+        run: |
+          flutter clean
+          flutter build web --release \
+            --pwa-strategy=none \
+            --source-maps \
+            --base-href "/doctor-call-web/"
+          # نسخة لصفحة 404 لتجنب مشاكل SPA routing
+          cp build/web/index.html build/web/404.html
+          # تعطيل Jekyll
+          touch build/web/.nojekyll
+
+      - name: Deploy to public repo (gh-pages)
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          personal_token: ${{ secrets.PAGES_TOKEN }}
+          external_repository: Alebrahimi2/doctor-call-web
+          publish_branch: gh-pages
+          publish_dir: ./build/web
