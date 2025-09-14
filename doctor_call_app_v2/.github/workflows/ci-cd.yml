@@ -108,7 +108,7 @@ jobs:
     name: Deploy to Private Repository
     runs-on: ubuntu-latest
     needs: [test, build-web]
-    if: github.ref == 'refs/heads/master' && github.repository == 'USERNAME/doctor-call-app'
+    if: github.ref == 'refs/heads/master' && github.repository == 'Alebrahimi2/doctor-call-app'
     
     steps:
       - name: Checkout code
@@ -144,7 +144,7 @@ jobs:
     name: Sync Web Build to Public Repository
     runs-on: ubuntu-latest
     needs: build-web
-    if: github.ref == 'refs/heads/master' && github.repository == 'USERNAME/doctor-call-app'
+    if: github.ref == 'refs/heads/master' && github.repository == 'Alebrahimi2/doctor-call-app'
     
     steps:
       - name: Checkout private repo
@@ -167,7 +167,7 @@ jobs:
       - name: Checkout public repo
         uses: actions/checkout@v4
         with:
-          repository: USERNAME/doctor-call-web
+          repository: Alebrahimi2/doctor-call-web
           token: ${{ secrets.PUBLIC_REPO_TOKEN }}
           path: public-repo
           

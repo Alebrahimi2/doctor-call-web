@@ -1,16 +1,16 @@
 # 🏥 Doctor Call App
 
-[![CI/CD](https://github.com/USERNAME/doctor-call-app/workflows/Doctor%20Call%20App%20CI/CD/badge.svg)](https://github.com/USERNAME/doctor-call-app/actions)
-[![Testing](https://github.com/USERNAME/doctor-call-app/workflows/Comprehensive%20Testing/badge.svg)](https://github.com/USERNAME/doctor-call-app/actions)
-[![codecov](https://codecov.io/gh/USERNAME/doctor-call-app/branch/master/graph/badge.svg)](https://codecov.io/gh/USERNAME/doctor-call-app)
+[![CI/CD](https://github.com/Alebrahimi2/doctor-call-app/workflows/Doctor%20Call%20App%20CI/CD/badge.svg)](https://github.com/Alebrahimi2/doctor-call-app/actions)
+[![Testing](https://github.com/Alebrahimi2/doctor-call-app/workflows/Comprehensive%20Testing/badge.svg)](https://github.com/Alebrahimi2/doctor-call-app/actions)
+[![codecov](https://codecov.io/gh/Alebrahimi2/doctor-call-app/branch/master/graph/badge.svg)](https://codecov.io/gh/Alebrahimi2/doctor-call-app)
 
 **الطبيب المتنقل** - تطبيق Flutter محاكاة للطوارئ الطبية والألعاب التعليمية
 
 ## 🚀 الوصول السريع
 
-- 🌐 **التطبيق المباشر**: [https://USERNAME.github.io/doctor-call-web](https://USERNAME.github.io/doctor-call-web)
-- 📱 **تنزيل APK**: [Releases](https://github.com/USERNAME/doctor-call-web/releases)
-- 📊 **حالة CI/CD**: [Actions](https://github.com/USERNAME/doctor-call-app/actions)
+- 🌐 **التطبيق المباشر**: [https://alebrahimi2.github.io/doctor-call-web](https://alebrahimi2.github.io/doctor-call-web)
+- 📱 **تنزيل APK**: [Releases](https://github.com/Alebrahimi2/doctor-call-web/releases)
+- 📊 **حالة CI/CD**: [Actions](https://github.com/Alebrahimi2/doctor-call-app/actions)
 - 📋 **حالة المشروع**: [PROJECT_STATUS.md](PROJECT_STATUS.md)
 
 ## 🎯 المميزات الرئيسية
