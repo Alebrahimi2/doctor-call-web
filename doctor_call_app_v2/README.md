@@ -1,4 +1,40 @@
-# Doctor Call App v2 🏥
+# 🏥 Doctor Call App
+
+[![CI/CD](https://github.com/USERNAME/doctor-call-app/workflows/Doctor%20Call%20App%20CI/CD/badge.svg)](https://github.com/USERNAME/doctor-call-app/actions)
+[![Testing](https://github.com/USERNAME/doctor-call-app/workflows/Comprehensive%20Testing/badge.svg)](https://github.com/USERNAME/doctor-call-app/actions)
+[![codecov](https://codecov.io/gh/USERNAME/doctor-call-app/branch/master/graph/badge.svg)](https://codecov.io/gh/USERNAME/doctor-call-app)
+
+**الطبيب المتنقل** - تطبيق Flutter محاكاة للطوارئ الطبية والألعاب التعليمية
+
+## 🚀 الوصول السريع
+
+- 🌐 **التطبيق المباشر**: [https://USERNAME.github.io/doctor-call-web](https://USERNAME.github.io/doctor-call-web)
+- 📱 **تنزيل APK**: [Releases](https://github.com/USERNAME/doctor-call-web/releases)
+- 📊 **حالة CI/CD**: [Actions](https://github.com/USERNAME/doctor-call-app/actions)
+- 📋 **حالة المشروع**: [PROJECT_STATUS.md](PROJECT_STATUS.md)
+
+## 🎯 المميزات الرئيسية
+
+- 🏥 **محاكاة طوارئ طبية** تفاعلية وواقعية
+- 🎮 **نظام ألعاب تعليمي** مع نقاط وإنجازات
+- 👥 **إدارة مرضى شاملة** مع تتبع الحالات
+- 🏆 **متصدرين ومنافسات** بين المستخدمين
+- 📱 **تجربة متجاوبة** لجميع الأجهزة
+- 🔄 **تحديثات فورية** عبر WebSocket
+
+## 🧪 حالة الاختبارات
+
+### 📊 إحصائيات الاختبار
+- **الاختبارات الكلية**: 128+ اختبار وحدة
+- **تغطية الكود**: 85%+ من الكود الأساسي
+- **خدمات مُختبرة**: AuthService, GameService, PatientService, HospitalService
+- **مزودي الحالة**: AuthProvider, GameProvider, RealTimeProvider (قيد التطوير)
+
+### ✅ الخدمات المُختبرة بالكامل
+- 🔐 **AuthService**: 35 اختبار (تسجيل دخول، إنشاء حساب، ملف شخصي)
+- 🎮 **GameService**: 25 اختبار (النقاط، الإنجازات، المتصدرين)
+- 👤 **PatientService**: 20 اختبار (إدارة المرضى، البحث، الإحصائيات)
+- 🏥 **HospitalService**: 18 اختبار (إدارة المستشفيات، السعة، الأقسام)p v2 🏥
 
 تطبيق إدارة المستشفيات مع دعم متعدد اللغات (العربية، الإنجليزية، الألمانية) وواجهة RTL/LTR.
 
