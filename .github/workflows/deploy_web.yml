@@ -48,7 +48,6 @@ jobs:
             --source-maps \
             --base-href "/doctor-call-web/" \
             --no-wasm-dry-run \
-            --web-renderer html \
             --verbose
           
           # نسخة لصفحة 404 لتجنب مشاكل SPA routing

@@ -56,8 +56,7 @@ jobs:
           --verbose \
           --source-maps \
           --base-href "/doctor-call-web/" \
-          --no-wasm-dry-run \
-          --web-renderer html
+          --no-wasm-dry-run
 
     - name: Check build output
       run: |
