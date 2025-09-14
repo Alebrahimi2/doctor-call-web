@@ -29,7 +29,7 @@ void main() {
         const token = 'valid_token_123';
         const page = 1;
         const limit = 10;
-        
+
         final mockResponse = {
           'success': true,
           'data': {
@@ -42,14 +42,10 @@ void main() {
             },
           },
         };
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
         final result = await patientService.getPatients(token, page, limit);
@@ -65,7 +61,7 @@ void main() {
         // Arrange
         const token = 'valid_token_123';
         const status = 'waiting';
-        
+
         final mockResponse = {
           'success': true,
           'data': {
@@ -81,14 +77,10 @@ void main() {
             },
           },
         };
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
         final result = await patientService.getPatientsByStatus(token, status);
@@ -106,7 +98,7 @@ void main() {
         // Arrange
         const token = 'valid_token_123';
         const priority = 'urgent';
-        
+
         final mockResponse = {
           'success': true,
           'data': {
@@ -122,17 +114,16 @@ void main() {
             },
           },
         };
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
-        final result = await patientService.getPatientsByPriority(token, priority);
+        final result = await patientService.getPatientsByPriority(
+          token,
+          priority,
+        );
 
         // Assert
         expect(result['success'], true);
@@ -150,19 +141,12 @@ void main() {
         const token = 'valid_token_123';
         const patientId = 1;
         final mockPatient = MockData.mockPatients.first;
-        
-        final mockResponse = {
-          'success': true,
-          'data': mockPatient.toJson(),
-        };
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        final mockResponse = {'success': true, 'data': mockPatient.toJson()};
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
         final result = await patientService.getPatientById(token, patientId);
@@ -178,14 +162,11 @@ void main() {
         // Arrange
         const token = 'valid_token_123';
         const patientId = 999;
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(MockData.mockNotFoundError),
-          404,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async =>
+              http.Response(json.encode(MockData.mockNotFoundError), 404),
+        );
 
         // Act
         final result = await patientService.getPatientById(token, patientId);
@@ -208,7 +189,7 @@ void main() {
           'priority': 'normal',
           'hospital_id': 1,
         };
-        
+
         final mockResponse = {
           'success': true,
           'message': 'تم إنشاء ملف المريض بنجاح',
@@ -223,15 +204,16 @@ void main() {
             'created_at': DateTime.now().toIso8601String(),
           },
         };
-        
-        when(mockHttpClient.post(
-          any,
-          headers: anyNamed('headers'),
-          body: anyNamed('body'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          201,
-        ));
+
+        when(
+          mockHttpClient.post(
+            any,
+            headers: anyNamed('headers'),
+            body: anyNamed('body'),
+          ),
+        ).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 201),
+        );
 
         // Act
         final result = await patientService.createPatient(token, patientData);
@@ -249,18 +231,23 @@ void main() {
           'age': 35,
           // Missing required fields: name, symptoms
         };
-        
-        when(mockHttpClient.post(
-          any,
-          headers: anyNamed('headers'),
-          body: anyNamed('body'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(MockData.mockValidationError),
-          422,
-        ));
+
+        when(
+          mockHttpClient.post(
+            any,
+            headers: anyNamed('headers'),
+            body: anyNamed('body'),
+          ),
+        ).thenAnswer(
+          (_) async =>
+              http.Response(json.encode(MockData.mockValidationError), 422),
+        );
 
         // Act
-        final result = await patientService.createPatient(token, invalidPatientData);
+        final result = await patientService.createPatient(
+          token,
+          invalidPatientData,
+        );
 
         // Assert
         expect(result['success'], false);
@@ -279,7 +266,7 @@ void main() {
           'assigned_doctor_id': 1,
           'notes': 'بدء الفحص',
         };
-        
+
         final updatedPatient = MockData.mockPatients.first;
         final mockResponse = {
           'success': true,
@@ -291,23 +278,31 @@ void main() {
             'notes': updateData['notes'],
           },
         };
-        
-        when(mockHttpClient.put(
-          any,
-          headers: anyNamed('headers'),
-          body: anyNamed('body'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(
+          mockHttpClient.put(
+            any,
+            headers: anyNamed('headers'),
+            body: anyNamed('body'),
+          ),
+        ).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
-        final result = await patientService.updatePatient(token, patientId, updateData);
+        final result = await patientService.updatePatient(
+          token,
+          patientId,
+          updateData,
+        );
 
         // Assert
         expect(result['success'], true);
         expect(result['data']['status'], updateData['status']);
-        expect(result['data']['assigned_doctor_id'], updateData['assigned_doctor_id']);
+        expect(
+          result['data']['assigned_doctor_id'],
+          updateData['assigned_doctor_id'],
+        );
       });
     });
 
@@ -317,7 +312,7 @@ void main() {
         const token = 'valid_token_123';
         const patientId = 1;
         const doctorId = 1;
-        
+
         final mockResponse = {
           'success': true,
           'message': 'تم تعيين المريض للطبيب بنجاح',
@@ -327,18 +322,23 @@ void main() {
             'assigned_at': DateTime.now().toIso8601String(),
           },
         };
-        
-        when(mockHttpClient.post(
-          any,
-          headers: anyNamed('headers'),
-          body: anyNamed('body'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(
+          mockHttpClient.post(
+            any,
+            headers: anyNamed('headers'),
+            body: anyNamed('body'),
+          ),
+        ).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
-        final result = await patientService.assignPatient(token, patientId, doctorId);
+        final result = await patientService.assignPatient(
+          token,
+          patientId,
+          doctorId,
+        );
 
         // Assert
         expect(result['success'], true);
@@ -351,24 +351,29 @@ void main() {
         const token = 'valid_token_123';
         const patientId = 1;
         const doctorId = 1;
-        
+
         final mockResponse = {
           'success': false,
           'message': 'المريض مُعيَّن بالفعل لطبيب آخر',
           'error_code': 409,
         };
-        
-        when(mockHttpClient.post(
-          any,
-          headers: anyNamed('headers'),
-          body: anyNamed('body'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          409,
-        ));
+
+        when(
+          mockHttpClient.post(
+            any,
+            headers: anyNamed('headers'),
+            body: anyNamed('body'),
+          ),
+        ).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 409),
+        );
 
         // Act
-        final result = await patientService.assignPatient(token, patientId, doctorId);
+        final result = await patientService.assignPatient(
+          token,
+          patientId,
+          doctorId,
+        );
 
         // Assert
         expect(result['success'], false);
@@ -386,7 +391,7 @@ void main() {
           'treatment': 'أدوية خافض للحرارة ومسكن',
           'notes': 'المريض في حالة جيدة، ينصح بالراحة',
         };
-        
+
         final mockResponse = {
           'success': true,
           'message': 'تم إنهاء علاج المريض بنجاح',
@@ -399,18 +404,23 @@ void main() {
             'notes': completionData['notes'],
           },
         };
-        
-        when(mockHttpClient.post(
-          any,
-          headers: anyNamed('headers'),
-          body: anyNamed('body'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(
+          mockHttpClient.post(
+            any,
+            headers: anyNamed('headers'),
+            body: anyNamed('body'),
+          ),
+        ).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
-        final result = await patientService.completePatient(token, patientId, completionData);
+        final result = await patientService.completePatient(
+          token,
+          patientId,
+          completionData,
+        );
 
         // Assert
         expect(result['success'], true);
@@ -424,7 +434,7 @@ void main() {
         // Arrange
         const token = 'valid_token_123';
         const patientId = 1;
-        
+
         final mockResponse = {
           'success': true,
           'data': {
@@ -449,14 +459,10 @@ void main() {
             ],
           },
         };
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
         final result = await patientService.getPatientHistory(token, patientId);
@@ -473,7 +479,7 @@ void main() {
         // Arrange
         const token = 'valid_token_123';
         const searchQuery = 'أحمد';
-        
+
         final mockResponse = {
           'success': true,
           'data': {
@@ -484,14 +490,10 @@ void main() {
             'total_found': 1,
           },
         };
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
         final result = await patientService.searchPatients(token, searchQuery);
@@ -506,22 +508,15 @@ void main() {
         // Arrange
         const token = 'valid_token_123';
         const searchQuery = 'اسم غير موجود';
-        
+
         final mockResponse = {
           'success': true,
-          'data': {
-            'patients': [],
-            'total_found': 0,
-          },
+          'data': {'patients': [], 'total_found': 0},
         };
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
         final result = await patientService.searchPatients(token, searchQuery);
@@ -537,7 +532,7 @@ void main() {
       test('should return patient statistics', () async {
         // Arrange
         const token = 'valid_token_123';
-        
+
         final mockResponse = {
           'success': true,
           'data': {
@@ -555,14 +550,10 @@ void main() {
             },
           },
         };
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
         final result = await patientService.getPatientStatistics(token);
@@ -579,14 +570,11 @@ void main() {
       test('should handle unauthorized access', () async {
         // Arrange
         const invalidToken = 'invalid_token';
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(MockData.mockUnauthorizedError),
-          401,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async =>
+              http.Response(json.encode(MockData.mockUnauthorizedError), 401),
+        );
 
         // Act
         final result = await patientService.getPatients(invalidToken, 1, 10);
@@ -599,14 +587,11 @@ void main() {
       test('should handle server errors', () async {
         // Arrange
         const token = 'valid_token_123';
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(MockData.mockServerError),
-          500,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async =>
+              http.Response(json.encode(MockData.mockServerError), 500),
+        );
 
         // Act
         final result = await patientService.getPatients(token, 1, 10);
@@ -619,11 +604,10 @@ void main() {
       test('should handle network errors', () async {
         // Arrange
         const token = 'valid_token_123';
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenThrow(Exception('Network error'));
+
+        when(
+          mockHttpClient.get(any, headers: anyNamed('headers')),
+        ).thenThrow(Exception('Network error'));
 
         // Act
         final result = await patientService.getPatients(token, 1, 10);

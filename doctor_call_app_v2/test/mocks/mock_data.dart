@@ -266,7 +266,9 @@ class MockData {
       'progress': 1,
       'points': 150,
       'completed': true,
-      'completed_at': DateTime.now().subtract(const Duration(hours: 3)).toIso8601String(),
+      'completed_at': DateTime.now()
+          .subtract(const Duration(hours: 3))
+          .toIso8601String(),
     },
   ];
 
@@ -289,7 +291,9 @@ class MockData {
       'title': 'يوم الصحة العالمي',
       'description': 'احتفل بيوم الصحة العالمي واحصل على مكافآت خاصة',
       'is_active': true,
-      'start_date': DateTime.now().subtract(const Duration(days: 2)).toIso8601String(),
+      'start_date': DateTime.now()
+          .subtract(const Duration(days: 2))
+          .toIso8601String(),
       'end_date': DateTime.now().add(const Duration(days: 5)).toIso8601String(),
       'rewards': {'points': 1000, 'special_badge': true},
     },

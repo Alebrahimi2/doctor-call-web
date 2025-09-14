@@ -33,10 +33,7 @@ class TestHelpers {
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
         locale: const Locale('ar'),
-        supportedLocales: const [
-          Locale('ar'),
-          Locale('en'),
-        ],
+        supportedLocales: const [Locale('ar'), Locale('en')],
       ),
     );
   }
@@ -80,7 +77,11 @@ class TestHelpers {
   }
 
   /// Enters text into a text field
-  static Future<void> enterText(WidgetTester tester, Finder finder, String text) async {
+  static Future<void> enterText(
+    WidgetTester tester,
+    Finder finder,
+    String text,
+  ) async {
     await tester.enterText(finder, text);
     await tester.pump();
   }
@@ -153,13 +154,13 @@ class MockAuthProvider extends AuthProvider {
   Future<bool> login(String email, String password) async {
     setLoading(true);
     await Future.delayed(const Duration(milliseconds: 500));
-    
+
     if (email == 'test@example.com' && password == 'password') {
       setAuthenticated(true);
       setLoading(false);
       return true;
     }
-    
+
     setLoading(false);
     return false;
   }
@@ -202,7 +203,7 @@ class MockGameProvider extends GameProvider {
   List<Achievement> get allAchievements => _achievements;
 
   @override
-  List<Achievement> get userAchievements => 
+  List<Achievement> get userAchievements =>
       _achievements.where((a) => a.isUnlocked).toList();
 
   @override
@@ -243,7 +244,10 @@ class MockGameProvider extends GameProvider {
   }
 
   @override
-  Future<void> loadLeaderboard(String token, {String category = 'overall'}) async {
+  Future<void> loadLeaderboard(
+    String token, {
+    String category = 'overall',
+  }) async {
     setLoading(true);
     await Future.delayed(const Duration(milliseconds: 300));
     _leaderboard = MockData.mockLeaderboard;

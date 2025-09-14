@@ -40,9 +40,10 @@ void main() {
         const email = 'test@example.com';
         const password = 'password123';
         final mockResponse = MockData.mockLoginResponse;
-        
-        when(mockAuthService.login(email, password))
-            .thenAnswer((_) async => mockResponse);
+
+        when(
+          mockAuthService.login(email, password),
+        ).thenAnswer((_) async => mockResponse);
 
         // Act
         await authProvider.login(email, password);
@@ -54,7 +55,7 @@ void main() {
         expect(authProvider.token, mockResponse['data']['token']);
         expect(authProvider.isLoading, false);
         expect(authProvider.error, null);
-        
+
         verify(mockAuthService.login(email, password)).called(1);
       });
 
@@ -63,9 +64,10 @@ void main() {
         const email = 'invalid@example.com';
         const password = 'wrongpassword';
         final mockResponse = MockData.mockUnauthorizedError;
-        
-        when(mockAuthService.login(email, password))
-            .thenAnswer((_) async => mockResponse);
+
+        when(
+          mockAuthService.login(email, password),
+        ).thenAnswer((_) async => mockResponse);
 
         // Act
         await authProvider.login(email, password);
@@ -83,22 +85,21 @@ void main() {
         const email = 'test@example.com';
         const password = 'password123';
         final mockResponse = MockData.mockLoginResponse;
-        
-        when(mockAuthService.login(email, password))
-            .thenAnswer((_) async {
-              // Simulate delay
-              await Future.delayed(Duration(milliseconds: 100));
-              return mockResponse;
-            });
+
+        when(mockAuthService.login(email, password)).thenAnswer((_) async {
+          // Simulate delay
+          await Future.delayed(Duration(milliseconds: 100));
+          return mockResponse;
+        });
 
         // Act
         final loginFuture = authProvider.login(email, password);
-        
+
         // Assert loading state
         expect(authProvider.isLoading, true);
-        
+
         await loginFuture;
-        
+
         // Assert final state
         expect(authProvider.isLoading, false);
       });
@@ -107,9 +108,10 @@ void main() {
         // Arrange
         const email = 'test@example.com';
         const password = 'password123';
-        
-        when(mockAuthService.login(email, password))
-            .thenThrow(Exception('Network error'));
+
+        when(
+          mockAuthService.login(email, password),
+        ).thenThrow(Exception('Network error'));
 
         // Act
         await authProvider.login(email, password);
@@ -129,9 +131,12 @@ void main() {
         await authProvider.login(invalidEmail, password);
 
         // Assert
-        expect(authProvider.error, contains('صيغة البريد الإلكتروني غير صحيحة'));
+        expect(
+          authProvider.error,
+          contains('صيغة البريد الإلكتروني غير صحيحة'),
+        );
         expect(authProvider.isAuthenticated, false);
-        
+
         // Should not call service with invalid email
         verifyNever(mockAuthService.login(any, any));
       });
@@ -147,7 +152,7 @@ void main() {
         // Assert
         expect(authProvider.error, contains('كلمة المرور قصيرة جداً'));
         expect(authProvider.isAuthenticated, false);
-        
+
         // Should not call service with short password
         verifyNever(mockAuthService.login(any, any));
       });
@@ -163,7 +168,7 @@ void main() {
           'hospital_id': 1,
           'role': 'doctor',
         };
-        
+
         final mockResponse = {
           'success': true,
           'message': 'تم إنشاء الحساب بنجاح',
@@ -172,9 +177,10 @@ void main() {
             'token': 'new_token_123456789',
           },
         };
-        
-        when(mockAuthService.register(userData))
-            .thenAnswer((_) async => mockResponse);
+
+        when(
+          mockAuthService.register(userData),
+        ).thenAnswer((_) async => mockResponse);
 
         // Act
         await authProvider.register(userData);
@@ -184,7 +190,7 @@ void main() {
         expect(authProvider.currentUser, isNotNull);
         expect(authProvider.token, mockResponse['data']['token']);
         expect(authProvider.error, null);
-        
+
         verify(mockAuthService.register(userData)).called(1);
       });
 
@@ -195,11 +201,12 @@ void main() {
           'email': 'existing@example.com',
           'password': 'password123',
         };
-        
+
         final mockResponse = MockData.mockValidationError;
-        
-        when(mockAuthService.register(userData))
-            .thenAnswer((_) async => mockResponse);
+
+        when(
+          mockAuthService.register(userData),
+        ).thenAnswer((_) async => mockResponse);
 
         // Act
         await authProvider.register(userData);
@@ -218,14 +225,15 @@ void main() {
         authProvider.token = 'valid_token_123';
         authProvider.currentUser = MockData.mockUser;
         authProvider.isAuthenticated = true;
-        
+
         final mockResponse = {
           'success': true,
           'message': 'تم تسجيل الخروج بنجاح',
         };
-        
-        when(mockAuthService.logout('valid_token_123'))
-            .thenAnswer((_) async => mockResponse);
+
+        when(
+          mockAuthService.logout('valid_token_123'),
+        ).thenAnswer((_) async => mockResponse);
 
         // Act
         await authProvider.logout();
@@ -235,7 +243,7 @@ void main() {
         expect(authProvider.currentUser, null);
         expect(authProvider.token, null);
         expect(authProvider.error, null);
-        
+
         verify(mockAuthService.logout('valid_token_123')).called(1);
       });
 
@@ -251,7 +259,7 @@ void main() {
         expect(authProvider.isAuthenticated, false);
         expect(authProvider.currentUser, null);
         expect(authProvider.token, null);
-        
+
         // Should not call service when not authenticated
         verifyNever(mockAuthService.logout(any));
       });
@@ -263,23 +271,24 @@ void main() {
         authProvider.token = 'valid_token_123';
         authProvider.currentUser = MockData.mockUser;
         authProvider.isAuthenticated = true;
-        
+
         final updateData = {
           'name': 'د. أحمد محمد الجديد',
           'phone': '+966501234567',
         };
-        
+
         final updatedUser = MockData.mockUser;
         updatedUser.name = updateData['name']!;
-        
+
         final mockResponse = {
           'success': true,
           'message': 'تم تحديث الملف الشخصي بنجاح',
           'data': updatedUser.toJson(),
         };
-        
-        when(mockAuthService.updateProfile('valid_token_123', updateData))
-            .thenAnswer((_) async => mockResponse);
+
+        when(
+          mockAuthService.updateProfile('valid_token_123', updateData),
+        ).thenAnswer((_) async => mockResponse);
 
         // Act
         await authProvider.updateProfile(updateData);
@@ -287,8 +296,10 @@ void main() {
         // Assert
         expect(authProvider.currentUser!.name, updateData['name']);
         expect(authProvider.error, null);
-        
-        verify(mockAuthService.updateProfile('valid_token_123', updateData)).called(1);
+
+        verify(
+          mockAuthService.updateProfile('valid_token_123', updateData),
+        ).called(1);
       });
 
       test('should handle update when not authenticated', () async {
@@ -301,7 +312,7 @@ void main() {
 
         // Assert
         expect(authProvider.error, contains('غير مسجل'));
-        
+
         // Should not call service when not authenticated
         verifyNever(mockAuthService.updateProfile(any, any));
       });
@@ -312,17 +323,22 @@ void main() {
         // Arrange
         authProvider.token = 'valid_token_123';
         authProvider.isAuthenticated = true;
-        
+
         const currentPassword = 'oldpassword';
         const newPassword = 'newpassword123';
-        
+
         final mockResponse = {
           'success': true,
           'message': 'تم تغيير كلمة المرور بنجاح',
         };
-        
-        when(mockAuthService.changePassword('valid_token_123', currentPassword, newPassword))
-            .thenAnswer((_) async => mockResponse);
+
+        when(
+          mockAuthService.changePassword(
+            'valid_token_123',
+            currentPassword,
+            newPassword,
+          ),
+        ).thenAnswer((_) async => mockResponse);
 
         // Act
         await authProvider.changePassword(currentPassword, newPassword);
@@ -330,26 +346,37 @@ void main() {
         // Assert
         expect(authProvider.error, null);
         expect(authProvider.passwordChangeSuccess, true);
-        
-        verify(mockAuthService.changePassword('valid_token_123', currentPassword, newPassword)).called(1);
+
+        verify(
+          mockAuthService.changePassword(
+            'valid_token_123',
+            currentPassword,
+            newPassword,
+          ),
+        ).called(1);
       });
 
       test('should handle incorrect current password', () async {
         // Arrange
         authProvider.token = 'valid_token_123';
         authProvider.isAuthenticated = true;
-        
+
         const currentPassword = 'wrongpassword';
         const newPassword = 'newpassword123';
-        
+
         final mockResponse = {
           'success': false,
           'message': 'كلمة المرور الحالية غير صحيحة',
           'error_code': 400,
         };
-        
-        when(mockAuthService.changePassword('valid_token_123', currentPassword, newPassword))
-            .thenAnswer((_) async => mockResponse);
+
+        when(
+          mockAuthService.changePassword(
+            'valid_token_123',
+            currentPassword,
+            newPassword,
+          ),
+        ).thenAnswer((_) async => mockResponse);
 
         // Act
         await authProvider.changePassword(currentPassword, newPassword);
@@ -365,14 +392,15 @@ void main() {
         // Arrange
         authProvider.token = 'valid_token_123';
         authProvider.isAuthenticated = true;
-        
+
         final mockResponse = {
           'success': true,
           'data': MockData.mockUser.toJson(),
         };
-        
-        when(mockAuthService.getCurrentUser('valid_token_123'))
-            .thenAnswer((_) async => mockResponse);
+
+        when(
+          mockAuthService.getCurrentUser('valid_token_123'),
+        ).thenAnswer((_) async => mockResponse);
 
         // Act
         await authProvider.getCurrentUser();
@@ -381,7 +409,7 @@ void main() {
         expect(authProvider.currentUser, isNotNull);
         expect(authProvider.currentUser!.id, MockData.mockUser.id);
         expect(authProvider.error, null);
-        
+
         verify(mockAuthService.getCurrentUser('valid_token_123')).called(1);
       });
 
@@ -389,11 +417,12 @@ void main() {
         // Arrange
         authProvider.token = 'invalid_token';
         authProvider.isAuthenticated = true;
-        
+
         final mockResponse = MockData.mockUnauthorizedError;
-        
-        when(mockAuthService.getCurrentUser('invalid_token'))
-            .thenAnswer((_) async => mockResponse);
+
+        when(
+          mockAuthService.getCurrentUser('invalid_token'),
+        ).thenAnswer((_) async => mockResponse);
 
         // Act
         await authProvider.getCurrentUser();
@@ -413,9 +442,10 @@ void main() {
           'success': true,
           'data': MockData.mockUser.toJson(),
         };
-        
-        when(mockAuthService.getCurrentUser(storedToken))
-            .thenAnswer((_) async => mockResponse);
+
+        when(
+          mockAuthService.getCurrentUser(storedToken),
+        ).thenAnswer((_) async => mockResponse);
 
         // Act
         await authProvider.autoLogin(storedToken);
@@ -430,9 +460,10 @@ void main() {
         // Arrange
         const invalidToken = 'invalid_stored_token';
         final mockResponse = MockData.mockUnauthorizedError;
-        
-        when(mockAuthService.getCurrentUser(invalidToken))
-            .thenAnswer((_) async => mockResponse);
+
+        when(
+          mockAuthService.getCurrentUser(invalidToken),
+        ).thenAnswer((_) async => mockResponse);
 
         // Act
         await authProvider.autoLogin(invalidToken);
@@ -496,9 +527,10 @@ void main() {
         // Arrange
         const email = 'test@example.com';
         const password = 'password123';
-        
-        when(mockAuthService.login(email, password))
-            .thenThrow(Exception('Service error'));
+
+        when(
+          mockAuthService.login(email, password),
+        ).thenThrow(Exception('Service error'));
 
         // Act
         await authProvider.login(email, password);
@@ -515,9 +547,10 @@ void main() {
         const email = 'test@example.com';
         const password = 'password123';
         final mockResponse = MockData.mockLoginResponse;
-        
-        when(mockAuthService.login(email, password))
-            .thenAnswer((_) async => mockResponse);
+
+        when(
+          mockAuthService.login(email, password),
+        ).thenAnswer((_) async => mockResponse);
 
         // Act
         await authProvider.login(email, password);

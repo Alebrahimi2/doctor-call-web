@@ -29,7 +29,7 @@ void main() {
         // Arrange
         const token = 'valid_token_123';
         const userId = 1;
-        
+
         final mockResponse = {
           'success': true,
           'data': {
@@ -39,17 +39,15 @@ void main() {
             'streak_days': 7,
             'achievements_count': 12,
             'rank': 5,
-            'recent_scores': MockData.mockGameScores.map((s) => s.toJson()).toList(),
+            'recent_scores': MockData.mockGameScores
+                .map((s) => s.toJson())
+                .toList(),
           },
         };
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
         final result = await gameService.getUserGameStats(token, userId);
@@ -65,14 +63,11 @@ void main() {
         // Arrange
         const token = 'valid_token_123';
         const userId = 999;
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(MockData.mockNotFoundError),
-          404,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async =>
+              http.Response(json.encode(MockData.mockNotFoundError), 404),
+        );
 
         // Act
         final result = await gameService.getUserGameStats(token, userId);
@@ -94,7 +89,7 @@ void main() {
           'response_time': 45,
           'is_correct': true,
         };
-        
+
         final mockResponse = {
           'success': true,
           'message': 'تم تسجيل العمل بنجاح',
@@ -104,15 +99,16 @@ void main() {
             'achievement_unlocked': null,
           },
         };
-        
-        when(mockHttpClient.post(
-          any,
-          headers: anyNamed('headers'),
-          body: anyNamed('body'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          201,
-        ));
+
+        when(
+          mockHttpClient.post(
+            any,
+            headers: anyNamed('headers'),
+            body: anyNamed('body'),
+          ),
+        ).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 201),
+        );
 
         // Act
         final result = await gameService.recordGameAction(token, gameAction);
@@ -133,7 +129,7 @@ void main() {
           'response_time': 30,
           'is_correct': true,
         };
-        
+
         final mockResponse = {
           'success': true,
           'message': 'تم تسجيل العمل بنجاح',
@@ -143,15 +139,16 @@ void main() {
             'achievement_unlocked': MockData.mockAchievements.first.toJson(),
           },
         };
-        
-        when(mockHttpClient.post(
-          any,
-          headers: anyNamed('headers'),
-          body: anyNamed('body'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          201,
-        ));
+
+        when(
+          mockHttpClient.post(
+            any,
+            headers: anyNamed('headers'),
+            body: anyNamed('body'),
+          ),
+        ).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 201),
+        );
 
         // Act
         final result = await gameService.recordGameAction(token, gameAction);
@@ -159,7 +156,10 @@ void main() {
         // Assert
         expect(result['success'], true);
         expect(result['data']['achievement_unlocked'], isNotNull);
-        expect(result['data']['achievement_unlocked']['name'], MockData.mockAchievements.first.name);
+        expect(
+          result['data']['achievement_unlocked']['name'],
+          MockData.mockAchievements.first.name,
+        );
       });
 
       test('should handle incorrect diagnosis', () async {
@@ -172,7 +172,7 @@ void main() {
           'response_time': 120,
           'is_correct': false,
         };
-        
+
         final mockResponse = {
           'success': true,
           'message': 'تم تسجيل العمل',
@@ -183,15 +183,16 @@ void main() {
             'correct_answer': 'الحمى الفيروسية',
           },
         };
-        
-        when(mockHttpClient.post(
-          any,
-          headers: anyNamed('headers'),
-          body: anyNamed('body'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          201,
-        ));
+
+        when(
+          mockHttpClient.post(
+            any,
+            headers: anyNamed('headers'),
+            body: anyNamed('body'),
+          ),
+        ).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 201),
+        );
 
         // Act
         final result = await gameService.recordGameAction(token, gameAction);
@@ -209,24 +210,22 @@ void main() {
         const token = 'valid_token_123';
         const page = 1;
         const limit = 10;
-        
+
         final mockResponse = {
           'success': true,
           'data': {
             'current_page': 1,
             'total_pages': 5,
             'total_users': 47,
-            'leaderboard': MockData.mockLeaderboard.map((entry) => entry.toJson()).toList(),
+            'leaderboard': MockData.mockLeaderboard
+                .map((entry) => entry.toJson())
+                .toList(),
           },
         };
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
         final result = await gameService.getLeaderboard(token, page, limit);
@@ -243,7 +242,7 @@ void main() {
         const token = 'valid_token_123';
         const page = 10;
         const limit = 10;
-        
+
         final mockResponse = {
           'success': true,
           'data': {
@@ -253,14 +252,10 @@ void main() {
             'leaderboard': [],
           },
         };
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
         final result = await gameService.getLeaderboard(token, page, limit);
@@ -276,24 +271,26 @@ void main() {
         // Arrange
         const token = 'valid_token_123';
         const userId = 1;
-        
+
         final mockResponse = {
           'success': true,
           'data': {
-            'unlocked_achievements': MockData.mockAchievements.where((a) => a.isUnlocked).map((a) => a.toJson()).toList(),
-            'locked_achievements': MockData.mockAchievements.where((a) => !a.isUnlocked).map((a) => a.toJson()).toList(),
+            'unlocked_achievements': MockData.mockAchievements
+                .where((a) => a.isUnlocked)
+                .map((a) => a.toJson())
+                .toList(),
+            'locked_achievements': MockData.mockAchievements
+                .where((a) => !a.isUnlocked)
+                .map((a) => a.toJson())
+                .toList(),
             'total_points': 750,
             'completion_percentage': 0.6,
           },
         };
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
         final result = await gameService.getUserAchievements(token, userId);
@@ -310,7 +307,7 @@ void main() {
       test('should return daily challenges', () async {
         // Arrange
         const token = 'valid_token_123';
-        
+
         final mockResponse = {
           'success': true,
           'data': {
@@ -338,14 +335,10 @@ void main() {
             ],
           },
         };
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
         final result = await gameService.getDailyChallenges(token);
@@ -405,7 +398,7 @@ void main() {
           isCorrect: true,
           difficulty: difficulty,
         );
-        
+
         final slowScore = gameService.calculateScore(
           responseTime: slowResponseTime,
           isCorrect: true,
@@ -419,14 +412,14 @@ void main() {
       test('should give higher score for difficult cases', () {
         // Arrange
         const responseTime = 60; // seconds
-        
+
         // Act
         final easyScore = gameService.calculateScore(
           responseTime: responseTime,
           isCorrect: true,
           difficulty: 'easy',
         );
-        
+
         final hardScore = gameService.calculateScore(
           responseTime: responseTime,
           isCorrect: true,
@@ -448,9 +441,12 @@ void main() {
           'success_rate': 0.95,
           'streak_days': 7,
         };
-        
+
         // Act
-        final newAchievements = await gameService.checkAchievements(token, userStats);
+        final newAchievements = await gameService.checkAchievements(
+          token,
+          userStats,
+        );
 
         // Assert
         expect(newAchievements, isA<List>());
@@ -462,14 +458,11 @@ void main() {
       test('should handle server errors gracefully', () async {
         // Arrange
         const token = 'valid_token_123';
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(MockData.mockServerError),
-          500,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async =>
+              http.Response(json.encode(MockData.mockServerError), 500),
+        );
 
         // Act
         final result = await gameService.getUserGameStats(token, 1);
@@ -482,11 +475,10 @@ void main() {
       test('should handle network timeouts', () async {
         // Arrange
         const token = 'valid_token_123';
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenThrow(Exception('Timeout'));
+
+        when(
+          mockHttpClient.get(any, headers: anyNamed('headers')),
+        ).thenThrow(Exception('Timeout'));
 
         // Act
         final result = await gameService.getUserGameStats(token, 1);

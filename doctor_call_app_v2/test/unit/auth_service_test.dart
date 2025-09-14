@@ -29,17 +29,18 @@ void main() {
         // Arrange
         const email = 'test@example.com';
         const password = 'password123';
-        
+
         final mockResponse = MockData.mockLoginResponse;
-        
-        when(mockHttpClient.post(
-          any,
-          headers: anyNamed('headers'),
-          body: anyNamed('body'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(
+          mockHttpClient.post(
+            any,
+            headers: anyNamed('headers'),
+            body: anyNamed('body'),
+          ),
+        ).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
         final result = await authService.login(email, password);
@@ -48,34 +49,32 @@ void main() {
         expect(result['success'], true);
         expect(result['data']['user']['email'], email);
         expect(result['data']['token'], isNotNull);
-        
+
         // Verify the HTTP call was made with correct parameters
-        verify(mockHttpClient.post(
-          any,
-          headers: argThat(
-            contains('Content-Type'),
-            named: 'headers',
+        verify(
+          mockHttpClient.post(
+            any,
+            headers: argThat(contains('Content-Type'), named: 'headers'),
+            body: argThat(contains('"email":"$email"'), named: 'body'),
           ),
-          body: argThat(
-            contains('"email":"$email"'),
-            named: 'body',
-          ),
-        )).called(1);
+        ).called(1);
       });
 
       test('should return error on invalid credentials', () async {
         // Arrange
         const email = 'invalid@example.com';
         const password = 'wrongpassword';
-        
-        when(mockHttpClient.post(
-          any,
-          headers: anyNamed('headers'),
-          body: anyNamed('body'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(MockData.mockUnauthorizedError),
-          401,
-        ));
+
+        when(
+          mockHttpClient.post(
+            any,
+            headers: anyNamed('headers'),
+            body: anyNamed('body'),
+          ),
+        ).thenAnswer(
+          (_) async =>
+              http.Response(json.encode(MockData.mockUnauthorizedError), 401),
+        );
 
         // Act
         final result = await authService.login(email, password);
@@ -90,12 +89,14 @@ void main() {
         // Arrange
         const email = 'test@example.com';
         const password = 'password123';
-        
-        when(mockHttpClient.post(
-          any,
-          headers: anyNamed('headers'),
-          body: anyNamed('body'),
-        )).thenThrow(Exception('Network error'));
+
+        when(
+          mockHttpClient.post(
+            any,
+            headers: anyNamed('headers'),
+            body: anyNamed('body'),
+          ),
+        ).thenThrow(Exception('Network error'));
 
         // Act
         final result = await authService.login(email, password);
@@ -109,15 +110,17 @@ void main() {
         // Arrange
         const email = '';
         const password = '123';
-        
-        when(mockHttpClient.post(
-          any,
-          headers: anyNamed('headers'),
-          body: anyNamed('body'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(MockData.mockValidationError),
-          422,
-        ));
+
+        when(
+          mockHttpClient.post(
+            any,
+            headers: anyNamed('headers'),
+            body: anyNamed('body'),
+          ),
+        ).thenAnswer(
+          (_) async =>
+              http.Response(json.encode(MockData.mockValidationError), 422),
+        );
 
         // Act
         final result = await authService.login(email, password);
@@ -139,7 +142,7 @@ void main() {
           'hospital_id': 1,
           'role': 'doctor',
         };
-        
+
         final mockResponse = {
           'success': true,
           'message': 'تم إنشاء الحساب بنجاح',
@@ -148,15 +151,16 @@ void main() {
             'token': 'new_token_123456789',
           },
         };
-        
-        when(mockHttpClient.post(
-          any,
-          headers: anyNamed('headers'),
-          body: anyNamed('body'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          201,
-        ));
+
+        when(
+          mockHttpClient.post(
+            any,
+            headers: anyNamed('headers'),
+            body: anyNamed('body'),
+          ),
+        ).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 201),
+        );
 
         // Act
         final result = await authService.register(userData);
@@ -174,7 +178,7 @@ void main() {
           'email': 'existing@example.com',
           'password': 'password123',
         };
-        
+
         final mockResponse = {
           'success': false,
           'message': 'Validation failed',
@@ -183,15 +187,16 @@ void main() {
           },
           'error_code': 422,
         };
-        
-        when(mockHttpClient.post(
-          any,
-          headers: anyNamed('headers'),
-          body: anyNamed('body'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          422,
-        ));
+
+        when(
+          mockHttpClient.post(
+            any,
+            headers: anyNamed('headers'),
+            body: anyNamed('body'),
+          ),
+        ).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 422),
+        );
 
         // Act
         final result = await authService.register(userData);
@@ -206,42 +211,37 @@ void main() {
       test('should logout successfully', () async {
         // Arrange
         const token = 'valid_token_123';
-        
-        when(mockHttpClient.post(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode({'success': true, 'message': 'تم تسجيل الخروج بنجاح'}),
-          200,
-        ));
+
+        when(mockHttpClient.post(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async => http.Response(
+            json.encode({'success': true, 'message': 'تم تسجيل الخروج بنجاح'}),
+            200,
+          ),
+        );
 
         // Act
         final result = await authService.logout(token);
 
         // Assert
         expect(result['success'], true);
-        
+
         // Verify the Authorization header was included
-        verify(mockHttpClient.post(
-          any,
-          headers: argThat(
-            contains('Authorization'),
-            named: 'headers',
+        verify(
+          mockHttpClient.post(
+            any,
+            headers: argThat(contains('Authorization'), named: 'headers'),
           ),
-        )).called(1);
+        ).called(1);
       });
 
       test('should handle unauthorized logout', () async {
         // Arrange
         const token = 'invalid_token';
-        
-        when(mockHttpClient.post(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(MockData.mockUnauthorizedError),
-          401,
-        ));
+
+        when(mockHttpClient.post(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async =>
+              http.Response(json.encode(MockData.mockUnauthorizedError), 401),
+        );
 
         // Act
         final result = await authService.logout(token);
@@ -256,19 +256,15 @@ void main() {
       test('should return user profile when token is valid', () async {
         // Arrange
         const token = 'valid_token_123';
-        
+
         final mockResponse = {
           'success': true,
           'data': MockData.mockUser.toJson(),
         };
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
         final result = await authService.getCurrentUser(token);
@@ -282,14 +278,11 @@ void main() {
       test('should return error when token is invalid', () async {
         // Arrange
         const token = 'invalid_token';
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(MockData.mockUnauthorizedError),
-          401,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async =>
+              http.Response(json.encode(MockData.mockUnauthorizedError), 401),
+        );
 
         // Act
         final result = await authService.getCurrentUser(token);
@@ -308,24 +301,25 @@ void main() {
           'name': 'د. أحمد محمد الجديد',
           'phone': '+966501234567',
         };
-        
+
         final updatedUser = MockData.mockUser;
         updatedUser.name = updateData['name']!;
-        
+
         final mockResponse = {
           'success': true,
           'message': 'تم تحديث الملف الشخصي بنجاح',
           'data': updatedUser.toJson(),
         };
-        
-        when(mockHttpClient.put(
-          any,
-          headers: anyNamed('headers'),
-          body: anyNamed('body'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(
+          mockHttpClient.put(
+            any,
+            headers: anyNamed('headers'),
+            body: anyNamed('body'),
+          ),
+        ).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
         final result = await authService.updateProfile(token, updateData);
@@ -342,20 +336,21 @@ void main() {
         const token = 'valid_token_123';
         const currentPassword = 'oldpassword';
         const newPassword = 'newpassword123';
-        
+
         final mockResponse = {
           'success': true,
           'message': 'تم تغيير كلمة المرور بنجاح',
         };
-        
-        when(mockHttpClient.post(
-          any,
-          headers: anyNamed('headers'),
-          body: anyNamed('body'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(
+          mockHttpClient.post(
+            any,
+            headers: anyNamed('headers'),
+            body: anyNamed('body'),
+          ),
+        ).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
         final result = await authService.changePassword(
@@ -374,21 +369,22 @@ void main() {
         const token = 'valid_token_123';
         const currentPassword = 'wrongpassword';
         const newPassword = 'newpassword123';
-        
+
         final mockResponse = {
           'success': false,
           'message': 'كلمة المرور الحالية غير صحيحة',
           'error_code': 400,
         };
-        
-        when(mockHttpClient.post(
-          any,
-          headers: anyNamed('headers'),
-          body: anyNamed('body'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          400,
-        ));
+
+        when(
+          mockHttpClient.post(
+            any,
+            headers: anyNamed('headers'),
+            body: anyNamed('body'),
+          ),
+        ).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 400),
+        );
 
         // Act
         final result = await authService.changePassword(

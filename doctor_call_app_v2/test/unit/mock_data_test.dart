@@ -61,7 +61,7 @@ void main() {
       // Assert
       expect(loginResponse['success'], true);
       expect(loginResponse['data'], isNotNull);
-      
+
       expect(errorResponse['success'], false);
       expect(errorResponse['error_code'], 401);
     });

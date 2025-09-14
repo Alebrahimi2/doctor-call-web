@@ -27,7 +27,7 @@ void main() {
       test('should return list of hospitals', () async {
         // Arrange
         const token = 'valid_token_123';
-        
+
         final mockResponse = {
           'success': true,
           'data': {
@@ -35,14 +35,10 @@ void main() {
             'total_count': MockData.mockHospitals.length,
           },
         };
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
         final result = await hospitalService.getHospitals(token);
@@ -50,28 +46,24 @@ void main() {
         // Assert
         expect(result['success'], true);
         expect(result['data']['hospitals'], isA<List>());
-        expect(result['data']['hospitals'].length, MockData.mockHospitals.length);
+        expect(
+          result['data']['hospitals'].length,
+          MockData.mockHospitals.length,
+        );
       });
 
       test('should handle empty hospital list', () async {
         // Arrange
         const token = 'valid_token_123';
-        
+
         final mockResponse = {
           'success': true,
-          'data': {
-            'hospitals': [],
-            'total_count': 0,
-          },
+          'data': {'hospitals': [], 'total_count': 0},
         };
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
         final result = await hospitalService.getHospitals(token);
@@ -88,19 +80,12 @@ void main() {
         const token = 'valid_token_123';
         const hospitalId = 1;
         final mockHospital = MockData.mockHospitals.first;
-        
-        final mockResponse = {
-          'success': true,
-          'data': mockHospital.toJson(),
-        };
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        final mockResponse = {'success': true, 'data': mockHospital.toJson()};
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
         final result = await hospitalService.getHospitalById(token, hospitalId);
@@ -116,14 +101,11 @@ void main() {
         // Arrange
         const token = 'valid_token_123';
         const hospitalId = 999;
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(MockData.mockNotFoundError),
-          404,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async =>
+              http.Response(json.encode(MockData.mockNotFoundError), 404),
+        );
 
         // Act
         final result = await hospitalService.getHospitalById(token, hospitalId);
@@ -139,7 +121,7 @@ void main() {
         // Arrange
         const token = 'valid_token_123';
         const hospitalId = 1;
-        
+
         final mockResponse = {
           'success': true,
           'data': {
@@ -169,17 +151,16 @@ void main() {
             ],
           },
         };
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
-        final result = await hospitalService.getHospitalStatistics(token, hospitalId);
+        final result = await hospitalService.getHospitalStatistics(
+          token,
+          hospitalId,
+        );
 
         // Assert
         expect(result['success'], true);
@@ -194,7 +175,7 @@ void main() {
         // Arrange
         const token = 'valid_token_123';
         const hospitalId = 1;
-        
+
         final mockResponse = {
           'success': true,
           'data': {
@@ -222,17 +203,16 @@ void main() {
             'available_doctors': 8,
           },
         };
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
-        final result = await hospitalService.getHospitalDoctors(token, hospitalId);
+        final result = await hospitalService.getHospitalDoctors(
+          token,
+          hospitalId,
+        );
 
         // Assert
         expect(result['success'], true);
@@ -246,7 +226,7 @@ void main() {
         const token = 'valid_token_123';
         const hospitalId = 1;
         const availableOnly = true;
-        
+
         final mockResponse = {
           'success': true,
           'data': {
@@ -265,17 +245,16 @@ void main() {
             'available_doctors': 8,
           },
         };
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
-        final result = await hospitalService.getAvailableDoctors(token, hospitalId);
+        final result = await hospitalService.getAvailableDoctors(
+          token,
+          hospitalId,
+        );
 
         // Assert
         expect(result['success'], true);
@@ -292,7 +271,7 @@ void main() {
         // Arrange
         const token = 'valid_token_123';
         const hospitalId = 1;
-        
+
         final mockResponse = {
           'success': true,
           'data': {
@@ -321,17 +300,16 @@ void main() {
             'total_departments': 6,
           },
         };
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
-        final result = await hospitalService.getHospitalDepartments(token, hospitalId);
+        final result = await hospitalService.getHospitalDepartments(
+          token,
+          hospitalId,
+        );
 
         // Assert
         expect(result['success'], true);
@@ -352,7 +330,7 @@ void main() {
           'phone': '+966112345678',
           'emergency_phone': '+966112345679',
         };
-        
+
         final mockResponse = {
           'success': true,
           'message': 'تم تحديث بيانات المستشفى بنجاح',
@@ -365,18 +343,23 @@ void main() {
             'updated_at': DateTime.now().toIso8601String(),
           },
         };
-        
-        when(mockHttpClient.put(
-          any,
-          headers: anyNamed('headers'),
-          body: anyNamed('body'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(
+          mockHttpClient.put(
+            any,
+            headers: anyNamed('headers'),
+            body: anyNamed('body'),
+          ),
+        ).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
-        final result = await hospitalService.updateHospitalInfo(token, hospitalId, updateData);
+        final result = await hospitalService.updateHospitalInfo(
+          token,
+          hospitalId,
+          updateData,
+        );
 
         // Assert
         expect(result['success'], true);
@@ -388,21 +371,25 @@ void main() {
         // Arrange
         const token = 'valid_token_123';
         const hospitalId = 1;
-        final invalidUpdateData = {
-          'phone': 'invalid_phone_number',
-        };
-        
-        when(mockHttpClient.put(
-          any,
-          headers: anyNamed('headers'),
-          body: anyNamed('body'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(MockData.mockValidationError),
-          422,
-        ));
+        final invalidUpdateData = {'phone': 'invalid_phone_number'};
+
+        when(
+          mockHttpClient.put(
+            any,
+            headers: anyNamed('headers'),
+            body: anyNamed('body'),
+          ),
+        ).thenAnswer(
+          (_) async =>
+              http.Response(json.encode(MockData.mockValidationError), 422),
+        );
 
         // Act
-        final result = await hospitalService.updateHospitalInfo(token, hospitalId, invalidUpdateData);
+        final result = await hospitalService.updateHospitalInfo(
+          token,
+          hospitalId,
+          invalidUpdateData,
+        );
 
         // Assert
         expect(result['success'], false);
@@ -422,7 +409,7 @@ void main() {
           'capacity': 25,
           'head_doctor_id': 3,
         };
-        
+
         final mockResponse = {
           'success': true,
           'message': 'تم إنشاء القسم بنجاح',
@@ -437,18 +424,23 @@ void main() {
             'created_at': DateTime.now().toIso8601String(),
           },
         };
-        
-        when(mockHttpClient.post(
-          any,
-          headers: anyNamed('headers'),
-          body: anyNamed('body'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          201,
-        ));
+
+        when(
+          mockHttpClient.post(
+            any,
+            headers: anyNamed('headers'),
+            body: anyNamed('body'),
+          ),
+        ).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 201),
+        );
 
         // Act
-        final result = await hospitalService.createDepartment(token, hospitalId, departmentData);
+        final result = await hospitalService.createDepartment(
+          token,
+          hospitalId,
+          departmentData,
+        );
 
         // Assert
         expect(result['success'], true);
@@ -462,7 +454,7 @@ void main() {
         // Arrange
         const token = 'valid_token_123';
         const hospitalId = 1;
-        
+
         final mockResponse = {
           'success': true,
           'data': {
@@ -490,17 +482,16 @@ void main() {
             'total_alerts': 15,
           },
         };
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
-        final result = await hospitalService.getHospitalAlerts(token, hospitalId);
+        final result = await hospitalService.getHospitalAlerts(
+          token,
+          hospitalId,
+        );
 
         // Assert
         expect(result['success'], true);
@@ -514,7 +505,7 @@ void main() {
         // Arrange
         const token = 'valid_token_123';
         const searchQuery = 'الملك';
-        
+
         final mockResponse = {
           'success': true,
           'data': {
@@ -525,17 +516,16 @@ void main() {
             'total_found': 2,
           },
         };
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
-        final result = await hospitalService.searchHospitals(token, searchQuery);
+        final result = await hospitalService.searchHospitals(
+          token,
+          searchQuery,
+        );
 
         // Assert
         expect(result['success'], true);
@@ -547,7 +537,7 @@ void main() {
         // Arrange
         const token = 'valid_token_123';
         const location = 'الرياض';
-        
+
         final mockResponse = {
           'success': true,
           'data': {
@@ -558,17 +548,16 @@ void main() {
             'total_found': 1,
           },
         };
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
-        final result = await hospitalService.searchHospitalsByLocation(token, location);
+        final result = await hospitalService.searchHospitalsByLocation(
+          token,
+          location,
+        );
 
         // Assert
         expect(result['success'], true);
@@ -581,7 +570,7 @@ void main() {
         // Arrange
         const token = 'valid_token_123';
         const hospitalId = 1;
-        
+
         final mockResponse = {
           'success': true,
           'data': {
@@ -608,17 +597,16 @@ void main() {
             ],
           },
         };
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(mockResponse),
-          200,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async => http.Response(json.encode(mockResponse), 200),
+        );
 
         // Act
-        final result = await hospitalService.getHospitalCapacity(token, hospitalId);
+        final result = await hospitalService.getHospitalCapacity(
+          token,
+          hospitalId,
+        );
 
         // Assert
         expect(result['success'], true);
@@ -632,14 +620,11 @@ void main() {
       test('should handle unauthorized access', () async {
         // Arrange
         const invalidToken = 'invalid_token';
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(MockData.mockUnauthorizedError),
-          401,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async =>
+              http.Response(json.encode(MockData.mockUnauthorizedError), 401),
+        );
 
         // Act
         final result = await hospitalService.getHospitals(invalidToken);
@@ -652,14 +637,11 @@ void main() {
       test('should handle server errors', () async {
         // Arrange
         const token = 'valid_token_123';
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenAnswer((_) async => http.Response(
-          json.encode(MockData.mockServerError),
-          500,
-        ));
+
+        when(mockHttpClient.get(any, headers: anyNamed('headers'))).thenAnswer(
+          (_) async =>
+              http.Response(json.encode(MockData.mockServerError), 500),
+        );
 
         // Act
         final result = await hospitalService.getHospitals(token);
@@ -672,11 +654,10 @@ void main() {
       test('should handle network errors', () async {
         // Arrange
         const token = 'valid_token_123';
-        
-        when(mockHttpClient.get(
-          any,
-          headers: anyNamed('headers'),
-        )).thenThrow(Exception('Network error'));
+
+        when(
+          mockHttpClient.get(any, headers: anyNamed('headers')),
+        ).thenThrow(Exception('Network error'));
 
         // Act
         final result = await hospitalService.getHospitals(token);
