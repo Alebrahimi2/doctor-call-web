@@ -1,6 +1,7 @@
 # 🏥 Doctor Call App
 
 [![CI/CD](https://github.com/Alebrahimi2/doctor-call-app/workflows/Doctor%20Call%20App%20CI/CD/badge.svg)](https://github.com/Alebrahimi2/doctor-call-app/actions)
+[![Build and Deploy Flutter Web](https://github.com/Alebrahimi2/doctor-call-app/actions/workflows/flutter-web-deploy.yml/badge.svg)](https://github.com/Alebrahimi2/doctor-call-app/actions/workflows/flutter-web-deploy.yml)
 [![Testing](https://github.com/Alebrahimi2/doctor-call-app/workflows/Comprehensive%20Testing/badge.svg)](https://github.com/Alebrahimi2/doctor-call-app/actions)
 [![codecov](https://codecov.io/gh/Alebrahimi2/doctor-call-app/branch/master/graph/badge.svg)](https://codecov.io/gh/Alebrahimi2/doctor-call-app)
 
@@ -21,6 +22,20 @@
 - 🏆 **متصدرين ومنافسات** بين المستخدمين
 - 📱 **تجربة متجاوبة** لجميع الأجهزة
 - 🔄 **تحديثات فورية** عبر WebSocket
+
+## 🔗 تكامل API
+
+### Laravel Backend API
+- **🌐 API Base URL**: `https://flutterhelper.com/api`
+- **📊 Test Endpoint**: `/api/test` - اختبار الاتصال
+- **🏥 Hospitals API**: `/api/hospitals` - إدارة المستشفيات مع فلترة جغرافية
+- **👥 Patients API**: `/api/patients` - نظام شامل لإدارة المرضى مع الفرز الطبي
+
+### مميزات API المتقدمة
+- **🔍 فلترة ذكية**: حسب المستشفى، الحالة، الأولوية، والخطورة
+- **📍 بحث جغرافي**: حساب المسافة للمستشفيات القريبة
+- **⏰ تتبع زمني**: مراقبة أوقات الانتظار والوصول
+- **🎯 نظام الفرز**: أولويات المرضى (حرج، طارئ، عادي)
 
 ## 🧪 حالة الاختبارات
 
