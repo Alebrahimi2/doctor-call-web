@@ -41,6 +41,12 @@ dependencies:
   
   # WebSocket support for real-time features
   web_socket_channel: ^2.4.0
+  
+  # MySQL database connection
+  mysql1: ^0.20.0
+  
+  # Configuration management
+  flutter_dotenv: ^5.1.0
 
 dev_dependencies:
   flutter_test:

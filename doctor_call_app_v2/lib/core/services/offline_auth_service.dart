@@ -1,75 +1,52 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
+import 'database_service.dart';
 
 class OfflineAuthService {
   static final OfflineAuthService _instance = OfflineAuthService._internal();
   factory OfflineAuthService() => _instance;
   OfflineAuthService._internal();
 
-  // Default demo users - Updated with new admin and user
-  final List<Map<String, dynamic>> _demoUsers = [
-    {
-      'id': 1,
-      'name': 'مدير النظام',
-      'email': 'admin@system.com',
-      'password': 'admin2024',
-      'role': 'admin',
-      'phone': '+966501111111',
-      'avatar': null,
-      'email_verified_at': DateTime.now().toIso8601String(),
-      'created_at': DateTime.now().toIso8601String(),
-      'updated_at': DateTime.now().toIso8601String(),
-      'token': null,
-    },
-    {
-      'id': 2,
-      'name': 'دكتور محمد العلي',
-      'email': 'doctor@clinic.com',
-      'password': 'doctor2024',
-      'role': 'doctor',
-      'phone': '+966502222222',
-      'avatar': null,
-      'email_verified_at': DateTime.now().toIso8601String(),
-      'created_at': DateTime.now().toIso8601String(),
-      'updated_at': DateTime.now().toIso8601String(),
-      'token': null,
-    },
-  ];
+  final DatabaseService _databaseService = DatabaseService();
 
-  // Login with email and password
+  // Login with email and password using MySQL database
   Future<AuthResult> login(String email, String password) async {
     try {
+      // Connect to database
+      bool connected = await _databaseService.connect();
+      if (!connected) {
+        return AuthResult.failure('فشل في الاتصال بقاعدة البيانات');
+      }
+
       // Simulate network delay
-      await Future.delayed(const Duration(milliseconds: 1500));
+      await Future.delayed(const Duration(milliseconds: 1000));
 
-      // Find user in demo data
-      final userData = _demoUsers.firstWhere(
-        (user) => user['email'] == email && user['password'] == password,
-        orElse: () => {},
-      );
-
-      if (userData.isEmpty) {
+      // Authenticate user from MySQL database
+      UserModel? user = await _databaseService.authenticateUser(email, password);
+      
+      if (user == null) {
         return AuthResult.failure('البريد الإلكتروني أو كلمة المرور غير صحيحة');
       }
 
       // Create token (fake JWT)
-      final token =
-          'demo_token_${userData['id']}_${DateTime.now().millisecondsSinceEpoch}';
+      final token = 'mysql_token_${user.id}_${DateTime.now().millisecondsSinceEpoch}';
 
-      // Store token and user data
+      // Update user token in database
+      await _databaseService.updateUserToken(email, token);
+
+      // Store token and user data locally
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('auth_token', token);
-      await prefs.setString('user_data', jsonEncode(userData));
+      await prefs.setString('user_data', jsonEncode(user.toJson()));
 
-      final user = UserModel.fromJson(userData);
       return AuthResult.success(user, token);
     } catch (e) {
       return AuthResult.failure('خطأ في تسجيل الدخول: $e');
     }
   }
 
-  // Register new user
+  // Register new user in MySQL database
   Future<AuthResult> register({
     required String name,
     required String email,
@@ -77,49 +54,50 @@ class OfflineAuthService {
     required String passwordConfirmation,
     String? phone,
     String? role,
+    String? department,
+    String? specialization,
   }) async {
     try {
-      // Simulate network delay
-      await Future.delayed(const Duration(milliseconds: 1500));
+      // Connect to database
+      bool connected = await _databaseService.connect();
+      if (!connected) {
+        return AuthResult.failure('فشل في الاتصال بقاعدة البيانات');
+      }
 
       // Check if password matches confirmation
       if (password != passwordConfirmation) {
         return AuthResult.failure('كلمات المرور غير متطابقة');
       }
 
-      // Check if email already exists
-      final existingUser = _demoUsers.any((user) => user['email'] == email);
-      if (existingUser) {
-        return AuthResult.failure('البريد الإلكتروني مستخدم بالفعل');
+      // Simulate network delay
+      await Future.delayed(const Duration(milliseconds: 1000));
+
+      // Create user in MySQL database
+      UserModel? user = await _databaseService.createUser(
+        name: name,
+        email: email,
+        password: password,
+        role: role ?? 'patient',
+        phone: phone,
+        department: department,
+        specialization: specialization,
+      );
+
+      if (user == null) {
+        return AuthResult.failure('فشل في إنشاء المستخدم');
       }
 
-      // Create new user
-      final newUserId = (_demoUsers.length + 1).toString();
-      final userData = {
-        'id': newUserId,
-        'name': name,
-        'email': email,
-        'role': role ?? 'patient',
-        'phone': phone,
-        'department': role == 'doctor' ? 'General' : null,
-        'specialization': role == 'doctor' ? 'General Practice' : null,
-        'profile_image': null,
-        'created_at': DateTime.now().toIso8601String(),
-      };
-
-      // Add to demo users list (for this session only)
-      _demoUsers.add(userData..addAll({'password': password}));
-
       // Create token
-      final token =
-          'demo_token_${userData['id']}_${DateTime.now().millisecondsSinceEpoch}';
+      final token = 'mysql_token_${user.id}_${DateTime.now().millisecondsSinceEpoch}';
 
-      // Store token and user data
+      // Update user token in database
+      await _databaseService.updateUserToken(email, token);
+
+      // Store token and user data locally
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('auth_token', token);
-      await prefs.setString('user_data', jsonEncode(userData));
+      await prefs.setString('user_data', jsonEncode(user.toJson()));
 
-      final user = UserModel.fromJson(userData);
       return AuthResult.success(user, token);
     } catch (e) {
       return AuthResult.failure('خطأ في التسجيل: $e');
@@ -149,14 +127,13 @@ class OfflineAuthService {
     }
   }
 
-  // Get current user from storage
+  // Get current user from local storage
   Future<UserModel?> getCurrentUser() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final userData = prefs.getString('user_data');
       if (userData != null) {
-        final Map<String, dynamic> userJson = jsonDecode(userData);
-        return UserModel.fromJson(userJson);
+        return UserModel.fromJson(jsonDecode(userData));
       }
       return null;
     } catch (e) {
@@ -164,79 +141,79 @@ class OfflineAuthService {
     }
   }
 
-  // Get stored user data
-  Future<UserModel?> getStoredUser() async {
-    return await getCurrentUser();
-  }
-
-  // Clear authentication data
-  Future<void> clearAuth() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('auth_token');
-    await prefs.remove('user_data');
-  }
-
-  // Get demo users (for testing purposes)
-  // Get demo users (without passwords for security)
-  List<Map<String, dynamic>> getDemoUsers() {
-    return _demoUsers.map((user) {
-      final userCopy = Map<String, dynamic>.from(user);
-      userCopy.remove('password'); // Don't expose passwords
-      return userCopy;
-    }).toList();
-  }
-
-  // Clear all stored auth data and reset to defaults
-  Future<void> clearAllData() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('auth_token');
-    await prefs.remove('user_data');
-    await prefs.remove('registered_users');
-    
-    // Clear any other related data
-    final keys = prefs.getKeys();
-    for (String key in keys) {
-      if (key.startsWith('auth_') || key.startsWith('user_')) {
-        await prefs.remove(key);
-      }
-    }
-  }
-
-  // Get current available users (demo + registered)
+  // Get all users from MySQL database
   Future<List<Map<String, dynamic>>> getAllUsers() async {
-    final prefs = await SharedPreferences.getInstance();
-    final registeredUsersJson = prefs.getString('registered_users');
-    
-    List<Map<String, dynamic>> allUsers = List.from(_demoUsers);
-    
-    if (registeredUsersJson != null) {
-      final registeredUsers = jsonDecode(registeredUsersJson) as List;
-      allUsers.addAll(registeredUsers.cast<Map<String, dynamic>>());
+    try {
+      bool connected = await _databaseService.connect();
+      if (!connected) {
+        return [];
+      }
+      return await _databaseService.getAllUsers();
+    } catch (e) {
+      print('خطأ في استرداد المستخدمين: $e');
+      return [];
     }
-    
-    // Remove passwords for security
-    return allUsers.map((user) {
-      final userCopy = Map<String, dynamic>.from(user);
-      userCopy.remove('password');
-      return userCopy;
-    }).toList();
-  }
-}
-
-// AuthResult class for consistent return type
-class AuthResult {
-  final bool success;
-  final UserModel? user;
-  final String? token;
-  final String? error;
-
-  AuthResult._({required this.success, this.user, this.token, this.error});
-
-  factory AuthResult.success(UserModel user, String token) {
-    return AuthResult._(success: true, user: user, token: token);
   }
 
-  factory AuthResult.failure(String error) {
-    return AuthResult._(success: false, error: error);
+  // Clear all users from database (for testing)
+  Future<bool> clearDatabase() async {
+    try {
+      bool connected = await _databaseService.connect();
+      if (!connected) {
+        return false;
+      }
+      return await _databaseService.clearAllUsers();
+    } catch (e) {
+      print('خطأ في مسح قاعدة البيانات: $e');
+      return false;
+    }
+  }
+
+  // Test database connection
+  Future<Map<String, dynamic>> testConnection() async {
+    return await _databaseService.testConnection();
+  }
+
+  // Reset database to default users
+  Future<bool> resetToDefaults() async {
+    try {
+      bool cleared = await clearDatabase();
+      if (cleared) {
+        await Future.delayed(const Duration(milliseconds: 500));
+        // Default users are automatically inserted by clearAllUsers method
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print('خطأ في إعادة تعيين قاعدة البيانات: $e');
+      return false;
+    }
+  }
+
+  // Get database statistics
+  Future<Map<String, dynamic>> getDatabaseStats() async {
+    try {
+      bool connected = await _databaseService.connect();
+      if (!connected) {
+        return {'error': 'فشل في الاتصال بقاعدة البيانات'};
+      }
+
+      var users = await _databaseService.getAllUsers();
+      var adminCount = users.where((u) => u['role'] == 'admin').length;
+      var doctorCount = users.where((u) => u['role'] == 'doctor').length;
+      var nurseCount = users.where((u) => u['role'] == 'nurse').length;
+      var patientCount = users.where((u) => u['role'] == 'patient').length;
+
+      return {
+        'total': users.length,
+        'admin': adminCount,
+        'doctor': doctorCount,
+        'nurse': nurseCount,
+        'patient': patientCount,
+        'users': users,
+      };
+    } catch (e) {
+      return {'error': 'خطأ في استرداد إحصائيات قاعدة البيانات: $e'};
+    }
   }
 }
