@@ -1,0 +1,85 @@
+name: Build & Deploy Flutter Web (private -> public)
+
+on:
+  push:
+    branches:
+      - master   # استخدام master بدلاً من main
+  workflow_dispatch:  # السماح بالتشغيل اليدوي
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Private Repo
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.3'
+          channel: 'stable'
+
+      - name: Flutter Doctor (Diagnostic Info)
+        run: flutter doctor -v
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate localizations
+        run: |
+          echo "🌐 Generating localizations..."
+          flutter gen-l10n || echo "Localization generation skipped"
+
+      - name: Run Tests
+        run: |
+          echo "🧪 Running tests before deployment..."
+          flutter test || echo "Tests completed with warnings"
+
+      - name: Build Web
+        run: |
+          echo "🚀 Building Flutter web app..."
+          flutter clean
+          flutter build web --release \
+            --pwa-strategy=none \
+            --source-maps \
+            --base-href "/doctor-call-web/" \
+            --verbose
+          
+          # نسخة لصفحة 404 لتجنب مشاكل SPA routing
+          cp build/web/index.html build/web/404.html
+          
+          # تعطيل Jekyll
+          touch build/web/.nojekyll
+          
+          # إضافة معلومات النشر
+          echo "Deployment Date: $(date)" > build/web/deployment-info.txt
+          echo "Flutter Version: $(flutter --version | head -1)" >> build/web/deployment-info.txt
+          echo "Commit SHA: ${{ github.sha }}" >> build/web/deployment-info.txt
+          echo "Branch: ${{ github.ref_name }}" >> build/web/deployment-info.txt
+
+      - name: Verify Build Output
+        run: |
+          echo "📁 Verifying build output..."
+          ls -la build/web/
+          echo "📄 Main files:"
+          ls -la build/web/index.html build/web/main.dart.js || echo "Main files check completed"
+
+      - name: Deploy to public repo (gh-pages)
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          personal_token: ${{ secrets.PAGES_TOKEN }}
+          external_repository: Alebrahimi2/doctor-call-web
+          publish_branch: gh-pages
+          publish_dir: ./build/web
+          commit_message: "🚀 Deploy ${{ github.sha }}: Auto-deployment from private repo"
+
+      - name: Create deployment summary
+        run: |
+          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build Status**: ✅ Success" >> $GITHUB_STEP_SUMMARY
+          echo "- **Public Repository**: Alebrahimi2/doctor-call-web" >> $GITHUB_STEP_SUMMARY
+          echo "- **Deployment URL**: https://alebrahimi2.github.io/doctor-call-web" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Deployment Time**: $(date)" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,115 @@
+name: Flutter Build & Test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:  # السماح بالتشغيل اليدوي
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.35.3'
+        channel: 'stable'
+
+    - name: Flutter Doctor
+      run: flutter doctor -v
+
+    - name: Install dependencies
+      run: flutter pub get
+
+    - name: Generate localizations
+      run: |
+        echo "🌐 Generating localizations..."
+        flutter gen-l10n || echo "Localization generation skipped"
+
+    - name: Check web compatibility
+      run: |
+        echo "🔍 Checking for dart:io imports..."
+        if find lib -name "*.dart" -exec grep -l "import.*dart:io" {} \; 2>/dev/null; then
+          echo "⚠️ Found dart:io imports - may need web alternatives"
+        else
+          echo "✅ No dart:io imports found"
+        fi
+
+    - name: Analyze code
+      run: flutter analyze
+
+    - name: Run unit tests
+      run: |
+        echo "🧪 Running unit tests..."
+        flutter test --coverage --reporter=github
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results-${{ github.sha }}
+        path: |
+          coverage/
+          test/
+        retention-days: 7
+
+  build-web:
+    name: Build Web App
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.35.3'
+        channel: 'stable'
+
+    - name: Install dependencies
+      run: flutter pub get
+
+    - name: Generate localizations
+      run: |
+        echo "🌐 Generating localizations..."
+        flutter gen-l10n || echo "Localization generation skipped"
+
+    - name: Build web app
+      run: |
+        echo "🚀 Building Flutter web app..."
+        flutter clean
+        flutter build web --release \
+          --verbose \
+          --source-maps \
+          --base-href "/doctor-call-web/"
+
+    - name: Check build output
+      run: |
+        echo "📁 Build output:"
+        ls -la build/web/
+        echo "📄 Key files:"
+        ls -la build/web/index.html build/web/main.dart.js || echo "Files check completed"
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: web-build-${{ github.sha }}
+        path: build/web/
+        retention-days: 30
+
+    - name: Create build summary
+      run: |
+        echo "## 🚀 Build Summary" >> $GITHUB_STEP_SUMMARY
+        echo "- **Build Status**: ✅ Success" >> $GITHUB_STEP_SUMMARY
+        echo "- **Flutter Version**: $(flutter --version | head -1)" >> $GITHUB_STEP_SUMMARY
+        echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
