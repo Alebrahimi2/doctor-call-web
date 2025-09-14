@@ -81,18 +81,10 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/{gameAvatar}/toggle-status', [GameAvatarController::class, 'toggleStatus']);
     });
 
-    // مسارات المستشفيات
-    Route::prefix('hospitals')->group(function() {
-        Route::get('/', [HospitalApiController::class, 'index']);
-        Route::get('/{id}', [HospitalApiController::class, 'show']);
-        Route::get('/{id}/stats', [HospitalApiController::class, 'stats']);
-    });
-
-    // مسارات المرضى
+    // مسارات إضافية للمرضى (تتطلب مصادقة)
     Route::prefix('patients')->group(function() {
-        Route::get('/', [PatientApiController::class, 'index']);
         Route::post('/', [PatientApiController::class, 'store']);
-        Route::get('/queue', [PatientApiController::class, 'queue']);
+        Route::get('/queue', [PatientController::class, 'queue']);
         Route::get('/statistics', [PatientApiController::class, 'statistics']);
         Route::get('/realtime', [PatientApiController::class, 'realtime']);
         Route::get('/{id}', [PatientApiController::class, 'show']);
