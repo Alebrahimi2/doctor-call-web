@@ -9,6 +9,9 @@ on:
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./doctor_call_app_v2
 
     steps:
       - name: Checkout Private Repo
@@ -71,7 +74,7 @@ jobs:
           personal_token: ${{ secrets.PAGES_TOKEN }}
           external_repository: Alebrahimi2/doctor-call-web
           publish_branch: gh-pages
-          publish_dir: ./build/web
+          publish_dir: ./doctor_call_app_v2/build/web
           commit_message: "🚀 Deploy ${{ github.sha }}: Auto-deployment from private repo"
 
       - name: Create deployment summary

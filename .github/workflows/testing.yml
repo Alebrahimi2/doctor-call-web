@@ -13,10 +13,13 @@ jobs:
   unit-tests:
     name: Unit Tests
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./doctor_call_app_v2
     
     strategy:
       matrix:
-        flutter-version: ['3.19.0', '3.16.0']
+        flutter-version: ['3.35.3']
         
     steps:
       - name: Checkout code
@@ -52,7 +55,7 @@ jobs:
           genhtml coverage/lcov.info -o coverage/html
           
       - name: Upload coverage reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-report-flutter-${{ matrix.flutter-version }}
           path: coverage/
@@ -61,6 +64,9 @@ jobs:
     name: Widget Tests
     runs-on: ubuntu-latest
     needs: unit-tests
+    defaults:
+      run:
+        working-directory: ./doctor_call_app_v2
     
     steps:
       - name: Checkout code
@@ -69,7 +75,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.0'
+          flutter-version: '3.35.3'
           channel: 'stable'
           
       - name: Get dependencies
