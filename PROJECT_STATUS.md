@@ -69,16 +69,21 @@
 - ✅ مشروع Flutter مُنشأ ومُعد
 - ✅ شاشات أساسية (7 شاشات)
 - ✅ Provider State Management
-- ❌ **HTTP Package** مُضاف للـ pubspec.yaml
-- ❌ **API Service Layer** مُنشأ
-- ❌ **Connection مع Backend** يعمل
+- ✅ **HTTP Package** مُضاف للـ pubspec.yaml
+- ✅ **API Service Layer** مُنشأ (PatientService + HospitalService)
+- ✅ **Models Layer** مُطبق (Patient + Hospital + User)
+- ✅ **ApiConstants** للإدارة المركزية للـ endpoints
+- ✅ **Hospital Management Screen** مع CRUD كامل
+- ✅ **Patient Management Screen** مع البحث والفلترة
+- ✅ **Settings Screen** مع إدارة الحساب
+- ❌ **Connection مع Backend** يعمل (اختبار على GitHub فقط)
 - ❌ **Dashboard يعرض بيانات حقيقية** من API
 
 #### Integration:
 - ❌ **Frontend ↔ Backend متصلين**
 - ❌ **GET /dashboard/stats** يعمل من Flutter
-- ❌ **Error Handling** أساسي
-- ❌ **Loading States** في UI
+- ✅ **Error Handling** أساسي في API Services
+- ✅ **Loading States** في UI
 
 ### 🗓️ **الأسبوع 3** (28 سبتمبر - 4 أكتوبر 2025)
 **الهدف**: Localization مبدئي (عربي + إنجليزي) + Responsive UI
