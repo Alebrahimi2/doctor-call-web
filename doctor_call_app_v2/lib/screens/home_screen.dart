@@ -89,7 +89,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     child: const ListTile(
                       leading: Icon(Icons.logout, color: Colors.red),
-                      title: Text('تسجيل الخروج', style: TextStyle(color: Colors.red)),
+                      title: Text(
+                        'تسجيل الخروج',
+                        style: TextStyle(color: Colors.red),
+                      ),
                       contentPadding: EdgeInsets.zero,
                     ),
                   ),
@@ -108,11 +111,13 @@ class _HomeScreenState extends State<HomeScreen> {
           });
         },
         destinations: _navigationItems
-            .map((item) => NavigationDestination(
-                  icon: Icon(item.icon),
-                  selectedIcon: Icon(item.selectedIcon),
-                  label: item.label,
-                ))
+            .map(
+              (item) => NavigationDestination(
+                icon: Icon(item.icon),
+                selectedIcon: Icon(item.selectedIcon),
+                label: item.label,
+              ),
+            )
             .toList(),
       ),
     );
@@ -170,13 +175,16 @@ class _HomeScreenState extends State<HomeScreen> {
                               children: [
                                 Text(
                                   'مرحباً، ${user?.name ?? 'مستخدم'}',
-                                  style: Theme.of(context).textTheme.headlineSmall,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.headlineSmall,
                                 ),
                                 Text(
                                   _getRoleDisplayName(user?.role ?? 'patient'),
-                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: Theme.of(context).primaryColor,
-                                  ),
+                                  style: Theme.of(context).textTheme.bodyMedium
+                                      ?.copyWith(
+                                        color: Theme.of(context).primaryColor,
+                                      ),
                                 ),
                               ],
                             ),
@@ -252,11 +260,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                icon,
-                size: 48,
-                color: Theme.of(context).primaryColor,
-              ),
+              Icon(icon, size: 48, color: Theme.of(context).primaryColor),
               const SizedBox(height: 12),
               Text(
                 title,

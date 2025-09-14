@@ -1,10 +1,10 @@
 class DatabaseConfig {
   // إعدادات Laravel API بدلاً من MySQL المباشر
-  static const String apiBaseUrl = 'http://localhost/games/Doctor_Call/fullstack-app/backend/public/api';
+  static const String apiBaseUrl = 'https://flutterhelper.com/api';
   static const String authEndpoint = '/auth';
   static const String usersEndpoint = '/users';
   static const String dashboardEndpoint = '/dashboard/stats';
-  
+
   // إعدادات قاعدة البيانات Laravel (للمرجع فقط)
   static const String host = 'localhost';
   static const int port = 3306;
@@ -37,7 +37,7 @@ class DatabaseConfig {
   static String get logoutUrl => '$apiBaseUrl$authEndpoint/logout';
   static String get meUrl => '$apiBaseUrl$authEndpoint/me';
   static String get dashboardStatsUrl => '$apiBaseUrl$dashboardEndpoint';
-  
+
   // الحصول على connection string (للمرجع فقط)
   static String get connectionString {
     return 'mysql://$username:$password@$host:$port/$database';

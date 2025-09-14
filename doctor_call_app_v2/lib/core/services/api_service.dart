@@ -4,7 +4,7 @@ import '../models/user_model.dart';
 import '../config/database_config.dart';
 
 class ApiConfig {
-  static const String baseUrl = 'http://localhost/games/Doctor_Call/fullstack-app/backend/public/api';
+  static const String baseUrl = 'https://flutterhelper.com/api';
   static const Duration timeout = Duration(seconds: 30);
 
   // Headers
@@ -149,21 +149,23 @@ class ApiService {
   // Authentication methods for Laravel API
   Future<AuthResult> login(String email, String password) async {
     try {
-      final response = await post('/auth/login', data: {
-        'email': email,
-        'password': password,
-      });
+      final response = await post(
+        '/auth/login',
+        data: {'email': email, 'password': password},
+      );
 
       if (response.statusCode == 200 && response.data['success'] == true) {
         final token = response.data['data']['token'];
         final user = UserModel.fromJson(response.data['data']['user']);
-        
+
         await storeToken(token);
         await _storage.write(key: 'user_data', value: user.toJson().toString());
-        
+
         return AuthResult.success(user, token);
       } else {
-        return AuthResult.failure(response.data['message'] ?? 'فشل في تسجيل الدخول');
+        return AuthResult.failure(
+          response.data['message'] ?? 'فشل في تسجيل الدخول',
+        );
       }
     } catch (e) {
       return AuthResult.failure('خطأ في الاتصال بالخادم: $e');
@@ -179,22 +181,25 @@ class ApiService {
     String? role,
   }) async {
     try {
-      final response = await post('/auth/register', data: {
-        'name': name,
-        'email': email,
-        'password': password,
-        'password_confirmation': passwordConfirmation,
-        'phone': phone,
-        'role': role ?? 'patient',
-      });
+      final response = await post(
+        '/auth/register',
+        data: {
+          'name': name,
+          'email': email,
+          'password': password,
+          'password_confirmation': passwordConfirmation,
+          'phone': phone,
+          'role': role ?? 'patient',
+        },
+      );
 
       if (response.statusCode == 201 && response.data['success'] == true) {
         final token = response.data['data']['token'];
         final user = UserModel.fromJson(response.data['data']['user']);
-        
+
         await storeToken(token);
         await _storage.write(key: 'user_data', value: user.toJson().toString());
-        
+
         return AuthResult.success(user, token);
       } else {
         return AuthResult.failure(response.data['message'] ?? 'فشل في التسجيل');
@@ -271,16 +276,10 @@ class ApiService {
           'kpis': data['kpis'] ?? 0,
         };
       } else {
-        return {
-          'success': false,
-          'error': 'فشل في الحصول على الإحصائيات',
-        };
+        return {'success': false, 'error': 'فشل في الحصول على الإحصائيات'};
       }
     } catch (e) {
-      return {
-        'success': false,
-        'error': 'خطأ في الاتصال: $e',
-      };
+      return {'success': false, 'error': 'خطأ في الاتصال: $e'};
     }
   }
 }
@@ -292,25 +291,13 @@ class AuthResult {
   final String? token;
   final String? error;
 
-  AuthResult._({
-    required this.isSuccess,
-    this.user,
-    this.token,
-    this.error,
-  });
+  AuthResult._({required this.isSuccess, this.user, this.token, this.error});
 
   factory AuthResult.success(UserModel user, String token) {
-    return AuthResult._(
-      isSuccess: true,
-      user: user,
-      token: token,
-    );
+    return AuthResult._(isSuccess: true, user: user, token: token);
   }
 
   factory AuthResult.failure(String error) {
-    return AuthResult._(
-      isSuccess: false,
-      error: error,
-    );
+    return AuthResult._(isSuccess: false, error: error);
   }
 }
