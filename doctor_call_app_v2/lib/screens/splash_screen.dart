@@ -50,7 +50,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     if (mounted) {
       if (authProvider.isAuthenticated) {
-        Navigator.of(context).pushReplacementNamed('/dashboard');
+        Navigator.of(context).pushReplacementNamed('/home');
       } else {
         Navigator.of(context).pushReplacementNamed('/login');
       }

@@ -6,7 +6,7 @@ import 'core/providers/auth_provider.dart';
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
-import 'screens/dashboard_screen.dart';
+import 'screens/home_screen.dart';
 
 void main() {
   runApp(const DoctorCallApp());
@@ -93,7 +93,7 @@ class DoctorCallApp extends StatelessWidget {
           '/': (context) => const SplashScreen(),
           '/login': (context) => const LoginScreen(),
           '/register': (context) => const RegisterScreen(),
-          '/dashboard': (context) => const DashboardScreen(),
+          '/home': (context) => const HomeScreen(),
         },
 
         // Route Generator for dynamic routes

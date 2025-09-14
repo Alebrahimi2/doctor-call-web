@@ -117,7 +117,7 @@ class UserModel {
   bool get isNurse => role == 'nurse';
   bool get isPatient => role == 'patient';
   bool get isEmailVerified => emailVerifiedAt != null;
-  
+
   String get displayName => name;
   String get avatarUrl => avatar ?? '';
 }
@@ -148,10 +148,7 @@ class AuthResult {
   }
 
   factory AuthResult.failure(String message) {
-    return AuthResult(
-      success: false,
-      message: message,
-    );
+    return AuthResult(success: false, message: message);
   }
 
   factory AuthResult.fromJson(Map<String, dynamic> json) {

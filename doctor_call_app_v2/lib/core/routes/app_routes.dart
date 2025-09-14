@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../screens/login_screen.dart';
 import '../../screens/register_screen.dart';
-import '../../screens/dashboard_screen.dart';
+import '../../screens/home_screen.dart';
 import '../../screens/patients_screen.dart';
 import '../../screens/hospitals_screen.dart';
 import '../../screens/notifications_screen.dart';
@@ -10,12 +10,11 @@ import '../../screens/achievements_screen.dart';
 import '../../screens/leaderboard_screen.dart';
 import '../../screens/challenges_screen.dart';
 import '../../screens/game_stats_screen.dart';
-import '../../screens/database_test_screen.dart';
 
 class AppRoutes {
   static const String login = '/login';
   static const String register = '/register';
-  static const String dashboard = '/dashboard';
+  static const String home = '/home';
   static const String patients = '/patients';
   static const String hospitals = '/hospitals';
   static const String notifications = '/notifications';
@@ -24,13 +23,12 @@ class AppRoutes {
   static const String leaderboard = '/leaderboard';
   static const String challenges = '/challenges';
   static const String gameStats = '/game-stats';
-  static const String databaseTest = '/database-test';
 
   static Map<String, WidgetBuilder> get routes {
     return {
       login: (context) => const LoginScreen(),
       register: (context) => const RegisterScreen(),
-      dashboard: (context) => const DashboardScreen(),
+      home: (context) => const HomeScreen(),
       patients: (context) => const PatientsScreen(),
       hospitals: (context) => const HospitalsScreen(),
       notifications: (context) => const NotificationsScreen(),
@@ -39,7 +37,6 @@ class AppRoutes {
       leaderboard: (context) => const LeaderboardScreen(),
       challenges: (context) => const ChallengesScreen(),
       gameStats: (context) => const GameStatsScreen(),
-      databaseTest: (context) => const DatabaseTestScreen(),
     };
   }
 
@@ -55,9 +52,9 @@ class AppRoutes {
           builder: (context) => const RegisterScreen(),
           settings: settings,
         );
-      case dashboard:
+      case home:
         return MaterialPageRoute(
-          builder: (context) => const DashboardScreen(),
+          builder: (context) => const HomeScreen(),
           settings: settings,
         );
       case patients:
