@@ -10,6 +10,7 @@ import '../../screens/achievements_screen.dart';
 import '../../screens/leaderboard_screen.dart';
 import '../../screens/challenges_screen.dart';
 import '../../screens/game_stats_screen.dart';
+import '../../screens/database_test_screen.dart';
 
 class AppRoutes {
   static const String login = '/login';
@@ -23,6 +24,7 @@ class AppRoutes {
   static const String leaderboard = '/leaderboard';
   static const String challenges = '/challenges';
   static const String gameStats = '/game-stats';
+  static const String databaseTest = '/database-test';
 
   static Map<String, WidgetBuilder> get routes {
     return {
@@ -37,6 +39,7 @@ class AppRoutes {
       leaderboard: (context) => const LeaderboardScreen(),
       challenges: (context) => const ChallengesScreen(),
       gameStats: (context) => const GameStatsScreen(),
+      databaseTest: (context) => const DatabaseTestScreen(),
     };
   }
 

@@ -7,43 +7,33 @@ class OfflineAuthService {
   factory OfflineAuthService() => _instance;
   OfflineAuthService._internal();
 
-  // Default demo users
+  // Default demo users - Updated with new admin and user
   final List<Map<String, dynamic>> _demoUsers = [
     {
-      'id': '1',
-      'name': 'دكتور أحمد محمد',
-      'email': 'doctor@hospital.com',
-      'password': '123456',
-      'role': 'doctor',
-      'phone': '+966501234567',
-      'department': 'Cardiology',
-      'specialization': 'Heart Surgery',
-      'profile_image': null,
-      'created_at': DateTime.now().toIso8601String(),
-    },
-    {
-      'id': '2',
-      'name': 'إدارة المستشفى',
-      'email': 'admin@hospital.com',
-      'password': 'admin123',
+      'id': 1,
+      'name': 'مدير النظام',
+      'email': 'admin@system.com',
+      'password': 'admin2024',
       'role': 'admin',
-      'phone': '+966501234568',
-      'department': 'Administration',
-      'specialization': 'Hospital Management',
-      'profile_image': null,
+      'phone': '+966501111111',
+      'avatar': null,
+      'email_verified_at': DateTime.now().toIso8601String(),
       'created_at': DateTime.now().toIso8601String(),
+      'updated_at': DateTime.now().toIso8601String(),
+      'token': null,
     },
     {
-      'id': '3',
-      'name': 'ممرضة فاطمة',
-      'email': 'nurse@hospital.com',
-      'password': 'nurse123',
-      'role': 'nurse',
-      'phone': '+966501234569',
-      'department': 'Emergency',
-      'specialization': 'Emergency Care',
-      'profile_image': null,
+      'id': 2,
+      'name': 'دكتور محمد العلي',
+      'email': 'doctor@clinic.com',
+      'password': 'doctor2024',
+      'role': 'doctor',
+      'phone': '+966502222222',
+      'avatar': null,
+      'email_verified_at': DateTime.now().toIso8601String(),
       'created_at': DateTime.now().toIso8601String(),
+      'updated_at': DateTime.now().toIso8601String(),
+      'token': null,
     },
   ];
 
@@ -64,7 +54,8 @@ class OfflineAuthService {
       }
 
       // Create token (fake JWT)
-      final token = 'demo_token_${userData['id']}_${DateTime.now().millisecondsSinceEpoch}';
+      final token =
+          'demo_token_${userData['id']}_${DateTime.now().millisecondsSinceEpoch}';
 
       // Store token and user data
       final prefs = await SharedPreferences.getInstance();
@@ -120,7 +111,8 @@ class OfflineAuthService {
       _demoUsers.add(userData..addAll({'password': password}));
 
       // Create token
-      final token = 'demo_token_${userData['id']}_${DateTime.now().millisecondsSinceEpoch}';
+      final token =
+          'demo_token_${userData['id']}_${DateTime.now().millisecondsSinceEpoch}';
 
       // Store token and user data
       final prefs = await SharedPreferences.getInstance();
@@ -185,10 +177,47 @@ class OfflineAuthService {
   }
 
   // Get demo users (for testing purposes)
+  // Get demo users (without passwords for security)
   List<Map<String, dynamic>> getDemoUsers() {
     return _demoUsers.map((user) {
       final userCopy = Map<String, dynamic>.from(user);
       userCopy.remove('password'); // Don't expose passwords
+      return userCopy;
+    }).toList();
+  }
+
+  // Clear all stored auth data and reset to defaults
+  Future<void> clearAllData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('auth_token');
+    await prefs.remove('user_data');
+    await prefs.remove('registered_users');
+    
+    // Clear any other related data
+    final keys = prefs.getKeys();
+    for (String key in keys) {
+      if (key.startsWith('auth_') || key.startsWith('user_')) {
+        await prefs.remove(key);
+      }
+    }
+  }
+
+  // Get current available users (demo + registered)
+  Future<List<Map<String, dynamic>>> getAllUsers() async {
+    final prefs = await SharedPreferences.getInstance();
+    final registeredUsersJson = prefs.getString('registered_users');
+    
+    List<Map<String, dynamic>> allUsers = List.from(_demoUsers);
+    
+    if (registeredUsersJson != null) {
+      final registeredUsers = jsonDecode(registeredUsersJson) as List;
+      allUsers.addAll(registeredUsers.cast<Map<String, dynamic>>());
+    }
+    
+    // Remove passwords for security
+    return allUsers.map((user) {
+      final userCopy = Map<String, dynamic>.from(user);
+      userCopy.remove('password');
       return userCopy;
     }).toList();
   }
@@ -201,25 +230,13 @@ class AuthResult {
   final String? token;
   final String? error;
 
-  AuthResult._({
-    required this.success,
-    this.user,
-    this.token,
-    this.error,
-  });
+  AuthResult._({required this.success, this.user, this.token, this.error});
 
   factory AuthResult.success(UserModel user, String token) {
-    return AuthResult._(
-      success: true,
-      user: user,
-      token: token,
-    );
+    return AuthResult._(success: true, user: user, token: token);
   }
 
   factory AuthResult.failure(String error) {
-    return AuthResult._(
-      success: false,
-      error: error,
-    );
+    return AuthResult._(success: false, error: error);
   }
 }

@@ -521,7 +521,9 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                 decoration: BoxDecoration(
                   color: Colors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
+                  border: Border.all(
+                    color: Colors.green.withValues(alpha: 0.3),
+                  ),
                 ),
                 child: Row(
                   children: [
@@ -639,8 +641,14 @@ class _ChallengesScreenState extends State<ChallengesScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isActive
-              ? [Colors.purple.withValues(alpha: 0.1), Colors.blue.withValues(alpha: 0.1)]
-              : [Colors.grey.withValues(alpha: 0.05), Colors.grey.withValues(alpha: 0.1)],
+              ? [
+                  Colors.purple.withValues(alpha: 0.1),
+                  Colors.blue.withValues(alpha: 0.1),
+                ]
+              : [
+                  Colors.grey.withValues(alpha: 0.05),
+                  Colors.grey.withValues(alpha: 0.1),
+                ],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
@@ -770,7 +778,9 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                 decoration: BoxDecoration(
                   color: Colors.amber.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
+                  border: Border.all(
+                    color: Colors.amber.withValues(alpha: 0.3),
+                  ),
                 ),
                 child: Row(
                   children: [
