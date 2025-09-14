@@ -65,7 +65,7 @@ class AuthProvider with ChangeNotifier {
         _setState(AuthState.authenticated);
         return true;
       } else {
-        _setError(result.error ?? 'Login failed');
+        _setError(result.message);
         return false;
       }
     } catch (e) {
@@ -103,7 +103,7 @@ class AuthProvider with ChangeNotifier {
         _setState(AuthState.authenticated);
         return true;
       } else {
-        _setError(result.error ?? 'Registration failed');
+        _setError(result.message);
         return false;
       }
     } catch (e) {
@@ -155,7 +155,7 @@ class AuthProvider with ChangeNotifier {
         notifyListeners();
         return true;
       } else {
-        _setError(result.error ?? 'Profile update failed');
+        _setError(result.message);
         return false;
       }
     } catch (e) {

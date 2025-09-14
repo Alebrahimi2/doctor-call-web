@@ -1,20 +1,41 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
-import 'offline_auth_service.dart';
 
 class AuthService {
-  final OfflineAuthService _offlineService = OfflineAuthService();
-
   static final AuthService _instance = AuthService._internal();
   factory AuthService() => _instance;
   AuthService._internal();
 
+  // SharedPreferences keys
+  static const String _tokenKey = 'auth_token';
+  static const String _userKey = 'user_data';
+
   // Login with email and password
   Future<AuthResult> login(String email, String password) async {
     try {
-      // Use offline service for demo/development
-      return await _offlineService.login(email, password);
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Mock authentication - check for demo credentials
+      if (email.isNotEmpty && password.isNotEmpty) {
+        // Create a mock user
+        final user = UserModel(
+          id: '1',
+          name: 'Demo User',
+          email: email,
+          phone: '123456789',
+          role: 'patient',
+          avatar: null,
+        );
+        
+        // Store token and user data
+        await prefs.setString(_tokenKey, 'demo_token_${DateTime.now().millisecondsSinceEpoch}');
+        await prefs.setString(_userKey, jsonEncode(user.toJson()));
+        
+        return AuthResult.success(user, 'demo_token');
+      }
+      
+      return AuthResult.failure('البيانات غير صحيحة');
     } catch (e) {
       return AuthResult.failure('خطأ في تسجيل الدخول: $e');
     }
@@ -30,15 +51,28 @@ class AuthService {
     String? role,
   }) async {
     try {
-      // Use offline service for demo/development
-      return await _offlineService.register(
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Basic validation
+      if (password != passwordConfirmation) {
+        return AuthResult.failure('كلمة المرور غير متطابقة');
+      }
+      
+      // Create a mock user
+      final user = UserModel(
+        id: '2',
         name: name,
         email: email,
-        password: password,
-        passwordConfirmation: passwordConfirmation,
-        phone: phone,
-        role: role,
+        phone: phone ?? '',
+        role: role ?? 'patient',
+        avatar: null,
       );
+      
+      // Store token and user data
+      await prefs.setString(_tokenKey, 'demo_token_${DateTime.now().millisecondsSinceEpoch}');
+      await prefs.setString(_userKey, jsonEncode(user.toJson()));
+      
+      return AuthResult.success(user, 'demo_token');
     } catch (e) {
       return AuthResult.failure('خطأ في التسجيل: $e');
     }
@@ -47,7 +81,10 @@ class AuthService {
   // Logout user
   Future<bool> logout() async {
     try {
-      return await _offlineService.logout();
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_tokenKey);
+      await prefs.remove(_userKey);
+      return true;
     } catch (e) {
       return false;
     }
@@ -56,7 +93,7 @@ class AuthService {
   // Get current user info
   Future<UserModel?> getCurrentUser() async {
     try {
-      return await _offlineService.getCurrentUser();
+      return await getStoredUser();
     } catch (e) {
       return null;
     }
@@ -65,7 +102,8 @@ class AuthService {
   // Check if user is authenticated
   Future<bool> isAuthenticated() async {
     try {
-      return await _offlineService.isAuthenticated();
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString(_tokenKey) != null;
     } catch (e) {
       return false;
     }
@@ -74,7 +112,13 @@ class AuthService {
   // Get stored user data
   Future<UserModel?> getStoredUser() async {
     try {
-      return await _offlineService.getStoredUser();
+      final prefs = await SharedPreferences.getInstance();
+      final userData = prefs.getString(_userKey);
+      if (userData != null) {
+        final Map<String, dynamic> userMap = jsonDecode(userData);
+        return UserModel.fromJson(userMap);
+      }
+      return null;
     } catch (e) {
       return null;
     }
@@ -83,7 +127,9 @@ class AuthService {
   // Clear authentication data
   Future<void> clearAuth() async {
     try {
-      await _offlineService.clearAuth();
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_tokenKey);
+      await prefs.remove(_userKey);
     } catch (e) {
       // Ignore errors in clearing
     }
