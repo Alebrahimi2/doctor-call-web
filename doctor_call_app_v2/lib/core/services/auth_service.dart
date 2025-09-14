@@ -15,7 +15,7 @@ class AuthService {
   Future<AuthResult> login(String email, String password) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       // Mock authentication - check for demo credentials
       if (email.isNotEmpty && password.isNotEmpty) {
         // Create a mock user
@@ -27,14 +27,17 @@ class AuthService {
           role: 'patient',
           avatar: null,
         );
-        
+
         // Store token and user data
-        await prefs.setString(_tokenKey, 'demo_token_${DateTime.now().millisecondsSinceEpoch}');
+        await prefs.setString(
+          _tokenKey,
+          'demo_token_${DateTime.now().millisecondsSinceEpoch}',
+        );
         await prefs.setString(_userKey, jsonEncode(user.toJson()));
-        
+
         return AuthResult.success(user, 'demo_token');
       }
-      
+
       return AuthResult.failure('البيانات غير صحيحة');
     } catch (e) {
       return AuthResult.failure('خطأ في تسجيل الدخول: $e');
@@ -52,12 +55,12 @@ class AuthService {
   }) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       // Basic validation
       if (password != passwordConfirmation) {
         return AuthResult.failure('كلمة المرور غير متطابقة');
       }
-      
+
       // Create a mock user
       final user = UserModel(
         id: '2',
@@ -67,11 +70,14 @@ class AuthService {
         role: role ?? 'patient',
         avatar: null,
       );
-      
+
       // Store token and user data
-      await prefs.setString(_tokenKey, 'demo_token_${DateTime.now().millisecondsSinceEpoch}');
+      await prefs.setString(
+        _tokenKey,
+        'demo_token_${DateTime.now().millisecondsSinceEpoch}',
+      );
       await prefs.setString(_userKey, jsonEncode(user.toJson()));
-      
+
       return AuthResult.success(user, 'demo_token');
     } catch (e) {
       return AuthResult.failure('خطأ في التسجيل: $e');
