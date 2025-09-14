@@ -282,6 +282,175 @@ class ApiService {
       return {'success': false, 'error': 'خطأ في الاتصال: $e'};
     }
   }
+
+  // Hospital API methods
+  Future<Map<String, dynamic>> getHospitals({
+    String? status,
+    String? city,
+    double? lat,
+    double? lng,
+  }) async {
+    try {
+      Map<String, dynamic> queryParams = {};
+
+      if (status != null) queryParams['status'] = status;
+      if (city != null) queryParams['city'] = city;
+      if (lat != null) queryParams['lat'] = lat.toString();
+      if (lng != null) queryParams['lng'] = lng.toString();
+
+      final response = await get('/hospitals', queryParameters: queryParams);
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'hospitals': response.data['hospitals'] ?? []};
+      } else {
+        return {
+          'success': false,
+          'error': 'فشل في الحصول على قائمة المستشفيات',
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'error': 'خطأ في الاتصال: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> getHospitalById(int hospitalId) async {
+    try {
+      final response = await get('/hospitals/$hospitalId');
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'hospital': response.data['hospital']};
+      } else {
+        return {'success': false, 'error': 'فشل في الحصول على بيانات المستشفى'};
+      }
+    } catch (e) {
+      return {'success': false, 'error': 'خطأ في الاتصال: $e'};
+    }
+  }
+
+  // Patient API methods
+  Future<Map<String, dynamic>> getPatients({
+    int? hospitalId,
+    String? status,
+    String? priority,
+    String? severity,
+  }) async {
+    try {
+      Map<String, dynamic> queryParams = {};
+
+      if (hospitalId != null)
+        queryParams['hospital_id'] = hospitalId.toString();
+      if (status != null) queryParams['status'] = status;
+      if (priority != null) queryParams['priority'] = priority;
+      if (severity != null) queryParams['severity'] = severity;
+
+      final response = await get('/patients', queryParameters: queryParams);
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'patients': response.data['patients'] ?? []};
+      } else {
+        return {'success': false, 'error': 'فشل في الحصول على قائمة المرضى'};
+      }
+    } catch (e) {
+      return {'success': false, 'error': 'خطأ في الاتصال: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> getPatientById(int patientId) async {
+    try {
+      final response = await get('/patients/$patientId');
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'patient': response.data['patient']};
+      } else {
+        return {'success': false, 'error': 'فشل في الحصول على بيانات المريض'};
+      }
+    } catch (e) {
+      return {'success': false, 'error': 'خطأ في الاتصال: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> createPatient(
+    Map<String, dynamic> patientData,
+  ) async {
+    try {
+      final response = await post('/patients', data: patientData);
+
+      if (response.statusCode == 201) {
+        return {
+          'success': true,
+          'patient': response.data['patient'],
+          'message': 'تم إنشاء المريض بنجاح',
+        };
+      } else {
+        return {
+          'success': false,
+          'error': response.data['message'] ?? 'فشل في إنشاء المريض',
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'error': 'خطأ في الاتصال: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> updatePatient(
+    int patientId,
+    Map<String, dynamic> patientData,
+  ) async {
+    try {
+      final response = await put('/patients/$patientId', data: patientData);
+
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'patient': response.data['patient'],
+          'message': 'تم تحديث بيانات المريض بنجاح',
+        };
+      } else {
+        return {
+          'success': false,
+          'error': response.data['message'] ?? 'فشل في تحديث بيانات المريض',
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'error': 'خطأ في الاتصال: $e'};
+    }
+  }
+
+  Future<Map<String, dynamic>> deletePatient(int patientId) async {
+    try {
+      final response = await delete('/patients/$patientId');
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': 'تم حذف المريض بنجاح'};
+      } else {
+        return {
+          'success': false,
+          'error': response.data['message'] ?? 'فشل في حذف المريض',
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'error': 'خطأ في الاتصال: $e'};
+    }
+  }
+
+  // Test API connection
+  Future<Map<String, dynamic>> testApiConnection() async {
+    try {
+      final response = await get('/test');
+
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'message': 'API connection successful',
+          'data': response.data,
+        };
+      } else {
+        return {'success': false, 'error': 'API connection failed'};
+      }
+    } catch (e) {
+      return {'success': false, 'error': 'Connection error: $e'};
+    }
+  }
 }
 
 // Authentication result helper class

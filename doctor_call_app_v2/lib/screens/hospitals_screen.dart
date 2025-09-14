@@ -25,16 +25,11 @@ class _HospitalsScreenState extends State<HospitalsScreen> {
 
   Future<void> _loadHospitals() async {
     try {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final token = authProvider.token;
-
-      if (token != null) {
-        final hospitals = await _hospitalService.getAllHospitals(token);
-        setState(() {
-          _hospitals = hospitals;
-          _isLoading = false;
-        });
-      }
+      final hospitals = await _hospitalService.getAllHospitals();
+      setState(() {
+        _hospitals = hospitals;
+        _isLoading = false;
+      });
     } catch (e) {
       setState(() {
         _isLoading = false;

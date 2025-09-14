@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{HospitalController,MissionController,PatientController,TickController};
-use App\Http\Controllers\API\{AuthController, GameAvatarController};
+use App\Http\Controllers\Api\{AuthController, GameAvatarController};
 use App\Http\Controllers\Api\{HospitalApiController, PatientApiController};
 
 // مسارات التوثيق العامة

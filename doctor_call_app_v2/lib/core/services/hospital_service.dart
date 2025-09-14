@@ -1,42 +1,33 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import '../models/hospital_model.dart';
-import '../constants/api_constants.dart';
+import './api_service.dart';
 
 class HospitalService {
-  static const String baseUrl = ApiConstants.baseUrl;
+  final ApiService _apiService = ApiService();
 
-  Future<List<Hospital>> getAllHospitals(String token) async {
+  Future<List<Hospital>> getAllHospitals([String? token]) async {
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/hospitals'),
-        headers: ApiConstants.getAuthHeaders(token),
-      );
+      final response = await _apiService.getHospitals();
 
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        final List<dynamic> hospitalsJson = data['data'] ?? [];
+      if (response['success'] == true) {
+        final List<dynamic> hospitalsJson = response['hospitals'] ?? [];
         return hospitalsJson.map((json) => Hospital.fromJson(json)).toList();
       } else {
-        throw Exception('Failed to load hospitals: ${response.statusCode}');
+        throw Exception(response['error'] ?? 'Failed to load hospitals');
       }
     } catch (e) {
       throw Exception('Error loading hospitals: $e');
     }
   }
 
-  Future<Hospital> getHospitalById(int id, String token) async {
+  Future<Hospital> getHospitalById(int id, [String? token]) async {
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/hospitals/$id'),
-        headers: ApiConstants.getAuthHeaders(token),
-      );
+      final response = await _apiService.getHospitalById(id);
 
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        return Hospital.fromJson(data['data']);
+      if (response['success'] == true) {
+        return Hospital.fromJson(response['hospital']);
       } else {
-        throw Exception('Failed to load hospital: ${response.statusCode}');
+        throw Exception(response['error'] ?? 'Failed to load hospital');
       }
     } catch (e) {
       throw Exception('Error loading hospital: $e');
