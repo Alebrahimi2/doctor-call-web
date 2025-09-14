@@ -25,6 +25,9 @@ class Achievement {
     this.rewards = const [],
   });
 
+  // Compatibility getter for points
+  int get points => requiredPoints;
+
   factory Achievement.fromJson(Map<String, dynamic> json) {
     return Achievement(
       id: json['id'] ?? 0,
@@ -122,6 +125,9 @@ class GameScore {
     this.rank = 0,
     this.title = 'مبتدئ',
   });
+
+  // Compatibility getter for experience
+  int get experience => experiencePoints;
 
   factory GameScore.fromJson(Map<String, dynamic> json) {
     return GameScore(
@@ -258,6 +264,9 @@ class GameAction {
     required this.metadata,
     DateTime? timestamp,
   }) : timestamp = timestamp ?? DateTime.now();
+
+  // Compatibility getter for actionType
+  String get actionType => type;
 
   factory GameAction.fromJson(Map<String, dynamic> json) {
     return GameAction(

@@ -139,7 +139,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
         margin: const EdgeInsets.all(8),
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.2),
+          color: color.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(4),
         ),
         child: Icon(icon, color: color, size: 20),
@@ -215,7 +215,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
             // Real-time emergency alerts from WebSocket
             if (emergencyAlerts.isNotEmpty) ...[
               Container(
-                color: Colors.red.withOpacity(0.1),
+                color: Colors.red.withValues(alpha: 0.1),
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -268,7 +268,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
             // Real-time system messages
             if (systemMessages.isNotEmpty) ...[
               Container(
-                color: Colors.blue.withOpacity(0.1),
+                color: Colors.blue.withValues(alpha: 0.1),
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -354,7 +354,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
 
   Widget _buildEmergencyAlertCard(Map<String, dynamic> alert) {
     return Card(
-      color: Colors.red.withOpacity(0.1),
+      color: Colors.red.withValues(alpha: 0.1),
       child: ListTile(
         leading: const Icon(Icons.warning, color: Colors.red),
         title: Text(
@@ -373,7 +373,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
 
   Widget _buildSystemMessageCard(Map<String, dynamic> message) {
     return Card(
-      color: Colors.blue.withOpacity(0.1),
+      color: Colors.blue.withValues(alpha: 0.1),
       child: ListTile(
         leading: const Icon(Icons.info, color: Colors.blue),
         title: Text(

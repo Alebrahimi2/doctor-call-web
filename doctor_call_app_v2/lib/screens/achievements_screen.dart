@@ -103,7 +103,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
               end: Alignment.bottomRight,
               colors: [
                 Theme.of(context).primaryColor,
-                Theme.of(context).primaryColor.withOpacity(0.8),
+                Theme.of(context).primaryColor.withValues(alpha: 0.8),
               ],
             ),
           ),
@@ -150,7 +150,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey.withValues(alpha: 0.1),
               spreadRadius: 2,
               blurRadius: 8,
               offset: const Offset(0, 2),
@@ -164,7 +164,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withOpacity(0.1),
+                    color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -388,13 +388,13 @@ class _AchievementsScreenState extends State<AchievementsScreen>
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: achievement.isUnlocked
-              ? Theme.of(context).primaryColor.withOpacity(0.3)
-              : Colors.grey.withOpacity(0.2),
+              ? Theme.of(context).primaryColor.withValues(alpha: 0.3)
+              : Colors.grey.withValues(alpha: 0.2),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, 2),
@@ -414,7 +414,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                 height: 60,
                 decoration: BoxDecoration(
                   color: achievement.isUnlocked
-                      ? _getRarityColor(achievement.rarity).withOpacity(0.1)
+                      ? _getRarityColor(achievement.rarity).withValues(alpha: 0.1)
                       : Colors.grey[100],
                   borderRadius: BorderRadius.circular(30),
                   border: Border.all(
@@ -554,7 +554,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                                     .clamp(0.0, 1.0),
                             backgroundColor: Colors.grey[200],
                             valueColor: AlwaysStoppedAnimation<Color>(
-                              Theme.of(context).primaryColor.withOpacity(0.7),
+                              Theme.of(context).primaryColor.withValues(alpha: 0.7),
                             ),
                             minHeight: 4,
                           ),
@@ -642,7 +642,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                         color: achievement.isUnlocked
                             ? _getRarityColor(
                                 achievement.rarity,
-                              ).withOpacity(0.1)
+                              ).withValues(alpha: 0.1)
                             : Colors.grey[100],
                         borderRadius: BorderRadius.circular(40),
                         border: Border.all(
@@ -679,7 +679,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                             decoration: BoxDecoration(
                               color: _getRarityColor(
                                 achievement.rarity,
-                              ).withOpacity(0.1),
+                              ).withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
                                 color: _getRarityColor(achievement.rarity),

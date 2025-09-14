@@ -8,6 +8,7 @@ class UserModel {
   final DateTime? emailVerifiedAt;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String? token; // Added for authentication compatibility
 
   UserModel({
     required this.id,
@@ -19,6 +20,7 @@ class UserModel {
     this.emailVerifiedAt,
     required this.createdAt,
     required this.updatedAt,
+    this.token, // Added token parameter
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -34,6 +36,7 @@ class UserModel {
           : null,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
+      token: json['token'] as String?, // Added token from JSON
     );
   }
 
@@ -48,6 +51,9 @@ class UserModel {
       'email_verified_at': emailVerifiedAt?.toIso8601String(),
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
+      'token': token, // Added token to JSON
+    };
+  }
     };
   }
 

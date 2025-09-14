@@ -35,6 +35,12 @@ dependencies:
   
   # Authentication and secure storage
   flutter_secure_storage: ^9.0.0
+  
+  # Web-compatible notifications (use conditional imports for web/mobile)
+  flutter_local_notifications: ^17.2.3
+  
+  # WebSocket support for real-time features
+  web_socket_channel: ^2.4.0
 
 dev_dependencies:
   flutter_test:

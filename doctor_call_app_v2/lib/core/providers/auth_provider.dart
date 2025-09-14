@@ -19,6 +19,9 @@ class AuthProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   bool get isAuthenticated =>
       _state == AuthState.authenticated && _user != null;
+  
+  // Token getter for compatibility
+  String? get token => _user?.token;
 
   // Initialize auth state
   Future<void> initializeAuth() async {

@@ -23,7 +23,7 @@ void main() {
       // Inject mock client into patient service
     });
 
-    group('getPatients', () {
+    group('getAllPatients', () {
       test('should return list of patients', () async {
         // Arrange
         const token = 'valid_token_123';
@@ -48,7 +48,7 @@ void main() {
         );
 
         // Act
-        final result = await patientService.getPatients(token, page, limit);
+        final result = await patientService.getAllPatients(token, page, limit);
 
         // Assert
         expect(result['success'], true);
@@ -577,7 +577,7 @@ void main() {
         );
 
         // Act
-        final result = await patientService.getPatients(invalidToken, 1, 10);
+        final result = await patientService.getAllPatients(invalidToken, 1, 10);
 
         // Assert
         expect(result['success'], false);
@@ -594,7 +594,7 @@ void main() {
         );
 
         // Act
-        final result = await patientService.getPatients(token, 1, 10);
+        final result = await patientService.getAllPatients(token, 1, 10);
 
         // Assert
         expect(result['success'], false);
@@ -610,7 +610,7 @@ void main() {
         ).thenThrow(Exception('Network error'));
 
         // Act
-        final result = await patientService.getPatients(token, 1, 10);
+        final result = await patientService.getAllPatients(token, 1, 10);
 
         // Assert
         expect(result['success'], false);

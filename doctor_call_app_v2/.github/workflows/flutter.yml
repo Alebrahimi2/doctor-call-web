@@ -114,7 +114,10 @@ jobs:
         echo ""
         echo "🔍 Starting build process..."
         
-        # Run with maximum verbosity to catch dart2js compilation issues
+        # Run with HTML renderer and without WASM for Flutter 3.35.3 compatibility
+        FLUTTER_WEB_RENDERER=html \
+        FLUTTER_WEB_USE_SKIA=true \
+        FLUTTER_WEB_USE_SKWASM=false \
         flutter build web --release --verbose --dart2js-optimization=O0 2>&1 | tee build_log.txt
         
         echo "📊 Build process completed with exit code: $?"

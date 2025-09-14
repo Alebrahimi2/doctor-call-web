@@ -24,10 +24,15 @@ jobs:
       - name: Build Web
         run: |
           flutter clean
+          # فرض استخدام HTML renderer بدون WASM
+          FLUTTER_WEB_RENDERER=html \
+          FLUTTER_WEB_USE_SKIA=true \
+          FLUTTER_WEB_USE_SKWASM=false \
           flutter build web --release \
             --pwa-strategy=none \
             --source-maps \
-            --base-href "/doctor-call-web/"
+            --base-href "/doctor-call-web/" \
+            --verbose
           # نسخة لصفحة 404 لتجنب مشاكل SPA routing
           cp build/web/index.html build/web/404.html
           # تعطيل Jekyll

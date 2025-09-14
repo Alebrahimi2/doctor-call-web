@@ -76,7 +76,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
               end: Alignment.bottomRight,
               colors: [
                 Theme.of(context).primaryColor,
-                Theme.of(context).primaryColor.withOpacity(0.8),
+                Theme.of(context).primaryColor.withValues(alpha: 0.8),
               ],
             ),
           ),
@@ -87,7 +87,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                 left: 20,
                 child: Icon(
                   Icons.assignment,
-                  color: Colors.white.withOpacity(0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                   size: 80,
                 ),
               ),
@@ -96,7 +96,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                 right: 20,
                 child: Icon(
                   Icons.emoji_events,
-                  color: Colors.white.withOpacity(0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                   size: 60,
                 ),
               ),
@@ -133,7 +133,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey.withValues(alpha: 0.1),
               spreadRadius: 2,
               blurRadius: 8,
               offset: const Offset(0, 2),
@@ -205,9 +205,9 @@ class _ChallengesScreenState extends State<ChallengesScreen>
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
@@ -360,13 +360,13 @@ class _ChallengesScreenState extends State<ChallengesScreen>
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isCompleted
-              ? Colors.green.withOpacity(0.3)
-              : Colors.grey.withOpacity(0.2),
+              ? Colors.green.withValues(alpha: 0.3)
+              : Colors.grey.withValues(alpha: 0.2),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, 2),
@@ -385,8 +385,8 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                   height: 48,
                   decoration: BoxDecoration(
                     color: isCompleted
-                        ? Colors.green.withOpacity(0.1)
-                        : _getChallengeTypeColor(type).withOpacity(0.1),
+                        ? Colors.green.withValues(alpha: 0.1)
+                        : _getChallengeTypeColor(type).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
                       color: isCompleted
@@ -435,7 +435,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.amber.withOpacity(0.1),
+                      color: Colors.amber.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: Colors.amber),
                     ),
@@ -519,9 +519,9 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
+                  color: Colors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.green.withOpacity(0.3)),
+                  border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
@@ -639,19 +639,19 @@ class _ChallengesScreenState extends State<ChallengesScreen>
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isActive
-              ? [Colors.purple.withOpacity(0.1), Colors.blue.withOpacity(0.1)]
-              : [Colors.grey.withOpacity(0.05), Colors.grey.withOpacity(0.1)],
+              ? [Colors.purple.withValues(alpha: 0.1), Colors.blue.withValues(alpha: 0.1)]
+              : [Colors.grey.withValues(alpha: 0.05), Colors.grey.withValues(alpha: 0.1)],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isActive
-              ? Colors.purple.withOpacity(0.3)
-              : Colors.grey.withOpacity(0.2),
+              ? Colors.purple.withValues(alpha: 0.3)
+              : Colors.grey.withValues(alpha: 0.2),
           width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, 2),
@@ -670,8 +670,8 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                   height: 48,
                   decoration: BoxDecoration(
                     color: isActive
-                        ? Colors.purple.withOpacity(0.1)
-                        : Colors.grey.withOpacity(0.1),
+                        ? Colors.purple.withValues(alpha: 0.1)
+                        : Colors.grey.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
                       color: isActive ? Colors.purple : Colors.grey,
@@ -716,8 +716,8 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                   ),
                   decoration: BoxDecoration(
                     color: isActive
-                        ? Colors.green.withOpacity(0.1)
-                        : Colors.grey.withOpacity(0.1),
+                        ? Colors.green.withValues(alpha: 0.1)
+                        : Colors.grey.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: isActive ? Colors.green : Colors.grey,
@@ -768,9 +768,9 @@ class _ChallengesScreenState extends State<ChallengesScreen>
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.amber.withOpacity(0.1),
+                  color: Colors.amber.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.amber.withOpacity(0.3)),
+                  border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [

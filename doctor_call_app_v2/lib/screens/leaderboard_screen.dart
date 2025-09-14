@@ -113,7 +113,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
               end: Alignment.bottomRight,
               colors: [
                 Theme.of(context).primaryColor,
-                Theme.of(context).primaryColor.withOpacity(0.8),
+                Theme.of(context).primaryColor.withValues(alpha: 0.8),
               ],
             ),
           ),
@@ -124,7 +124,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                 left: 20,
                 child: Icon(
                   Icons.emoji_events,
-                  color: Colors.white.withOpacity(0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                   size: 80,
                 ),
               ),
@@ -133,7 +133,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                 right: 20,
                 child: Icon(
                   Icons.leaderboard,
-                  color: Colors.white.withOpacity(0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                   size: 60,
                 ),
               ),
@@ -186,13 +186,13 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Theme.of(context).primaryColor.withOpacity(0.1),
-              Theme.of(context).primaryColor.withOpacity(0.05),
+              Theme.of(context).primaryColor.withValues(alpha: 0.1),
+              Theme.of(context).primaryColor.withValues(alpha: 0.05),
             ],
           ),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: Theme.of(context).primaryColor.withOpacity(0.3),
+            color: Theme.of(context).primaryColor.withValues(alpha: 0.3),
           ),
         ),
         child: Column(
@@ -207,7 +207,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: [
                       BoxShadow(
-                        color: Theme.of(context).primaryColor.withOpacity(0.3),
+                        color: Theme.of(context).primaryColor.withValues(alpha: 0.3),
                         spreadRadius: 2,
                         blurRadius: 8,
                         offset: const Offset(0, 2),
@@ -308,7 +308,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, color: color, size: 20),
@@ -477,17 +477,17 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: isTopThree ? rankColor.withOpacity(0.05) : Colors.white,
+        color: isTopThree ? rankColor.withValues(alpha: 0.05) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isTopThree
-              ? rankColor.withOpacity(0.3)
-              : Colors.grey.withOpacity(0.2),
+              ? rankColor.withValues(alpha: 0.3)
+              : Colors.grey.withValues(alpha: 0.2),
           width: isTopThree ? 2 : 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, 2),
@@ -616,7 +616,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.1),
+                      color: Colors.green.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
