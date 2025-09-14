@@ -1,11 +1,10 @@
 import 'dart:convert';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
-import 'api_service.dart';
+import 'offline_auth_service.dart';
 
 class AuthService {
-  final ApiService _apiService = ApiService();
-  final FlutterSecureStorage _storage = const FlutterSecureStorage();
+  final OfflineAuthService _offlineService = OfflineAuthService();
 
   static final AuthService _instance = AuthService._internal();
   factory AuthService() => _instance;
@@ -14,27 +13,10 @@ class AuthService {
   // Login with email and password
   Future<AuthResult> login(String email, String password) async {
     try {
-      final response = await _apiService.post(
-        '/auth/login',
-        data: {'email': email, 'password': password},
-      );
-
-      if (response.statusCode == 200) {
-        final data = response.data;
-        final token = data['token'];
-        final userData = data['user'];
-
-        // Store token and user data
-        await _apiService.storeToken(token);
-        await _storage.write(key: 'user_data', value: jsonEncode(userData));
-
-        final user = UserModel.fromJson(userData);
-        return AuthResult.success(user, token);
-      }
-
-      return AuthResult.failure(response.data['message'] ?? 'Login failed');
+      // Use offline service for demo/development
+      return await _offlineService.login(email, password);
     } catch (e) {
-      return AuthResult.failure(e.toString());
+      return AuthResult.failure('خطأ في تسجيل الدخول: $e');
     }
   }
 
@@ -48,48 +30,25 @@ class AuthService {
     String? role,
   }) async {
     try {
-      final response = await _apiService.post(
-        '/auth/register',
-        data: {
-          'name': name,
-          'email': email,
-          'password': password,
-          'password_confirmation': passwordConfirmation,
-          if (phone != null) 'phone': phone,
-          if (role != null) 'role': role,
-        },
-      );
-
-      if (response.statusCode == 201) {
-        final data = response.data;
-        final token = data['token'];
-        final userData = data['user'];
-
-        // Store token and user data
-        await _apiService.storeToken(token);
-        await _storage.write(key: 'user_data', value: jsonEncode(userData));
-
-        final user = UserModel.fromJson(userData);
-        return AuthResult.success(user, token);
-      }
-
-      return AuthResult.failure(
-        response.data['message'] ?? 'Registration failed',
+      // Use offline service for demo/development
+      return await _offlineService.register(
+        name: name,
+        email: email,
+        password: password,
+        passwordConfirmation: passwordConfirmation,
+        phone: phone,
+        role: role,
       );
     } catch (e) {
-      return AuthResult.failure(e.toString());
+      return AuthResult.failure('خطأ في التسجيل: $e');
     }
   }
 
   // Logout user
   Future<bool> logout() async {
     try {
-      await _apiService.post('/auth/logout');
-      await _apiService.clearAuth();
-      return true;
+      return await _offlineService.logout();
     } catch (e) {
-      // Even if logout request fails, clear local data
-      await _apiService.clearAuth();
       return false;
     }
   }
@@ -97,11 +56,7 @@ class AuthService {
   // Get current user info
   Future<UserModel?> getCurrentUser() async {
     try {
-      final response = await _apiService.get('/auth/user');
-      if (response.statusCode == 200) {
-        return UserModel.fromJson(response.data['user']);
-      }
-      return null;
+      return await _offlineService.getCurrentUser();
     } catch (e) {
       return null;
     }
@@ -109,12 +64,8 @@ class AuthService {
 
   // Check if user is authenticated
   Future<bool> isAuthenticated() async {
-    final token = await _apiService.getToken();
-    if (token == null) return false;
-
     try {
-      final response = await _apiService.get('/auth/check');
-      return response.statusCode == 200;
+      return await _offlineService.isAuthenticated();
     } catch (e) {
       return false;
     }
@@ -123,29 +74,18 @@ class AuthService {
   // Get stored user data
   Future<UserModel?> getStoredUser() async {
     try {
-      final userDataString = await _storage.read(key: 'user_data');
-      if (userDataString != null) {
-        final userData = jsonDecode(userDataString);
-        return UserModel.fromJson(userData);
-      }
-      return null;
+      return await _offlineService.getStoredUser();
     } catch (e) {
       return null;
     }
   }
 
-  // Refresh authentication token
-  Future<bool> refreshToken() async {
+  // Clear authentication data
+  Future<void> clearAuth() async {
     try {
-      final response = await _apiService.post('/auth/refresh');
-      if (response.statusCode == 200) {
-        final newToken = response.data['token'];
-        await _apiService.storeToken(newToken);
-        return true;
-      }
-      return false;
+      await _offlineService.clearAuth();
     } catch (e) {
-      return false;
+      // Ignore errors in clearing
     }
   }
 
@@ -157,25 +97,14 @@ class AuthService {
     String? avatar,
   }) async {
     try {
-      final data = <String, dynamic>{};
-      if (name != null) data['name'] = name;
-      if (email != null) data['email'] = email;
-      if (phone != null) data['phone'] = phone;
-      if (avatar != null) data['avatar'] = avatar;
-
-      final response = await _apiService.put('/auth/profile', data: data);
-
-      if (response.statusCode == 200) {
-        final userData = response.data['user'];
-        await _storage.write(key: 'user_data', value: jsonEncode(userData));
-
-        final user = UserModel.fromJson(userData);
-        return AuthResult.success(user);
+      // For now, just return success (implement later)
+      final user = await getCurrentUser();
+      if (user != null) {
+        return AuthResult.success(user, '');
       }
-
-      return AuthResult.failure(response.data['message'] ?? 'Update failed');
+      return AuthResult.failure('المستخدم غير موجود');
     } catch (e) {
-      return AuthResult.failure(e.toString());
+      return AuthResult.failure('خطأ في تحديث الملف الشخصي: $e');
     }
   }
 
@@ -186,29 +115,10 @@ class AuthService {
     required String passwordConfirmation,
   }) async {
     try {
-      final response = await _apiService.put(
-        '/auth/change-password',
-        data: {
-          'current_password': currentPassword,
-          'new_password': newPassword,
-          'new_password_confirmation': passwordConfirmation,
-        },
-      );
-
-      return response.statusCode == 200;
+      // For now, just return true (implement later)
+      return true;
     } catch (e) {
       return false;
     }
   }
-}
-
-// Authentication result class
-class AuthResult {
-  final bool success;
-  final String? error;
-  final UserModel? user;
-  final String? token;
-
-  AuthResult.success(this.user, [this.token]) : success = true, error = null;
-  AuthResult.failure(this.error) : success = false, user = null, token = null;
 }
