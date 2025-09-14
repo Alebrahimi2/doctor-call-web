@@ -4,12 +4,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/io.dart';
 import '../constants/api_constants.dart';
 
-enum WebSocketConnectionStatus {
-  connecting,
-  connected,
-  disconnected,
-  error,
-}
+enum WebSocketConnectionStatus { connecting, connected, disconnected, error }
 
 class WebSocketService {
   static final WebSocketService _instance = WebSocketService._internal();
@@ -18,10 +13,10 @@ class WebSocketService {
 
   WebSocketChannel? _channel;
   StreamSubscription? _subscription;
-  
-  final StreamController<Map<String, dynamic>> _messageController = 
+
+  final StreamController<Map<String, dynamic>> _messageController =
       StreamController<Map<String, dynamic>>.broadcast();
-  final StreamController<WebSocketConnectionStatus> _statusController = 
+  final StreamController<WebSocketConnectionStatus> _statusController =
       StreamController<WebSocketConnectionStatus>.broadcast();
 
   WebSocketConnectionStatus _status = WebSocketConnectionStatus.disconnected;
@@ -35,7 +30,8 @@ class WebSocketService {
 
   // Getters
   Stream<Map<String, dynamic>> get messages => _messageController.stream;
-  Stream<WebSocketConnectionStatus> get connectionStatus => _statusController.stream;
+  Stream<WebSocketConnectionStatus> get connectionStatus =>
+      _statusController.stream;
   WebSocketConnectionStatus get currentStatus => _status;
   bool get isConnected => _status == WebSocketConnectionStatus.connected;
 
@@ -44,16 +40,14 @@ class WebSocketService {
     try {
       _token = token;
       _updateStatus(WebSocketConnectionStatus.connecting);
-      
+
       // Construct WebSocket URL with auth token
       final wsUrl = '${ApiConstants.wsBaseUrl}/ws?token=$token';
-      
+
       // Create WebSocket connection
       _channel = IOWebSocketChannel.connect(
         Uri.parse(wsUrl),
-        headers: {
-          'Authorization': 'Bearer $token',
-        },
+        headers: {'Authorization': 'Bearer $token'},
       );
 
       // Listen to WebSocket messages
@@ -66,14 +60,13 @@ class WebSocketService {
       _updateStatus(WebSocketConnectionStatus.connected);
       _reconnectAttempts = 0;
       _startHeartbeat();
-      
+
       // Send initial connection message
       _sendMessage({
         'type': 'connection',
         'action': 'subscribe',
-        'channels': ['patients', 'hospitals', 'emergency', 'notifications']
+        'channels': ['patients', 'hospitals', 'emergency', 'notifications'],
       });
-
     } catch (e) {
       _updateStatus(WebSocketConnectionStatus.error);
       _scheduleReconnect();
@@ -125,10 +118,7 @@ class WebSocketService {
 
   /// Subscribe to emergency alerts
   void subscribeToEmergencyAlerts() {
-    _sendMessage({
-      'type': 'subscribe',
-      'channel': 'emergency',
-    });
+    _sendMessage({'type': 'subscribe', 'channel': 'emergency'});
   }
 
   /// Send patient status update
@@ -165,7 +155,7 @@ class WebSocketService {
     try {
       final Map<String, dynamic> data = json.decode(message);
       _messageController.add(data);
-      
+
       // Handle specific message types
       switch (data['type']) {
         case 'heartbeat':

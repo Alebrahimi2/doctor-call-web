@@ -6,38 +6,38 @@ import 'api_service.dart';
 class AuthService {
   final ApiService _apiService = ApiService();
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
-  
+
   static final AuthService _instance = AuthService._internal();
   factory AuthService() => _instance;
   AuthService._internal();
-  
+
   // Login with email and password
   Future<AuthResult> login(String email, String password) async {
     try {
-      final response = await _apiService.post('/auth/login', data: {
-        'email': email,
-        'password': password,
-      });
-      
+      final response = await _apiService.post(
+        '/auth/login',
+        data: {'email': email, 'password': password},
+      );
+
       if (response.statusCode == 200) {
         final data = response.data;
         final token = data['token'];
         final userData = data['user'];
-        
+
         // Store token and user data
         await _apiService.storeToken(token);
         await _storage.write(key: 'user_data', value: jsonEncode(userData));
-        
+
         final user = UserModel.fromJson(userData);
         return AuthResult.success(user, token);
       }
-      
+
       return AuthResult.failure(response.data['message'] ?? 'Login failed');
     } catch (e) {
       return AuthResult.failure(e.toString());
     }
   }
-  
+
   // Register new user
   Future<AuthResult> register({
     required String name,
@@ -48,34 +48,39 @@ class AuthService {
     String? role,
   }) async {
     try {
-      final response = await _apiService.post('/auth/register', data: {
-        'name': name,
-        'email': email,
-        'password': password,
-        'password_confirmation': passwordConfirmation,
-        if (phone != null) 'phone': phone,
-        if (role != null) 'role': role,
-      });
-      
+      final response = await _apiService.post(
+        '/auth/register',
+        data: {
+          'name': name,
+          'email': email,
+          'password': password,
+          'password_confirmation': passwordConfirmation,
+          if (phone != null) 'phone': phone,
+          if (role != null) 'role': role,
+        },
+      );
+
       if (response.statusCode == 201) {
         final data = response.data;
         final token = data['token'];
         final userData = data['user'];
-        
+
         // Store token and user data
         await _apiService.storeToken(token);
         await _storage.write(key: 'user_data', value: jsonEncode(userData));
-        
+
         final user = UserModel.fromJson(userData);
         return AuthResult.success(user, token);
       }
-      
-      return AuthResult.failure(response.data['message'] ?? 'Registration failed');
+
+      return AuthResult.failure(
+        response.data['message'] ?? 'Registration failed',
+      );
     } catch (e) {
       return AuthResult.failure(e.toString());
     }
   }
-  
+
   // Logout user
   Future<bool> logout() async {
     try {
@@ -88,7 +93,7 @@ class AuthService {
       return false;
     }
   }
-  
+
   // Get current user info
   Future<UserModel?> getCurrentUser() async {
     try {
@@ -101,12 +106,12 @@ class AuthService {
       return null;
     }
   }
-  
+
   // Check if user is authenticated
   Future<bool> isAuthenticated() async {
     final token = await _apiService.getToken();
     if (token == null) return false;
-    
+
     try {
       final response = await _apiService.get('/auth/check');
       return response.statusCode == 200;
@@ -114,7 +119,7 @@ class AuthService {
       return false;
     }
   }
-  
+
   // Get stored user data
   Future<UserModel?> getStoredUser() async {
     try {
@@ -128,7 +133,7 @@ class AuthService {
       return null;
     }
   }
-  
+
   // Refresh authentication token
   Future<bool> refreshToken() async {
     try {
@@ -143,7 +148,7 @@ class AuthService {
       return false;
     }
   }
-  
+
   // Update user profile
   Future<AuthResult> updateProfile({
     String? name,
@@ -157,23 +162,23 @@ class AuthService {
       if (email != null) data['email'] = email;
       if (phone != null) data['phone'] = phone;
       if (avatar != null) data['avatar'] = avatar;
-      
+
       final response = await _apiService.put('/auth/profile', data: data);
-      
+
       if (response.statusCode == 200) {
         final userData = response.data['user'];
         await _storage.write(key: 'user_data', value: jsonEncode(userData));
-        
+
         final user = UserModel.fromJson(userData);
         return AuthResult.success(user);
       }
-      
+
       return AuthResult.failure(response.data['message'] ?? 'Update failed');
     } catch (e) {
       return AuthResult.failure(e.toString());
     }
   }
-  
+
   // Change password
   Future<bool> changePassword({
     required String currentPassword,
@@ -181,12 +186,15 @@ class AuthService {
     required String passwordConfirmation,
   }) async {
     try {
-      final response = await _apiService.put('/auth/change-password', data: {
-        'current_password': currentPassword,
-        'new_password': newPassword,
-        'new_password_confirmation': passwordConfirmation,
-      });
-      
+      final response = await _apiService.put(
+        '/auth/change-password',
+        data: {
+          'current_password': currentPassword,
+          'new_password': newPassword,
+          'new_password_confirmation': passwordConfirmation,
+        },
+      );
+
       return response.statusCode == 200;
     } catch (e) {
       return false;
@@ -200,7 +208,7 @@ class AuthResult {
   final String? error;
   final UserModel? user;
   final String? token;
-  
+
   AuthResult.success(this.user, [this.token]) : success = true, error = null;
   AuthResult.failure(this.error) : success = false, user = null, token = null;
 }

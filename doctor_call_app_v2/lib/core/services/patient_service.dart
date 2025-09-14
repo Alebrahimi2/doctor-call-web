@@ -51,7 +51,10 @@ class PatientService {
     }
   }
 
-  Future<Patient> createPatient(Map<String, dynamic> patientData, String token) async {
+  Future<Patient> createPatient(
+    Map<String, dynamic> patientData,
+    String token,
+  ) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/patients'),
@@ -74,7 +77,11 @@ class PatientService {
     }
   }
 
-  Future<Patient> updatePatient(int id, Map<String, dynamic> patientData, String token) async {
+  Future<Patient> updatePatient(
+    int id,
+    Map<String, dynamic> patientData,
+    String token,
+  ) async {
     try {
       final response = await http.put(
         Uri.parse('$baseUrl/patients/$id'),
@@ -132,14 +139,19 @@ class PatientService {
         final List<dynamic> patientsJson = data['data'] ?? [];
         return patientsJson.map((json) => Patient.fromJson(json)).toList();
       } else {
-        throw Exception('Failed to load patients by status: ${response.statusCode}');
+        throw Exception(
+          'Failed to load patients by status: ${response.statusCode}',
+        );
       }
     } catch (e) {
       throw Exception('Error loading patients by status: $e');
     }
   }
 
-  Future<List<Patient>> getPatientsByHospital(int hospitalId, String token) async {
+  Future<List<Patient>> getPatientsByHospital(
+    int hospitalId,
+    String token,
+  ) async {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/patients/hospital/$hospitalId'),
@@ -155,14 +167,20 @@ class PatientService {
         final List<dynamic> patientsJson = data['data'] ?? [];
         return patientsJson.map((json) => Patient.fromJson(json)).toList();
       } else {
-        throw Exception('Failed to load patients by hospital: ${response.statusCode}');
+        throw Exception(
+          'Failed to load patients by hospital: ${response.statusCode}',
+        );
       }
     } catch (e) {
       throw Exception('Error loading patients by hospital: $e');
     }
   }
 
-  Future<Map<String, dynamic>> updatePatientStatus(int id, String status, String token) async {
+  Future<Map<String, dynamic>> updatePatientStatus(
+    int id,
+    String status,
+    String token,
+  ) async {
     try {
       final response = await http.patch(
         Uri.parse('$baseUrl/patients/$id/status'),
@@ -177,7 +195,9 @@ class PatientService {
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
-        throw Exception('Failed to update patient status: ${response.statusCode}');
+        throw Exception(
+          'Failed to update patient status: ${response.statusCode}',
+        );
       }
     } catch (e) {
       throw Exception('Error updating patient status: $e');
@@ -228,7 +248,11 @@ class PatientService {
     }
   }
 
-  Future<Map<String, dynamic>> assignPatientToHospital(int patientId, int hospitalId, String token) async {
+  Future<Map<String, dynamic>> assignPatientToHospital(
+    int patientId,
+    int hospitalId,
+    String token,
+  ) async {
     try {
       final response = await http.patch(
         Uri.parse('$baseUrl/patients/$patientId/assign'),
@@ -250,7 +274,10 @@ class PatientService {
     }
   }
 
-  Future<Map<String, dynamic>> getPatientHistory(int patientId, String token) async {
+  Future<Map<String, dynamic>> getPatientHistory(
+    int patientId,
+    String token,
+  ) async {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/patients/$patientId/history'),
@@ -264,7 +291,9 @@ class PatientService {
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
-        throw Exception('Failed to load patient history: ${response.statusCode}');
+        throw Exception(
+          'Failed to load patient history: ${response.statusCode}',
+        );
       }
     } catch (e) {
       throw Exception('Error loading patient history: $e');

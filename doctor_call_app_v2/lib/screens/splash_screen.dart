@@ -28,21 +28,13 @@ class _SplashScreenState extends State<SplashScreen>
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeIn,
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
+    );
 
-    _scaleAnimation = Tween<double>(
-      begin: 0.5,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.elasticOut,
-    ));
+    _scaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.elasticOut),
+    );
 
     _animationController.forward();
   }
@@ -120,25 +112,27 @@ class _SplashScreenState extends State<SplashScreen>
                             ),
                           ),
                           const SizedBox(height: 32),
-                          
+
                           // App Name
                           Text(
                             'Doctor Call',
-                            style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 32,
-                            ),
+                            style: Theme.of(context).textTheme.headlineLarge
+                                ?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 32,
+                                ),
                           ),
                           const SizedBox(height: 8),
-                          
+
                           // App Subtitle
                           Text(
                             'Hospital Management System',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              color: Colors.white.withOpacity(0.9),
-                              fontSize: 16,
-                            ),
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(
+                                  color: Colors.white.withOpacity(0.9),
+                                  fontSize: 16,
+                                ),
                           ),
                         ],
                       ),
@@ -146,9 +140,9 @@ class _SplashScreenState extends State<SplashScreen>
                   );
                 },
               ),
-              
+
               const SizedBox(height: 80),
-              
+
               // Loading Indicator
               Consumer<AuthProvider>(
                 builder: (context, authProvider, child) {
@@ -159,7 +153,9 @@ class _SplashScreenState extends State<SplashScreen>
                         height: 32,
                         child: CircularProgressIndicator(
                           strokeWidth: 3,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),

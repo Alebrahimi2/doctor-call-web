@@ -14,12 +14,12 @@ class GameStatsScreen extends StatefulWidget {
 class _GameStatsScreenState extends State<GameStatsScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadGameData();
     });
@@ -34,7 +34,7 @@ class _GameStatsScreenState extends State<GameStatsScreen>
   Future<void> _loadGameData() async {
     final gameProvider = Provider.of<GameProvider>(context, listen: false);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    
+
     if (authProvider.token != null) {
       await Future.wait([
         gameProvider.loadUserScore(authProvider.token!),
@@ -72,10 +72,7 @@ class _GameStatsScreenState extends State<GameStatsScreen>
       flexibleSpace: FlexibleSpaceBar(
         title: const Text(
           'إحصائيات الألعاب',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         background: Container(
           decoration: BoxDecoration(
@@ -123,7 +120,7 @@ class _GameStatsScreenState extends State<GameStatsScreen>
 
   Widget _buildOverviewCards(GameProvider gameProvider) {
     final currentScore = gameProvider.currentScore;
-    
+
     return SliverToBoxAdapter(
       child: Container(
         margin: const EdgeInsets.all(16),
@@ -170,15 +167,13 @@ class _GameStatsScreenState extends State<GameStatsScreen>
                           children: [
                             Text(
                               'إحصائياتك الشاملة',
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: Theme.of(context).textTheme.titleLarge
+                                  ?.copyWith(fontWeight: FontWeight.bold),
                             ),
                             Text(
                               'أداؤك في النظام',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Colors.grey[600],
-                              ),
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(color: Colors.grey[600]),
                             ),
                           ],
                         ),
@@ -186,7 +181,7 @@ class _GameStatsScreenState extends State<GameStatsScreen>
                     ],
                   ),
                   const SizedBox(height: 20),
-                  
+
                   // Stats grid
                   if (currentScore != null) ...[
                     Row(
@@ -245,16 +240,14 @@ class _GameStatsScreenState extends State<GameStatsScreen>
                           const SizedBox(height: 12),
                           Text(
                             'لا توجد بيانات إحصائية',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              color: Colors.grey[600],
-                            ),
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(color: Colors.grey[600]),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'ابدأ بتقديم الخدمات لبناء إحصائياتك',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Colors.grey[500],
-                            ),
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(color: Colors.grey[500]),
                           ),
                         ],
                       ),
@@ -264,7 +257,7 @@ class _GameStatsScreenState extends State<GameStatsScreen>
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // Quick actions
             Row(
               children: [
@@ -295,7 +288,12 @@ class _GameStatsScreenState extends State<GameStatsScreen>
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -318,10 +316,7 @@ class _GameStatsScreenState extends State<GameStatsScreen>
           const SizedBox(height: 4),
           Text(
             title,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
-            ),
+            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
             textAlign: TextAlign.center,
           ),
         ],
@@ -367,16 +362,16 @@ class _GameStatsScreenState extends State<GameStatsScreen>
             const SizedBox(height: 8),
             Text(
               title,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
             Text(
               subtitle,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.grey[600],
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
           ],
@@ -403,18 +398,9 @@ class _GameStatsScreenState extends State<GameStatsScreen>
           labelColor: Colors.white,
           unselectedLabelColor: Colors.grey[600],
           tabs: const [
-            Tab(
-              icon: Icon(Icons.timeline),
-              text: 'التقدم',
-            ),
-            Tab(
-              icon: Icon(Icons.category),
-              text: 'الفئات',
-            ),
-            Tab(
-              icon: Icon(Icons.history),
-              text: 'النشاط',
-            ),
+            Tab(icon: Icon(Icons.timeline), text: 'التقدم'),
+            Tab(icon: Icon(Icons.category), text: 'الفئات'),
+            Tab(icon: Icon(Icons.history), text: 'النشاط'),
           ],
         ),
       ),
@@ -436,7 +422,7 @@ class _GameStatsScreenState extends State<GameStatsScreen>
 
   Widget _buildProgressTab(GameProvider gameProvider) {
     final currentScore = gameProvider.currentScore;
-    
+
     return RefreshIndicator(
       onRefresh: _loadGameData,
       child: ListView(
@@ -454,7 +440,7 @@ class _GameStatsScreenState extends State<GameStatsScreen>
               'خبرة',
             ),
             const SizedBox(height: 16),
-            
+
             // Achievement progress
             _buildProgressCard(
               'تقدم الإنجازات',
@@ -466,22 +452,24 @@ class _GameStatsScreenState extends State<GameStatsScreen>
               'إنجاز',
             ),
             const SizedBox(height: 16),
-            
+
             // Category progress
             if (currentScore.categoryPoints.isNotEmpty) ...[
               Text(
                 'التقدم حسب الفئة',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
               ...currentScore.categoryPoints.entries.map((entry) {
                 final categoryName = _getCategoryName(entry.key);
                 final categoryIcon = _getCategoryIcon(entry.key);
                 final categoryColor = _getCategoryColor(entry.key);
-                final nextAchievement = gameProvider.getNextAchievementProgress(entry.key);
-                
+                final nextAchievement = gameProvider.getNextAchievementProgress(
+                  entry.key,
+                );
+
                 if (nextAchievement != null) {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 12),
@@ -503,7 +491,9 @@ class _GameStatsScreenState extends State<GameStatsScreen>
                       decoration: BoxDecoration(
                         color: Colors.green.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.green.withOpacity(0.3)),
+                        border: Border.all(
+                          color: Colors.green.withOpacity(0.3),
+                        ),
                       ),
                       child: Row(
                         children: [
@@ -515,15 +505,13 @@ class _GameStatsScreenState extends State<GameStatsScreen>
                               children: [
                                 Text(
                                   categoryName,
-                                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  style: Theme.of(context).textTheme.titleSmall
+                                      ?.copyWith(fontWeight: FontWeight.bold),
                                 ),
                                 Text(
                                   'جميع الإنجازات مكتملة!',
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: Colors.green,
-                                  ),
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(color: Colors.green),
                                 ),
                               ],
                             ),
@@ -555,8 +543,12 @@ class _GameStatsScreenState extends State<GameStatsScreen>
   }
 
   Widget _buildCategoriesTab(GameProvider gameProvider) {
-    final categories = ['patient_care', 'emergency_response', 'hospital_management'];
-    
+    final categories = [
+      'patient_care',
+      'emergency_response',
+      'hospital_management',
+    ];
+
     return RefreshIndicator(
       onRefresh: _loadGameData,
       child: ListView.builder(
@@ -564,10 +556,15 @@ class _GameStatsScreenState extends State<GameStatsScreen>
         itemCount: categories.length,
         itemBuilder: (context, index) {
           final category = categories[index];
-          final categoryAchievements = gameProvider.getAchievementsByCategory(category);
-          final unlockedCount = categoryAchievements.where((a) => a.isUnlocked).length;
-          final totalPoints = gameProvider.currentScore?.categoryPoints[category] ?? 0;
-          
+          final categoryAchievements = gameProvider.getAchievementsByCategory(
+            category,
+          );
+          final unlockedCount = categoryAchievements
+              .where((a) => a.isUnlocked)
+              .length;
+          final totalPoints =
+              gameProvider.currentScore?.categoryPoints[category] ?? 0;
+
           return Container(
             margin: const EdgeInsets.only(bottom: 12),
             decoration: BoxDecoration(
@@ -609,15 +606,13 @@ class _GameStatsScreenState extends State<GameStatsScreen>
                           children: [
                             Text(
                               _getCategoryName(category),
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(fontWeight: FontWeight.bold),
                             ),
                             Text(
                               '$unlockedCount من ${categoryAchievements.length} إنجاز',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Colors.grey[600],
-                              ),
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(color: Colors.grey[600]),
                             ),
                           ],
                         ),
@@ -627,39 +622,41 @@ class _GameStatsScreenState extends State<GameStatsScreen>
                         children: [
                           Text(
                             '$totalPoints',
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: _getCategoryColor(category),
-                            ),
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: _getCategoryColor(category),
+                                ),
                           ),
                           Text(
                             'نقطة',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Colors.grey[600],
-                            ),
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(color: Colors.grey[600]),
                           ),
                         ],
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Progress bar
                   LinearProgressIndicator(
-                    value: categoryAchievements.isEmpty 
-                        ? 0.0 
+                    value: categoryAchievements.isEmpty
+                        ? 0.0
                         : unlockedCount / categoryAchievements.length,
                     backgroundColor: Colors.grey[200],
-                    valueColor: AlwaysStoppedAnimation<Color>(_getCategoryColor(category)),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      _getCategoryColor(category),
+                    ),
                     minHeight: 6,
                   ),
                   const SizedBox(height: 8),
-                  
+
                   Text(
                     '${((categoryAchievements.isEmpty ? 0 : unlockedCount / categoryAchievements.length) * 100).toInt()}% مكتمل',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey[600],
-                    ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
                   ),
                 ],
               ),
@@ -679,9 +676,9 @@ class _GameStatsScreenState extends State<GameStatsScreen>
           if (gameProvider.gameHistory.isNotEmpty) ...[
             Text(
               'النشاط الأخير',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             ...gameProvider.gameHistory.take(10).map((action) {
@@ -709,7 +706,7 @@ class _GameStatsScreenState extends State<GameStatsScreen>
     String unit,
   ) {
     final progress = total > 0 ? current / total : 0.0;
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -744,9 +741,9 @@ class _GameStatsScreenState extends State<GameStatsScreen>
                     ),
                     Text(
                       subtitle,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.grey[600],
-                      ),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
                     ),
                   ],
                 ),
@@ -770,9 +767,9 @@ class _GameStatsScreenState extends State<GameStatsScreen>
           const SizedBox(height: 8),
           Text(
             '${(progress * 100).toInt()}% مكتمل',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Colors.grey[600],
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
           ),
         ],
       ),
@@ -809,15 +806,15 @@ class _GameStatsScreenState extends State<GameStatsScreen>
               children: [
                 Text(
                   _getActionTypeName(action.actionType),
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
                 ),
                 Text(
                   _formatActionDate(action.createdAt),
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.grey[600],
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -851,24 +848,20 @@ class _GameStatsScreenState extends State<GameStatsScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              size: 64,
-              color: Colors.grey[400],
-            ),
+            Icon(icon, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
             Text(
               title,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: Colors.grey[600],
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(color: Colors.grey[600]),
             ),
             const SizedBox(height: 8),
             Text(
               subtitle,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.grey[500],
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: Colors.grey[500]),
               textAlign: TextAlign.center,
             ),
           ],
@@ -967,7 +960,7 @@ class _GameStatsScreenState extends State<GameStatsScreen>
   String _formatActionDate(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
-    
+
     if (difference.inMinutes < 1) {
       return 'الآن';
     } else if (difference.inHours < 1) {

@@ -99,11 +99,8 @@ class AppRoutes {
         );
       default:
         return MaterialPageRoute(
-          builder: (context) => const Scaffold(
-            body: Center(
-              child: Text('الصفحة غير موجودة'),
-            ),
-          ),
+          builder: (context) =>
+              const Scaffold(body: Center(child: Text('الصفحة غير موجودة'))),
           settings: settings,
         );
     }
@@ -151,16 +148,16 @@ class GameNavigation {
               ),
             ),
             const SizedBox(height: 20),
-            
+
             // Title
             Text(
               'قائمة الألعاب',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-            
+
             // Menu items
             _buildGameMenuItem(
               context,
@@ -218,10 +215,7 @@ class GameNavigation {
         ),
         child: Icon(icon, color: color),
       ),
-      title: Text(
-        title,
-        style: const TextStyle(fontWeight: FontWeight.w600),
-      ),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
       subtitle: Text(subtitle),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       onTap: () {

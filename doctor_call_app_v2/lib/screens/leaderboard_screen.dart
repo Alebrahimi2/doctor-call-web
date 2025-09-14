@@ -24,12 +24,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
     'hospital_management',
   ];
 
-  final List<String> _periods = [
-    'daily',
-    'weekly',
-    'monthly',
-    'all_time',
-  ];
+  final List<String> _periods = ['daily', 'weekly', 'monthly', 'all_time'];
 
   final Map<String, String> _categoryNames = {
     'overall': 'عام',
@@ -56,7 +51,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: _periods.length, vsync: this);
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadLeaderboard();
     });
@@ -71,9 +66,12 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
   Future<void> _loadLeaderboard() async {
     final gameProvider = Provider.of<GameProvider>(context, listen: false);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    
+
     if (authProvider.token != null) {
-      await gameProvider.loadLeaderboard(authProvider.token!, category: _selectedCategory);
+      await gameProvider.loadLeaderboard(
+        authProvider.token!,
+        category: _selectedCategory,
+      );
     }
   }
 
@@ -106,10 +104,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
       flexibleSpace: FlexibleSpaceBar(
         title: const Text(
           'المتصدرين',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         background: Container(
           decoration: BoxDecoration(
@@ -149,7 +144,9 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
       actions: [
         IconButton(
           icon: const Icon(Icons.refresh, color: Colors.white),
-          onPressed: gameProvider.isLoadingLeaderboard ? null : _loadLeaderboard,
+          onPressed: gameProvider.isLoadingLeaderboard
+              ? null
+              : _loadLeaderboard,
         ),
         PopupMenuButton<String>(
           icon: const Icon(Icons.filter_list, color: Colors.white),
@@ -179,7 +176,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
   Widget _buildUserRankCard(GameProvider gameProvider) {
     final userRank = gameProvider.getUserRankPosition();
     final currentScore = gameProvider.currentScore;
-    
+
     return SliverToBoxAdapter(
       child: Container(
         margin: const EdgeInsets.all(16),
@@ -230,16 +227,16 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                     children: [
                       Text(
                         'ترتيبك الحالي',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       Text(
                         userRank != null ? '#$userRank' : 'غير محدد',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          color: Theme.of(context).primaryColor,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: Theme.of(context).textTheme.headlineSmall
+                            ?.copyWith(
+                              color: Theme.of(context).primaryColor,
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
                     ],
                   ),
@@ -300,7 +297,12 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
     );
   }
 
-  Widget _buildStatItem(String label, String value, IconData icon, Color color) {
+  Widget _buildStatItem(
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Column(
       children: [
         Container(
@@ -320,13 +322,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
             color: color,
           ),
         ),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
-          ),
-        ),
+        Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
       ],
     );
   }
@@ -342,7 +338,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
           itemBuilder: (context, index) {
             final category = _categories[index];
             final isSelected = category == _selectedCategory;
-            
+
             return Container(
               margin: const EdgeInsets.only(right: 8),
               child: FilterChip(
@@ -359,7 +355,9 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                       _categoryNames[category] ?? category,
                       style: TextStyle(
                         color: isSelected ? Colors.white : Colors.grey[600],
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                       ),
                     ),
                   ],
@@ -398,7 +396,10 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
           indicatorSize: TabBarIndicatorSize.tab,
           labelColor: Colors.white,
           unselectedLabelColor: Colors.grey[600],
-          labelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+          labelStyle: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
           unselectedLabelStyle: const TextStyle(fontSize: 12),
           tabs: _periods.map((period) {
             return Tab(text: _periodNames[period]);
@@ -440,16 +441,16 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
               const SizedBox(height: 16),
               Text(
                 'لا توجد بيانات للمتصدرين',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Colors.grey[600],
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(color: Colors.grey[600]),
               ),
               const SizedBox(height: 8),
               Text(
                 'ابدأ بتقديم الخدمات لتظهر في المتصدرين',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey[500],
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: Colors.grey[500]),
               ),
             ],
           ),
@@ -460,13 +461,10 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
     return SliverPadding(
       padding: const EdgeInsets.all(16),
       sliver: SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final entry = leaderboard[index];
-            return _buildLeaderboardCard(entry, index + 1);
-          },
-          childCount: leaderboard.length,
-        ),
+        delegate: SliverChildBuilderDelegate((context, index) {
+          final entry = leaderboard[index];
+          return _buildLeaderboardCard(entry, index + 1);
+        }, childCount: leaderboard.length),
       ),
     );
   }
@@ -479,12 +477,10 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: isTopThree 
-            ? rankColor.withOpacity(0.05)
-            : Colors.white,
+        color: isTopThree ? rankColor.withOpacity(0.05) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isTopThree 
+          color: isTopThree
               ? rankColor.withOpacity(0.3)
               : Colors.grey.withOpacity(0.2),
           width: isTopThree ? 2 : 1,
@@ -515,11 +511,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                 ),
               ),
               child: isTopThree
-                  ? Icon(
-                      rankIcon,
-                      color: Colors.white,
-                      size: 24,
-                    )
+                  ? Icon(rankIcon, color: Colors.white, size: 24)
                   : Center(
                       child: Text(
                         '$position',
@@ -532,7 +524,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                     ),
             ),
             const SizedBox(width: 16),
-            
+
             // User info
             Expanded(
               child: Column(
@@ -548,25 +540,20 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      Icon(
-                        Icons.business,
-                        size: 14,
-                        color: Colors.grey[600],
-                      ),
+                      Icon(Icons.business, size: 14, color: Colors.grey[600]),
                       const SizedBox(width: 4),
                       Flexible(
                         child: Text(
                           entry.hospitalName ?? 'غير محدد',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Colors.grey[600],
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: Colors.grey[600]),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 8),
-                  
+
                   // Stats row
                   Row(
                     children: [
@@ -588,7 +575,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                 ],
               ),
             ),
-            
+
             // Points
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -598,7 +585,9 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                   children: [
                     Icon(
                       Icons.stars,
-                      color: isTopThree ? rankColor : Theme.of(context).primaryColor,
+                      color: isTopThree
+                          ? rankColor
+                          : Theme.of(context).primaryColor,
                       size: 20,
                     ),
                     const SizedBox(width: 4),
@@ -606,21 +595,26 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                       '${entry.totalPoints}',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: isTopThree ? rankColor : Theme.of(context).primaryColor,
+                        color: isTopThree
+                            ? rankColor
+                            : Theme.of(context).primaryColor,
                       ),
                     ),
                   ],
                 ),
                 Text(
                   'نقطة',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.grey[600],
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
                 ),
                 if (entry.weeklyGrowth != null && entry.weeklyGrowth! > 0) ...[
                   const SizedBox(height: 4),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.green.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
@@ -628,11 +622,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
-                          Icons.arrow_upward,
-                          color: Colors.green,
-                          size: 12,
-                        ),
+                        Icon(Icons.arrow_upward, color: Colors.green, size: 12),
                         const SizedBox(width: 2),
                         Text(
                           '+${entry.weeklyGrowth}',
@@ -654,15 +644,16 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
     );
   }
 
-  Widget _buildMiniStat(String label, String value, IconData icon, Color color) {
+  Widget _buildMiniStat(
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          icon,
-          size: 14,
-          color: color,
-        ),
+        Icon(icon, size: 14, color: color),
         const SizedBox(width: 4),
         Text(
           value,
@@ -673,13 +664,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
           ),
         ),
         const SizedBox(width: 2),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 10,
-            color: Colors.grey[600],
-          ),
-        ),
+        Text(label, style: TextStyle(fontSize: 10, color: Colors.grey[600])),
       ],
     );
   }

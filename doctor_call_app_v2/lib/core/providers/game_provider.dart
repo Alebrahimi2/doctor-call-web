@@ -33,12 +33,16 @@ class GameProvider extends ChangeNotifier {
   // Getters
   GameScore? get currentScore => _currentScore;
   List<Achievement> get allAchievements => List.unmodifiable(_allAchievements);
-  List<Achievement> get userAchievements => List.unmodifiable(_userAchievements);
+  List<Achievement> get userAchievements =>
+      List.unmodifiable(_userAchievements);
   List<LeaderboardEntry> get leaderboard => List.unmodifiable(_leaderboard);
   List<GameAction> get gameHistory => List.unmodifiable(_gameHistory);
-  List<Map<String, dynamic>> get dailyChallenges => List.unmodifiable(_dailyChallenges);
-  List<Map<String, dynamic>> get weeklyChallenges => List.unmodifiable(_weeklyCheckallenges);
-  List<Map<String, dynamic>> get seasonalEvents => List.unmodifiable(_seasonalEvents);
+  List<Map<String, dynamic>> get dailyChallenges =>
+      List.unmodifiable(_dailyChallenges);
+  List<Map<String, dynamic>> get weeklyChallenges =>
+      List.unmodifiable(_weeklyCheckallenges);
+  List<Map<String, dynamic>> get seasonalEvents =>
+      List.unmodifiable(_seasonalEvents);
 
   bool get isLoadingScore => _isLoadingScore;
   bool get isLoadingAchievements => _isLoadingAchievements;
@@ -49,14 +53,14 @@ class GameProvider extends ChangeNotifier {
   // Calculated properties
   int get totalUnlockedAchievements => _userAchievements.length;
   int get totalAvailableAchievements => _allAchievements.length;
-  double get achievementProgress => 
-      _allAchievements.isEmpty ? 0.0 : _userAchievements.length / _allAchievements.length;
+  double get achievementProgress => _allAchievements.isEmpty
+      ? 0.0
+      : _userAchievements.length / _allAchievements.length;
 
-  List<Achievement> get recentAchievements => _userAchievements
-      .where((a) => a.unlockedAt != null)
-      .toList()
-      ..sort((a, b) => b.unlockedAt!.compareTo(a.unlockedAt!))
-      ..take(5);
+  List<Achievement> get recentAchievements =>
+      _userAchievements.where((a) => a.unlockedAt != null).toList()
+        ..sort((a, b) => b.unlockedAt!.compareTo(a.unlockedAt!))
+        ..take(5);
 
   Map<String, List<Achievement>> get achievementsByCategory {
     final Map<String, List<Achievement>> grouped = {};
@@ -69,10 +73,10 @@ class GameProvider extends ChangeNotifier {
     return grouped;
   }
 
-  List<Achievement> get unlockedAchievements => 
+  List<Achievement> get unlockedAchievements =>
       _allAchievements.where((a) => a.isUnlocked).toList();
 
-  List<Achievement> get lockedAchievements => 
+  List<Achievement> get lockedAchievements =>
       _allAchievements.where((a) => !a.isUnlocked).toList();
 
   /// Initialize game data
@@ -130,14 +134,20 @@ class GameProvider extends ChangeNotifier {
   }
 
   /// Load leaderboard
-  Future<void> loadLeaderboard(String token, {String category = 'overall'}) async {
+  Future<void> loadLeaderboard(
+    String token, {
+    String category = 'overall',
+  }) async {
     if (_isLoadingLeaderboard) return;
 
     _isLoadingLeaderboard = true;
     notifyListeners();
 
     try {
-      _leaderboard = await _gameService.getLeaderboard(token, category: category);
+      _leaderboard = await _gameService.getLeaderboard(
+        token,
+        category: category,
+      );
       _lastLeaderboardUpdate = DateTime.now();
       notifyListeners();
     } catch (e) {
@@ -199,12 +209,16 @@ class GameProvider extends ChangeNotifier {
     String token,
   ) async {
     try {
-      final result = await _gameService.submitGameAction(actionType, actionData, token);
-      
+      final result = await _gameService.submitGameAction(
+        actionType,
+        actionData,
+        token,
+      );
+
       // Update local score if points were earned
       if (result['points_earned'] != null && result['points_earned'] > 0) {
         await loadUserScore(token);
-        
+
         // Show notification for points earned
         _notificationService.sendCustomNotification(
           title: 'نقاط جديدة! 🎉',
@@ -215,10 +229,10 @@ class GameProvider extends ChangeNotifier {
       }
 
       // Check for new achievements
-      if (result['new_achievements'] != null && 
+      if (result['new_achievements'] != null &&
           (result['new_achievements'] as List).isNotEmpty) {
         await loadAchievements(token);
-        
+
         for (final achievementData in result['new_achievements']) {
           _notificationService.sendCustomNotification(
             title: 'إنجاز جديد! 🏆',
@@ -254,16 +268,12 @@ class GameProvider extends ChangeNotifier {
     required Map<String, dynamic> details,
     required String token,
   }) async {
-    await submitGameAction(
-      GameActionType.patientAdmitted,
-      {
-        'patient_id': patientId,
-        'action_type': actionType,
-        'time_spent': timeSpent,
-        'details': details,
-      },
-      token,
-    );
+    await submitGameAction(GameActionType.patientAdmitted, {
+      'patient_id': patientId,
+      'action_type': actionType,
+      'time_spent': timeSpent,
+      'details': details,
+    }, token);
   }
 
   /// Submit emergency response
@@ -273,15 +283,11 @@ class GameProvider extends ChangeNotifier {
     required String outcome,
     required String token,
   }) async {
-    await submitGameAction(
-      GameActionType.emergencyHandled,
-      {
-        'emergency_type': emergencyType,
-        'response_time': responseTime,
-        'outcome': outcome,
-      },
-      token,
-    );
+    await submitGameAction(GameActionType.emergencyHandled, {
+      'emergency_type': emergencyType,
+      'response_time': responseTime,
+      'outcome': outcome,
+    }, token);
   }
 
   /// Submit hospital management action
@@ -291,27 +297,20 @@ class GameProvider extends ChangeNotifier {
     required Map<String, dynamic> improvements,
     required String token,
   }) async {
-    await submitGameAction(
-      GameActionType.hospitalManaged,
-      {
-        'hospital_id': hospitalId,
-        'action_type': actionType,
-        'improvements': improvements,
-      },
-      token,
-    );
+    await submitGameAction(GameActionType.hospitalManaged, {
+      'hospital_id': hospitalId,
+      'action_type': actionType,
+      'improvements': improvements,
+    }, token);
   }
 
   /// Complete a challenge
   Future<void> completeChallenge(int challengeId, String token) async {
     try {
       final result = await _gameService.completeChallenge(challengeId, token);
-      
+
       // Reload challenges and score
-      await Future.wait([
-        loadChallenges(token),
-        loadUserScore(token),
-      ]);
+      await Future.wait([loadChallenges(token), loadUserScore(token)]);
 
       // Show notification
       _notificationService.sendCustomNotification(
@@ -328,13 +327,13 @@ class GameProvider extends ChangeNotifier {
   /// Claim achievement reward
   Future<void> claimAchievementReward(int achievementId, String token) async {
     try {
-      final result = await _gameService.claimAchievementReward(achievementId, token);
-      
+      final result = await _gameService.claimAchievementReward(
+        achievementId,
+        token,
+      );
+
       // Reload score and achievements
-      await Future.wait([
-        loadUserScore(token),
-        loadAchievements(token),
-      ]);
+      await Future.wait([loadUserScore(token), loadAchievements(token)]);
 
       // Show notification
       _notificationService.sendCustomNotification(
@@ -369,10 +368,9 @@ class GameProvider extends ChangeNotifier {
 
   /// Get user's progress to next achievement in category
   Map<String, dynamic>? getNextAchievementProgress(String category) {
-    final categoryAchievements = getAchievementsByCategory(category)
-        .where((a) => !a.isUnlocked)
-        .toList()
-      ..sort((a, b) => a.requiredPoints.compareTo(b.requiredPoints));
+    final categoryAchievements =
+        getAchievementsByCategory(category).where((a) => !a.isUnlocked).toList()
+          ..sort((a, b) => a.requiredPoints.compareTo(b.requiredPoints));
 
     if (categoryAchievements.isEmpty || _currentScore == null) return null;
 
@@ -385,20 +383,23 @@ class GameProvider extends ChangeNotifier {
       'current_points': currentPoints,
       'required_points': nextAchievement.requiredPoints,
       'progress': progress.clamp(0.0, 1.0),
-      'points_needed': (nextAchievement.requiredPoints - currentPoints).clamp(0, nextAchievement.requiredPoints),
+      'points_needed': (nextAchievement.requiredPoints - currentPoints).clamp(
+        0,
+        nextAchievement.requiredPoints,
+      ),
     };
   }
 
   /// Check if data needs refresh
   bool needsRefresh({Duration maxAge = const Duration(minutes: 5)}) {
     final now = DateTime.now();
-    
+
     return _lastScoreUpdate == null ||
-           _lastLeaderboardUpdate == null ||
-           _lastAchievementsUpdate == null ||
-           now.difference(_lastScoreUpdate!).compareTo(maxAge) > 0 ||
-           now.difference(_lastLeaderboardUpdate!).compareTo(maxAge) > 0 ||
-           now.difference(_lastAchievementsUpdate!).compareTo(maxAge) > 0;
+        _lastLeaderboardUpdate == null ||
+        _lastAchievementsUpdate == null ||
+        now.difference(_lastScoreUpdate!).compareTo(maxAge) > 0 ||
+        now.difference(_lastLeaderboardUpdate!).compareTo(maxAge) > 0 ||
+        now.difference(_lastAchievementsUpdate!).compareTo(maxAge) > 0;
   }
 
   /// Refresh all game data

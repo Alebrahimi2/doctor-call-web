@@ -95,21 +95,22 @@ class NotificationService {
   factory NotificationService() => _instance;
   NotificationService._internal();
 
-  final FlutterLocalNotificationsPlugin _localNotifications = 
+  final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
   final WebSocketService _webSocketService = WebSocketService();
-  
-  final StreamController<NotificationData> _notificationController = 
+
+  final StreamController<NotificationData> _notificationController =
       StreamController<NotificationData>.broadcast();
   final List<NotificationData> _notifications = [];
-  
+
   StreamSubscription? _webSocketSubscription;
   bool _isInitialized = false;
 
   // Getters
   Stream<NotificationData> get notifications => _notificationController.stream;
-  List<NotificationData> get allNotifications => List.unmodifiable(_notifications);
-  List<NotificationData> get unreadNotifications => 
+  List<NotificationData> get allNotifications =>
+      List.unmodifiable(_notifications);
+  List<NotificationData> get unreadNotifications =>
       _notifications.where((n) => !n.isRead).toList();
   int get unreadCount => unreadNotifications.length;
 
@@ -118,10 +119,10 @@ class NotificationService {
     if (_isInitialized) return;
 
     // Initialize local notifications
-    const AndroidInitializationSettings androidSettings = 
+    const AndroidInitializationSettings androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-    
-    const DarwinInitializationSettings iosSettings = 
+
+    const DarwinInitializationSettings iosSettings =
         DarwinInitializationSettings(
           requestAlertPermission: true,
           requestBadgePermission: true,
@@ -139,7 +140,9 @@ class NotificationService {
     );
 
     // Listen to WebSocket messages for real-time notifications
-    _webSocketSubscription = _webSocketService.messages.listen(_handleWebSocketMessage);
+    _webSocketSubscription = _webSocketService.messages.listen(
+      _handleWebSocketMessage,
+    );
 
     _isInitialized = true;
   }
@@ -170,12 +173,13 @@ class NotificationService {
     final notification = NotificationData(
       id: 'patient_${data['patient_id']}_${DateTime.now().millisecondsSinceEpoch}',
       title: 'تحديث حالة المريض',
-      body: 'تم تحديث حالة المريض ${data['patient_name']} إلى ${data['status']}',
+      body:
+          'تم تحديث حالة المريض ${data['patient_name']} إلى ${data['status']}',
       type: NotificationType.patientUpdate,
       payload: data,
       priority: _getPatientPriority(data['status']),
     );
-    
+
     _addNotification(notification);
     _showLocalNotification(notification);
   }
@@ -190,7 +194,7 @@ class NotificationService {
       payload: data,
       priority: 5, // Highest priority
     );
-    
+
     _addNotification(notification);
     _showLocalNotification(notification);
   }
@@ -200,12 +204,13 @@ class NotificationService {
     final notification = NotificationData(
       id: 'hospital_${data['hospital_id']}_${DateTime.now().millisecondsSinceEpoch}',
       title: 'تحديث سعة المستشفى',
-      body: 'متاح الآن ${data['available_beds']} سرير في ${data['hospital_name']}',
+      body:
+          'متاح الآن ${data['available_beds']} سرير في ${data['hospital_name']}',
       type: NotificationType.hospitalCapacity,
       payload: data,
       priority: 3,
     );
-    
+
     _addNotification(notification);
     _showLocalNotification(notification);
   }
@@ -220,7 +225,7 @@ class NotificationService {
       payload: data,
       priority: data['priority'] ?? 3,
     );
-    
+
     _addNotification(notification);
     _showLocalNotification(notification);
   }
@@ -235,7 +240,7 @@ class NotificationService {
       payload: data,
       priority: 4,
     );
-    
+
     _addNotification(notification);
     _showLocalNotification(notification);
   }
@@ -244,7 +249,7 @@ class NotificationService {
   void _addNotification(NotificationData notification) {
     _notifications.insert(0, notification); // Add to top
     _notificationController.add(notification);
-    
+
     // Keep only last 100 notifications
     if (_notifications.length > 100) {
       _notifications.removeRange(100, _notifications.length);
@@ -253,14 +258,15 @@ class NotificationService {
 
   /// Show local notification
   Future<void> _showLocalNotification(NotificationData notification) async {
-    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-      'doctor_call_channel',
-      'Doctor Call Notifications',
-      channelDescription: 'Notifications for Doctor Call app',
-      importance: Importance.high,
-      priority: Priority.high,
-      showWhen: true,
-    );
+    const AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
+          'doctor_call_channel',
+          'Doctor Call Notifications',
+          channelDescription: 'Notifications for Doctor Call app',
+          importance: Importance.high,
+          priority: Priority.high,
+          showWhen: true,
+        );
 
     const DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
       presentAlert: true,
@@ -338,11 +344,15 @@ class NotificationService {
   /// Request notification permissions
   Future<bool> requestPermissions() async {
     final android = await _localNotifications
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.requestNotificationsPermission();
-    
+
     final ios = await _localNotifications
-        .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
+        .resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin
+        >()
         ?.requestPermissions(alert: true, badge: true, sound: true);
 
     return android ?? ios ?? false;
@@ -364,7 +374,7 @@ class NotificationService {
       payload: payload,
       priority: priority,
     );
-    
+
     _addNotification(notification);
     _showLocalNotification(notification);
   }

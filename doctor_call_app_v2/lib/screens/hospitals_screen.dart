@@ -27,7 +27,7 @@ class _HospitalsScreenState extends State<HospitalsScreen> {
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final token = authProvider.token;
-      
+
       if (token != null) {
         final hospitals = await _hospitalService.getAllHospitals(token);
         setState(() {
@@ -40,19 +40,19 @@ class _HospitalsScreenState extends State<HospitalsScreen> {
         _isLoading = false;
       });
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error loading hospitals: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error loading hospitals: $e')));
       }
     }
   }
 
   List<Hospital> get filteredHospitals {
     if (_searchQuery.isEmpty) return _hospitals;
-    
+
     return _hospitals.where((hospital) {
       return hospital.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-             hospital.location.toLowerCase().contains(_searchQuery.toLowerCase());
+          hospital.location.toLowerCase().contains(_searchQuery.toLowerCase());
     }).toList();
   }
 
@@ -87,25 +87,25 @@ class _HospitalsScreenState extends State<HospitalsScreen> {
               },
             ),
           ),
-          
+
           // Hospitals List
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : filteredHospitals.isEmpty
-                    ? const Center(
-                        child: Text(
-                          'لا توجد مستشفيات مسجلة',
-                          style: TextStyle(fontSize: 18),
-                        ),
-                      )
-                    : ListView.builder(
-                        itemCount: filteredHospitals.length,
-                        itemBuilder: (context, index) {
-                          final hospital = filteredHospitals[index];
-                          return _buildHospitalCard(hospital);
-                        },
-                      ),
+                ? const Center(
+                    child: Text(
+                      'لا توجد مستشفيات مسجلة',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: filteredHospitals.length,
+                    itemBuilder: (context, index) {
+                      final hospital = filteredHospitals[index];
+                      return _buildHospitalCard(hospital);
+                    },
+                  ),
           ),
         ],
       ),
@@ -133,7 +133,9 @@ class _HospitalsScreenState extends State<HospitalsScreen> {
                   height: 12,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: hospital.status == 'active' ? Colors.green : Colors.red,
+                    color: hospital.status == 'active'
+                        ? Colors.green
+                        : Colors.red,
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -145,22 +147,10 @@ class _HospitalsScreenState extends State<HospitalsScreen> {
         trailing: PopupMenuButton<String>(
           onSelected: (value) => _handleHospitalAction(value, hospital),
           itemBuilder: (context) => [
-            const PopupMenuItem(
-              value: 'edit',
-              child: Text('تعديل'),
-            ),
-            const PopupMenuItem(
-              value: 'departments',
-              child: Text('الأقسام'),
-            ),
-            const PopupMenuItem(
-              value: 'stats',
-              child: Text('الإحصائيات'),
-            ),
-            const PopupMenuItem(
-              value: 'delete',
-              child: Text('حذف'),
-            ),
+            const PopupMenuItem(value: 'edit', child: Text('تعديل')),
+            const PopupMenuItem(value: 'departments', child: Text('الأقسام')),
+            const PopupMenuItem(value: 'stats', child: Text('الإحصائيات')),
+            const PopupMenuItem(value: 'delete', child: Text('حذف')),
           ],
         ),
         children: [
@@ -203,10 +193,9 @@ class _HospitalsScreenState extends State<HospitalsScreen> {
   }
 
   void _showAddHospitalDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => _HospitalDialog(),
-    ).then((result) {
+    showDialog(context: context, builder: (context) => _HospitalDialog()).then((
+      result,
+    ) {
       if (result == true) {
         _loadHospitals();
       }
@@ -242,8 +231,12 @@ class _HospitalsScreenState extends State<HospitalsScreen> {
           children: [
             Text('إجمالي الأسرة: ${hospital.capacity}'),
             Text('الأسرة المتاحة: ${hospital.availableBeds}'),
-            Text('معدل الإشغال: ${((hospital.capacity - hospital.availableBeds) / hospital.capacity * 100).toStringAsFixed(1)}%'),
-            Text('عدد المرضى الحاليين: ${hospital.capacity - hospital.availableBeds}'),
+            Text(
+              'معدل الإشغال: ${((hospital.capacity - hospital.availableBeds) / hospital.capacity * 100).toStringAsFixed(1)}%',
+            ),
+            Text(
+              'عدد المرضى الحاليين: ${hospital.capacity - hospital.availableBeds}',
+            ),
           ],
         ),
         actions: [
@@ -283,7 +276,7 @@ class _HospitalsScreenState extends State<HospitalsScreen> {
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final token = authProvider.token;
-      
+
       if (token != null) {
         await _hospitalService.deleteHospital(hospitalId, token);
         _loadHospitals();
@@ -295,9 +288,9 @@ class _HospitalsScreenState extends State<HospitalsScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('خطأ في حذف المستشفى: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('خطأ في حذف المستشفى: $e')));
       }
     }
   }
@@ -321,7 +314,7 @@ class _HospitalDialogState extends State<_HospitalDialog> {
   final _capacityController = TextEditingController();
   final _specializationController = TextEditingController();
   final _descriptionController = TextEditingController();
-  
+
   String _selectedStatus = 'active';
 
   @override
@@ -342,7 +335,9 @@ class _HospitalDialogState extends State<_HospitalDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.hospital == null ? 'إضافة مستشفى جديد' : 'تعديل بيانات المستشفى'),
+      title: Text(
+        widget.hospital == null ? 'إضافة مستشفى جديد' : 'تعديل بيانات المستشفى',
+      ),
       content: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -381,7 +376,9 @@ class _HospitalDialogState extends State<_HospitalDialog> {
               ),
               TextFormField(
                 controller: _emailController,
-                decoration: const InputDecoration(labelText: 'البريد الإلكتروني'),
+                decoration: const InputDecoration(
+                  labelText: 'البريد الإلكتروني',
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'يرجى إدخال البريد الإلكتروني';
@@ -391,7 +388,9 @@ class _HospitalDialogState extends State<_HospitalDialog> {
               ),
               TextFormField(
                 controller: _capacityController,
-                decoration: const InputDecoration(labelText: 'السعة (عدد الأسرة)'),
+                decoration: const InputDecoration(
+                  labelText: 'السعة (عدد الأسرة)',
+                ),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -446,10 +445,10 @@ class _HospitalDialogState extends State<_HospitalDialog> {
       try {
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
         final token = authProvider.token;
-        
+
         if (token != null) {
           final hospitalService = HospitalService();
-          
+
           final hospitalData = {
             'name': _nameController.text,
             'location': _locationController.text,
@@ -464,7 +463,11 @@ class _HospitalDialogState extends State<_HospitalDialog> {
           if (widget.hospital == null) {
             await hospitalService.createHospital(hospitalData, token);
           } else {
-            await hospitalService.updateHospital(widget.hospital!.id, hospitalData, token);
+            await hospitalService.updateHospital(
+              widget.hospital!.id,
+              hospitalData,
+              token,
+            );
           }
 
           if (mounted) {
@@ -473,9 +476,9 @@ class _HospitalDialogState extends State<_HospitalDialog> {
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('خطأ في حفظ البيانات: $e')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('خطأ في حفظ البيانات: $e')));
         }
       }
     }

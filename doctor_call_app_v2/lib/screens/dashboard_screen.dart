@@ -11,7 +11,7 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
-  
+
   final List<DashboardItem> _dashboardItems = [
     DashboardItem(
       icon: Icons.dashboard,
@@ -62,7 +62,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               // TODO: Show notifications
             },
           ),
-          
+
           // User Profile Menu
           Consumer<AuthProvider>(
             builder: (context, authProvider, child) {
@@ -109,7 +109,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     },
                     child: const ListTile(
                       leading: Icon(Icons.logout, color: Colors.red),
-                      title: Text('Sign Out', style: TextStyle(color: Colors.red)),
+                      title: Text(
+                        'Sign Out',
+                        style: TextStyle(color: Colors.red),
+                      ),
                       contentPadding: EdgeInsets.zero,
                     ),
                   ),
@@ -138,13 +141,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
               );
             }).toList(),
           ),
-          
+
           const VerticalDivider(thickness: 1, width: 1),
-          
+
           // Main Content Area
-          Expanded(
-            child: _buildMainContent(),
-          ),
+          Expanded(child: _buildMainContent()),
         ],
       ),
     );
@@ -191,9 +192,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   const SizedBox(height: 8),
                   Text(
                     'Here\'s what\'s happening in your hospital system today.',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.grey[600],
-                    ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyLarge?.copyWith(color: Colors.grey[600]),
                   ),
                 ],
               );
@@ -280,7 +281,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -304,10 +310,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             const SizedBox(height: 8),
             Text(
               title,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
             ),
           ],
         ),
@@ -316,33 +319,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildHospitalsContent() {
-    return const Center(
-      child: Text('Hospitals Management - Coming Soon'),
-    );
+    return const Center(child: Text('Hospitals Management - Coming Soon'));
   }
 
   Widget _buildPatientsContent() {
-    return const Center(
-      child: Text('Patients Management - Coming Soon'),
-    );
+    return const Center(child: Text('Patients Management - Coming Soon'));
   }
 
   Widget _buildMissionsContent() {
-    return const Center(
-      child: Text('Missions Management - Coming Soon'),
-    );
+    return const Center(child: Text('Missions Management - Coming Soon'));
   }
 
   Widget _buildAnalyticsContent() {
-    return const Center(
-      child: Text('Analytics Dashboard - Coming Soon'),
-    );
+    return const Center(child: Text('Analytics Dashboard - Coming Soon'));
   }
 
   Widget _buildSettingsContent() {
-    return const Center(
-      child: Text('System Settings - Coming Soon'),
-    );
+    return const Center(child: Text('System Settings - Coming Soon'));
   }
 }
 

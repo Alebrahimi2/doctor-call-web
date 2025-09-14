@@ -36,7 +36,9 @@ class GameService {
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
         final List<dynamic> achievementsJson = data['data'] ?? [];
-        return achievementsJson.map((json) => Achievement.fromJson(json)).toList();
+        return achievementsJson
+            .map((json) => Achievement.fromJson(json))
+            .toList();
       } else {
         throw Exception('Failed to load achievements: ${response.statusCode}');
       }
@@ -56,9 +58,13 @@ class GameService {
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
         final List<dynamic> achievementsJson = data['data'] ?? [];
-        return achievementsJson.map((json) => Achievement.fromJson(json)).toList();
+        return achievementsJson
+            .map((json) => Achievement.fromJson(json))
+            .toList();
       } else {
-        throw Exception('Failed to load user achievements: ${response.statusCode}');
+        throw Exception(
+          'Failed to load user achievements: ${response.statusCode}',
+        );
       }
     } catch (e) {
       throw Exception('Error loading user achievements: $e');
@@ -66,21 +72,26 @@ class GameService {
   }
 
   /// Get leaderboard
-  Future<List<LeaderboardEntry>> getLeaderboard(String token, {
+  Future<List<LeaderboardEntry>> getLeaderboard(
+    String token, {
     String category = 'overall',
     int limit = 50,
     int offset = 0,
   }) async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/leaderboard?category=$category&limit=$limit&offset=$offset'),
+        Uri.parse(
+          '$baseUrl/leaderboard?category=$category&limit=$limit&offset=$offset',
+        ),
         headers: ApiConstants.getAuthHeaders(token),
       );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
         final List<dynamic> leaderboardJson = data['data'] ?? [];
-        return leaderboardJson.map((json) => LeaderboardEntry.fromJson(json)).toList();
+        return leaderboardJson
+            .map((json) => LeaderboardEntry.fromJson(json))
+            .toList();
       } else {
         throw Exception('Failed to load leaderboard: ${response.statusCode}');
       }
@@ -99,10 +110,7 @@ class GameService {
       final response = await http.post(
         Uri.parse('$baseUrl/game/action'),
         headers: ApiConstants.getAuthHeaders(token),
-        body: json.encode({
-          'type': actionType,
-          'data': actionData,
-        }),
+        body: json.encode({'type': actionType, 'data': actionData}),
       );
 
       if (response.statusCode == 200) {
@@ -116,7 +124,8 @@ class GameService {
   }
 
   /// Get user's game activity history
-  Future<List<GameAction>> getUserGameHistory(String token, {
+  Future<List<GameAction>> getUserGameHistory(
+    String token, {
     int limit = 20,
     int offset = 0,
   }) async {
@@ -139,7 +148,10 @@ class GameService {
   }
 
   /// Get achievements by category
-  Future<List<Achievement>> getAchievementsByCategory(String category, String token) async {
+  Future<List<Achievement>> getAchievementsByCategory(
+    String category,
+    String token,
+  ) async {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/achievements/category/$category'),
@@ -149,9 +161,13 @@ class GameService {
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
         final List<dynamic> achievementsJson = data['data'] ?? [];
-        return achievementsJson.map((json) => Achievement.fromJson(json)).toList();
+        return achievementsJson
+            .map((json) => Achievement.fromJson(json))
+            .toList();
       } else {
-        throw Exception('Failed to load category achievements: ${response.statusCode}');
+        throw Exception(
+          'Failed to load category achievements: ${response.statusCode}',
+        );
       }
     } catch (e) {
       throw Exception('Error loading category achievements: $e');
@@ -159,7 +175,10 @@ class GameService {
   }
 
   /// Claim achievement reward
-  Future<Map<String, dynamic>> claimAchievementReward(int achievementId, String token) async {
+  Future<Map<String, dynamic>> claimAchievementReward(
+    int achievementId,
+    String token,
+  ) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/achievements/$achievementId/claim'),
@@ -177,7 +196,10 @@ class GameService {
   }
 
   /// Get daily/weekly challenges
-  Future<List<Map<String, dynamic>>> getChallenges(String token, {String period = 'daily'}) async {
+  Future<List<Map<String, dynamic>>> getChallenges(
+    String token, {
+    String period = 'daily',
+  }) async {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/game/challenges?period=$period'),
@@ -196,7 +218,10 @@ class GameService {
   }
 
   /// Complete a challenge
-  Future<Map<String, dynamic>> completeChallenge(int challengeId, String token) async {
+  Future<Map<String, dynamic>> completeChallenge(
+    int challengeId,
+    String token,
+  ) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/game/challenges/$challengeId/complete'),
@@ -224,7 +249,9 @@ class GameService {
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
-        throw Exception('Failed to load game statistics: ${response.statusCode}');
+        throw Exception(
+          'Failed to load game statistics: ${response.statusCode}',
+        );
       }
     } catch (e) {
       throw Exception('Error loading game statistics: $e');
@@ -239,16 +266,12 @@ class GameService {
     required Map<String, dynamic> details,
     required String token,
   }) async {
-    return await submitGameAction(
-      GameActionType.patientAdmitted,
-      {
-        'patient_id': patientId,
-        'action_type': actionType,
-        'time_spent': timeSpent,
-        'details': details,
-      },
-      token,
-    );
+    return await submitGameAction(GameActionType.patientAdmitted, {
+      'patient_id': patientId,
+      'action_type': actionType,
+      'time_spent': timeSpent,
+      'details': details,
+    }, token);
   }
 
   /// Submit emergency response action
@@ -259,16 +282,12 @@ class GameService {
     required Map<String, dynamic> details,
     required String token,
   }) async {
-    return await submitGameAction(
-      GameActionType.emergencyHandled,
-      {
-        'emergency_type': emergencyType,
-        'response_time': responseTime,
-        'outcome': outcome,
-        'details': details,
-      },
-      token,
-    );
+    return await submitGameAction(GameActionType.emergencyHandled, {
+      'emergency_type': emergencyType,
+      'response_time': responseTime,
+      'outcome': outcome,
+      'details': details,
+    }, token);
   }
 
   /// Submit hospital management action
@@ -278,15 +297,11 @@ class GameService {
     required Map<String, dynamic> improvements,
     required String token,
   }) async {
-    return await submitGameAction(
-      GameActionType.hospitalManaged,
-      {
-        'hospital_id': hospitalId,
-        'action_type': actionType,
-        'improvements': improvements,
-      },
-      token,
-    );
+    return await submitGameAction(GameActionType.hospitalManaged, {
+      'hospital_id': hospitalId,
+      'action_type': actionType,
+      'improvements': improvements,
+    }, token);
   }
 
   /// Submit team collaboration action
@@ -296,15 +311,11 @@ class GameService {
     required Map<String, dynamic> results,
     required String token,
   }) async {
-    return await submitGameAction(
-      GameActionType.teamCollaboration,
-      {
-        'team_members': teamMemberIds,
-        'collaboration_type': collaborationType,
-        'results': results,
-      },
-      token,
-    );
+    return await submitGameAction(GameActionType.teamCollaboration, {
+      'team_members': teamMemberIds,
+      'collaboration_type': collaborationType,
+      'results': results,
+    }, token);
   }
 
   /// Get user's current rank position
@@ -326,7 +337,10 @@ class GameService {
   }
 
   /// Get nearby players for comparison
-  Future<List<LeaderboardEntry>> getNearbyPlayers(String token, {int range = 5}) async {
+  Future<List<LeaderboardEntry>> getNearbyPlayers(
+    String token, {
+    int range = 5,
+  }) async {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/game/nearby-players?range=$range'),
@@ -336,9 +350,13 @@ class GameService {
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
         final List<dynamic> playersJson = data['data'] ?? [];
-        return playersJson.map((json) => LeaderboardEntry.fromJson(json)).toList();
+        return playersJson
+            .map((json) => LeaderboardEntry.fromJson(json))
+            .toList();
       } else {
-        throw Exception('Failed to load nearby players: ${response.statusCode}');
+        throw Exception(
+          'Failed to load nearby players: ${response.statusCode}',
+        );
       }
     } catch (e) {
       throw Exception('Error loading nearby players: $e');
@@ -357,7 +375,9 @@ class GameService {
         final Map<String, dynamic> data = json.decode(response.body);
         return List<Map<String, dynamic>>.from(data['data'] ?? []);
       } else {
-        throw Exception('Failed to load seasonal events: ${response.statusCode}');
+        throw Exception(
+          'Failed to load seasonal events: ${response.statusCode}',
+        );
       }
     } catch (e) {
       throw Exception('Error loading seasonal events: $e');

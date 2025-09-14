@@ -45,11 +45,11 @@ class Hospital {
       status: json['status'] ?? 'active',
       latitude: json['latitude']?.toDouble(),
       longitude: json['longitude']?.toDouble(),
-      createdAt: json['created_at'] != null 
-          ? DateTime.parse(json['created_at']) 
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
           : null,
-      updatedAt: json['updated_at'] != null 
-          ? DateTime.parse(json['updated_at']) 
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'])
           : null,
     );
   }
@@ -109,11 +109,12 @@ class Hospital {
 
   // Helper methods
   int get occupiedBeds => capacity - availableBeds;
-  
-  double get occupancyRate => capacity > 0 ? (occupiedBeds / capacity) * 100 : 0.0;
-  
+
+  double get occupancyRate =>
+      capacity > 0 ? (occupiedBeds / capacity) * 100 : 0.0;
+
   bool get isActive => status.toLowerCase() == 'active';
-  
+
   bool get hasAvailableBeds => availableBeds > 0;
 
   String get occupancyStatus {
@@ -131,9 +132,7 @@ class Hospital {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is Hospital &&
-        other.id == id &&
-        other.name == name;
+    return other is Hospital && other.id == id && other.name == name;
   }
 
   @override

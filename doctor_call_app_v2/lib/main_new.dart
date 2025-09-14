@@ -18,13 +18,11 @@ class DoctorCallApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
-      ],
+      providers: [ChangeNotifierProvider(create: (_) => AuthProvider())],
       child: MaterialApp(
         title: 'Doctor Call - Hospital Management',
         debugShowCheckedModeBanner: false,
-        
+
         // Localization
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
@@ -37,7 +35,7 @@ class DoctorCallApp extends StatelessWidget {
           Locale('es', 'ES'), // Spanish
         ],
         locale: const Locale('en', 'US'),
-        
+
         // Theme
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
@@ -45,14 +43,14 @@ class DoctorCallApp extends StatelessWidget {
             brightness: Brightness.light,
           ),
           useMaterial3: true,
-          
+
           // App Bar Theme
           appBarTheme: const AppBarTheme(
             centerTitle: false,
             elevation: 0,
             scrolledUnderElevation: 1,
           ),
-          
+
           // Card Theme
           cardTheme: const CardTheme(
             elevation: 2,
@@ -60,31 +58,26 @@ class DoctorCallApp extends StatelessWidget {
               borderRadius: BorderRadius.all(Radius.circular(12)),
             ),
           ),
-          
+
           // Input Decoration Theme
           inputDecorationTheme: InputDecorationTheme(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             filled: true,
             fillColor: Colors.grey[50],
           ),
-          
+
           // Elevated Button Theme
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
               elevation: 2,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24,
-                vertical: 12,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
           ),
         ),
-        
+
         // Dark Theme
         darkTheme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
@@ -93,7 +86,7 @@ class DoctorCallApp extends StatelessWidget {
           ),
           useMaterial3: true,
         ),
-        
+
         // Routes
         initialRoute: '/',
         routes: {
@@ -102,7 +95,7 @@ class DoctorCallApp extends StatelessWidget {
           '/register': (context) => const RegisterScreen(),
           '/dashboard': (context) => const DashboardScreen(),
         },
-        
+
         // Route Generator for dynamic routes
         onGenerateRoute: (settings) {
           switch (settings.name) {
@@ -112,15 +105,12 @@ class DoctorCallApp extends StatelessWidget {
               );
           }
         },
-        
+
         // Unknown Route
         onUnknownRoute: (settings) {
           return MaterialPageRoute(
-            builder: (context) => const Scaffold(
-              body: Center(
-                child: Text('Page not found!'),
-              ),
-            ),
+            builder: (context) =>
+                const Scaffold(body: Center(child: Text('Page not found!'))),
           );
         },
       ),

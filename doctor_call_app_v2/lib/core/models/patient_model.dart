@@ -38,8 +38,8 @@ class Patient {
       status: json['status'] ?? '',
       medicalHistory: json['medical_history'] ?? '',
       priority: json['priority'] ?? 'normal',
-      admissionDate: json['admission_date'] != null 
-          ? DateTime.parse(json['admission_date']) 
+      admissionDate: json['admission_date'] != null
+          ? DateTime.parse(json['admission_date'])
           : null,
       hospitalId: json['hospital_id'],
       assignedDoctor: json['assigned_doctor'],
@@ -101,9 +101,7 @@ class Patient {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is Patient &&
-        other.id == id &&
-        other.nationalId == nationalId;
+    return other is Patient && other.id == id && other.nationalId == nationalId;
   }
 
   @override

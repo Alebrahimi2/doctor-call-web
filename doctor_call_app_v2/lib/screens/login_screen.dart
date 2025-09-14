@@ -85,18 +85,18 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: 16),
                         Text(
                           'Doctor Call',
-                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).primaryColor,
-                          ),
+                          style: Theme.of(context).textTheme.headlineMedium
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).primaryColor,
+                              ),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 8),
                         Text(
                           'Hospital Management System',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey[600],
-                          ),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: Colors.grey[600]),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 32),
@@ -118,7 +118,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             if (value == null || value.isEmpty) {
                               return 'Please enter your email';
                             }
-                            if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                            if (!RegExp(
+                              r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                            ).hasMatch(value)) {
                               return 'Please enter a valid email address';
                             }
                             return null;
@@ -138,7 +140,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             prefixIcon: const Icon(Icons.lock_outlined),
                             suffixIcon: IconButton(
                               icon: Icon(
-                                _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                                _obscurePassword
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
                               ),
                               onPressed: () {
                                 setState(() {
@@ -180,7 +184,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 // TODO: Implement forgot password
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text('Forgot password feature coming soon'),
+                                    content: Text(
+                                      'Forgot password feature coming soon',
+                                    ),
                                   ),
                                 );
                               },
@@ -194,9 +200,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         Consumer<AuthProvider>(
                           builder: (context, authProvider, child) {
                             return ElevatedButton(
-                              onPressed: authProvider.isLoading ? null : _handleLogin,
+                              onPressed: authProvider.isLoading
+                                  ? null
+                                  : _handleLogin,
                               style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -207,12 +217,18 @@ class _LoginScreenState extends State<LoginScreen> {
                                       width: 20,
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
-                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              Colors.white,
+                                            ),
                                       ),
                                     )
                                   : const Text(
                                       'Sign In',
-                                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                             );
                           },
@@ -236,7 +252,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: 24),
 
                         // Demo Credentials (for development)
-                        if (Theme.of(context).brightness == Brightness.light) // Only show in debug
+                        if (Theme.of(context).brightness ==
+                            Brightness.light) // Only show in debug
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(

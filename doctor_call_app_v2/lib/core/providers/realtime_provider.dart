@@ -8,62 +8,71 @@ import '../models/hospital_model.dart';
 class RealTimeProvider extends ChangeNotifier {
   final WebSocketService _webSocketService = WebSocketService();
   final NotificationService _notificationService = NotificationService();
-  
+
   StreamSubscription? _webSocketSubscription;
   StreamSubscription? _connectionSubscription;
-  
+
   // Connection state
-  WebSocketConnectionStatus _connectionStatus = WebSocketConnectionStatus.disconnected;
+  WebSocketConnectionStatus _connectionStatus =
+      WebSocketConnectionStatus.disconnected;
   String? _lastErrorMessage;
-  
+
   // Real-time data
   final Map<int, Patient> _livePatients = {};
   final Map<int, Hospital> _liveHospitals = {};
   final List<Map<String, dynamic>> _emergencyAlerts = [];
   final List<Map<String, dynamic>> _systemMessages = [];
-  
+
   // Statistics
   int _activePatientsCount = 0;
   int _criticalPatientsCount = 0;
   int _availableBedsCount = 0;
   int _totalHospitalCapacity = 0;
-  
+
   // Getters
   WebSocketConnectionStatus get connectionStatus => _connectionStatus;
   String? get lastErrorMessage => _lastErrorMessage;
-  bool get isConnected => _connectionStatus == WebSocketConnectionStatus.connected;
-  bool get isConnecting => _connectionStatus == WebSocketConnectionStatus.connecting;
-  
+  bool get isConnected =>
+      _connectionStatus == WebSocketConnectionStatus.connected;
+  bool get isConnecting =>
+      _connectionStatus == WebSocketConnectionStatus.connecting;
+
   Map<int, Patient> get livePatients => Map.unmodifiable(_livePatients);
   Map<int, Hospital> get liveHospitals => Map.unmodifiable(_liveHospitals);
-  List<Map<String, dynamic>> get emergencyAlerts => List.unmodifiable(_emergencyAlerts);
-  List<Map<String, dynamic>> get systemMessages => List.unmodifiable(_systemMessages);
-  
+  List<Map<String, dynamic>> get emergencyAlerts =>
+      List.unmodifiable(_emergencyAlerts);
+  List<Map<String, dynamic>> get systemMessages =>
+      List.unmodifiable(_systemMessages);
+
   int get activePatientsCount => _activePatientsCount;
   int get criticalPatientsCount => _criticalPatientsCount;
   int get availableBedsCount => _availableBedsCount;
   int get totalHospitalCapacity => _totalHospitalCapacity;
-  
-  double get hospitalOccupancyRate => 
-      _totalHospitalCapacity > 0 
-          ? ((_totalHospitalCapacity - _availableBedsCount) / _totalHospitalCapacity) * 100 
-          : 0.0;
+
+  double get hospitalOccupancyRate => _totalHospitalCapacity > 0
+      ? ((_totalHospitalCapacity - _availableBedsCount) /
+                _totalHospitalCapacity) *
+            100
+      : 0.0;
 
   /// Initialize real-time connection
   Future<void> initialize(String token) async {
     try {
       // Initialize notification service
       await _notificationService.initialize();
-      
+
       // Listen to connection status changes
-      _connectionSubscription = _webSocketService.connectionStatus.listen(_onConnectionStatusChanged);
-      
+      _connectionSubscription = _webSocketService.connectionStatus.listen(
+        _onConnectionStatusChanged,
+      );
+
       // Listen to WebSocket messages
-      _webSocketSubscription = _webSocketService.messages.listen(_handleWebSocketMessage);
-      
+      _webSocketSubscription = _webSocketService.messages.listen(
+        _handleWebSocketMessage,
+      );
+
       // Connect to WebSocket
       await _webSocketService.connect(token);
-      
     } catch (e) {
       _lastErrorMessage = 'Failed to initialize real-time connection: $e';
       notifyListeners();
@@ -73,14 +82,14 @@ class RealTimeProvider extends ChangeNotifier {
   /// Handle connection status changes
   void _onConnectionStatusChanged(WebSocketConnectionStatus status) {
     _connectionStatus = status;
-    
+
     if (status == WebSocketConnectionStatus.connected) {
       _lastErrorMessage = null;
       _subscribeToChannels();
     } else if (status == WebSocketConnectionStatus.error) {
       _lastErrorMessage = 'Connection error occurred';
     }
-    
+
     notifyListeners();
   }
 
@@ -88,7 +97,7 @@ class RealTimeProvider extends ChangeNotifier {
   void _subscribeToChannels() {
     // Subscribe to emergency alerts
     _webSocketService.subscribeToEmergencyAlerts();
-    
+
     // Subscribe to general patient and hospital updates
     // Individual subscriptions will be handled when viewing specific screens
   }
@@ -122,12 +131,12 @@ class RealTimeProvider extends ChangeNotifier {
     try {
       final patientData = message['data'];
       final patient = Patient.fromJson(patientData);
-      
+
       _livePatients[patient.id] = patient;
-      
+
       // Update statistics
       _updatePatientStatistics();
-      
+
       notifyListeners();
     } catch (e) {
       print('Error handling patient update: $e');
@@ -139,12 +148,12 @@ class RealTimeProvider extends ChangeNotifier {
     try {
       final hospitalData = message['data'];
       final hospital = Hospital.fromJson(hospitalData);
-      
+
       _liveHospitals[hospital.id] = hospital;
-      
+
       // Update statistics
       _updateHospitalStatistics();
-      
+
       notifyListeners();
     } catch (e) {
       print('Error handling hospital update: $e');
@@ -158,12 +167,12 @@ class RealTimeProvider extends ChangeNotifier {
       'timestamp': DateTime.now().toIso8601String(),
       'id': DateTime.now().millisecondsSinceEpoch.toString(),
     });
-    
+
     // Keep only last 50 alerts
     if (_emergencyAlerts.length > 50) {
       _emergencyAlerts.removeRange(50, _emergencyAlerts.length);
     }
-    
+
     notifyListeners();
   }
 
@@ -174,31 +183,32 @@ class RealTimeProvider extends ChangeNotifier {
       'timestamp': DateTime.now().toIso8601String(),
       'id': DateTime.now().millisecondsSinceEpoch.toString(),
     });
-    
+
     // Keep only last 100 messages
     if (_systemMessages.length > 100) {
       _systemMessages.removeRange(100, _systemMessages.length);
     }
-    
+
     notifyListeners();
   }
 
   /// Handle statistics updates
   void _handleStatsUpdate(Map<String, dynamic> message) {
     final stats = message['data'];
-    
+
     _activePatientsCount = stats['active_patients'] ?? _activePatientsCount;
-    _criticalPatientsCount = stats['critical_patients'] ?? _criticalPatientsCount;
+    _criticalPatientsCount =
+        stats['critical_patients'] ?? _criticalPatientsCount;
     _availableBedsCount = stats['available_beds'] ?? _availableBedsCount;
     _totalHospitalCapacity = stats['total_capacity'] ?? _totalHospitalCapacity;
-    
+
     notifyListeners();
   }
 
   /// Handle batch updates (multiple entities at once)
   void _handleBatchUpdate(Map<String, dynamic> message) {
     final updates = message['data'] as List<dynamic>? ?? [];
-    
+
     for (final update in updates) {
       switch (update['type']) {
         case 'patient':
@@ -258,7 +268,7 @@ class RealTimeProvider extends ChangeNotifier {
     _activePatientsCount = _livePatients.values
         .where((p) => p.status != 'discharged' && p.status != 'transferred')
         .length;
-    
+
     _criticalPatientsCount = _livePatients.values
         .where((p) => p.status == 'critical')
         .length;
@@ -266,11 +276,15 @@ class RealTimeProvider extends ChangeNotifier {
 
   /// Update hospital statistics
   void _updateHospitalStatistics() {
-    _availableBedsCount = _liveHospitals.values
-        .fold(0, (sum, hospital) => sum + hospital.availableBeds);
-    
-    _totalHospitalCapacity = _liveHospitals.values
-        .fold(0, (sum, hospital) => sum + hospital.capacity);
+    _availableBedsCount = _liveHospitals.values.fold(
+      0,
+      (sum, hospital) => sum + hospital.availableBeds,
+    );
+
+    _totalHospitalCapacity = _liveHospitals.values.fold(
+      0,
+      (sum, hospital) => sum + hospital.capacity,
+    );
   }
 
   /// Get patient by ID with real-time data

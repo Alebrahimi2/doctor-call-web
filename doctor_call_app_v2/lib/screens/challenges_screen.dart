@@ -18,7 +18,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadChallenges();
     });
@@ -33,7 +33,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
   Future<void> _loadChallenges() async {
     final gameProvider = Provider.of<GameProvider>(context, listen: false);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    
+
     if (authProvider.token != null) {
       await gameProvider.loadChallenges(authProvider.token!);
     }
@@ -67,10 +67,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
       flexibleSpace: FlexibleSpaceBar(
         title: const Text(
           'التحديات والمهام',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         background: Container(
           decoration: BoxDecoration(
@@ -148,9 +145,9 @@ class _ChallengesScreenState extends State<ChallengesScreen>
           children: [
             Text(
               'ملخص التقدم',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             Row(
@@ -159,7 +156,10 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                   child: _buildProgressCard(
                     'التحديات اليومية',
                     '$dailyCompleted/${gameProvider.dailyChallenges.length}',
-                    dailyCompleted / (gameProvider.dailyChallenges.isEmpty ? 1 : gameProvider.dailyChallenges.length),
+                    dailyCompleted /
+                        (gameProvider.dailyChallenges.isEmpty
+                            ? 1
+                            : gameProvider.dailyChallenges.length),
                     Icons.today,
                     Colors.blue,
                   ),
@@ -169,7 +169,10 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                   child: _buildProgressCard(
                     'التحديات الأسبوعية',
                     '$weeklyCompleted/${gameProvider.weeklyChallenges.length}',
-                    weeklyCompleted / (gameProvider.weeklyChallenges.isEmpty ? 1 : gameProvider.weeklyChallenges.length),
+                    weeklyCompleted /
+                        (gameProvider.weeklyChallenges.isEmpty
+                            ? 1
+                            : gameProvider.weeklyChallenges.length),
                     Icons.date_range,
                     Colors.green,
                   ),
@@ -221,10 +224,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
           const SizedBox(height: 4),
           Text(
             title,
-            style: TextStyle(
-              fontSize: 10,
-              color: Colors.grey[600],
-            ),
+            style: TextStyle(fontSize: 10, color: Colors.grey[600]),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
@@ -257,18 +257,9 @@ class _ChallengesScreenState extends State<ChallengesScreen>
           labelColor: Colors.white,
           unselectedLabelColor: Colors.grey[600],
           tabs: const [
-            Tab(
-              icon: Icon(Icons.today),
-              text: 'يومية',
-            ),
-            Tab(
-              icon: Icon(Icons.date_range),
-              text: 'أسبوعية',
-            ),
-            Tab(
-              icon: Icon(Icons.event),
-              text: 'أحداث خاصة',
-            ),
+            Tab(icon: Icon(Icons.today), text: 'يومية'),
+            Tab(icon: Icon(Icons.date_range), text: 'أسبوعية'),
+            Tab(icon: Icon(Icons.event), text: 'أحداث خاصة'),
           ],
         ),
       ),
@@ -280,8 +271,16 @@ class _ChallengesScreenState extends State<ChallengesScreen>
       child: TabBarView(
         controller: _tabController,
         children: [
-          _buildChallengesList(gameProvider.dailyChallenges, gameProvider, 'daily'),
-          _buildChallengesList(gameProvider.weeklyChallenges, gameProvider, 'weekly'),
+          _buildChallengesList(
+            gameProvider.dailyChallenges,
+            gameProvider,
+            'daily',
+          ),
+          _buildChallengesList(
+            gameProvider.weeklyChallenges,
+            gameProvider,
+            'weekly',
+          ),
           _buildEventsList(gameProvider.seasonalEvents, gameProvider),
         ],
       ),
@@ -311,24 +310,20 @@ class _ChallengesScreenState extends State<ChallengesScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.assignment_outlined,
-              size: 64,
-              color: Colors.grey[400],
-            ),
+            Icon(Icons.assignment_outlined, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
             Text(
               'لا توجد تحديات متاحة',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: Colors.grey[600],
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(color: Colors.grey[600]),
             ),
             const SizedBox(height: 8),
             Text(
               'تحقق مرة أخرى لاحقاً للتحديات الجديدة',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.grey[500],
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: Colors.grey[500]),
             ),
           ],
         ),
@@ -364,7 +359,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isCompleted 
+          color: isCompleted
               ? Colors.green.withOpacity(0.3)
               : Colors.grey.withOpacity(0.2),
           width: 1,
@@ -389,22 +384,22 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: isCompleted 
+                    color: isCompleted
                         ? Colors.green.withOpacity(0.1)
                         : _getChallengeTypeColor(type).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
-                      color: isCompleted 
+                      color: isCompleted
                           ? Colors.green
                           : _getChallengeTypeColor(type),
                       width: 2,
                     ),
                   ),
                   child: Icon(
-                    isCompleted 
+                    isCompleted
                         ? Icons.check_circle
                         : _getChallengeTypeIcon(type),
-                    color: isCompleted 
+                    color: isCompleted
                         ? Colors.green
                         : _getChallengeTypeColor(type),
                     size: 24,
@@ -417,10 +412,11 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                     children: [
                       Text(
                         challenge['title'] ?? 'تحدي غير محدد',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: isCompleted ? Colors.green : Colors.black,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: isCompleted ? Colors.green : Colors.black,
+                            ),
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -434,7 +430,10 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                 ),
                 if (challenge['points'] != null) ...[
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.amber.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
@@ -443,11 +442,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
-                          Icons.stars,
-                          color: Colors.amber[700],
-                          size: 16,
-                        ),
+                        Icon(Icons.stars, color: Colors.amber[700], size: 16),
                         const SizedBox(width: 4),
                         Text(
                           '${challenge['points']}',
@@ -464,7 +459,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
               ],
             ),
             const SizedBox(height: 16),
-            
+
             // Progress section
             if (!isCompleted) ...[
               Row(
@@ -500,24 +495,19 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                 children: [
                   Text(
                     '${(progressPercent * 100).toInt()}% مكتمل',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey[600],
-                    ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
                   ),
                   if (challenge['time_remaining'] != null) ...[
                     Row(
                       children: [
-                        Icon(
-                          Icons.schedule,
-                          size: 14,
-                          color: Colors.grey[600],
-                        ),
+                        Icon(Icons.schedule, size: 14, color: Colors.grey[600]),
                         const SizedBox(width: 4),
                         Text(
                           challenge['time_remaining'],
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Colors.grey[600],
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: Colors.grey[600]),
                         ),
                       ],
                     ),
@@ -535,11 +525,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                 ),
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.check_circle,
-                      color: Colors.green,
-                      size: 20,
-                    ),
+                    Icon(Icons.check_circle, color: Colors.green, size: 20),
                     const SizedBox(width: 8),
                     Text(
                       'تم إنجاز التحدي!',
@@ -552,24 +538,22 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                     if (challenge['completed_at'] != null) ...[
                       Text(
                         _formatCompletionTime(challenge['completed_at']),
-                        style: TextStyle(
-                          color: Colors.green,
-                          fontSize: 12,
-                        ),
+                        style: TextStyle(color: Colors.green, fontSize: 12),
                       ),
                     ],
                   ],
                 ),
               ),
             ],
-            
+
             // Action button
             if (!isCompleted && progressPercent >= 1.0) ...[
               const SizedBox(height: 12),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: () => _completeChallenge(challenge['id'], gameProvider),
+                  onPressed: () =>
+                      _completeChallenge(challenge['id'], gameProvider),
                   icon: const Icon(Icons.check),
                   label: const Text('استلام المكافأة'),
                   style: ElevatedButton.styleFrom(
@@ -607,24 +591,20 @@ class _ChallengesScreenState extends State<ChallengesScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.event_outlined,
-              size: 64,
-              color: Colors.grey[400],
-            ),
+            Icon(Icons.event_outlined, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
             Text(
               'لا توجد أحداث خاصة حالياً',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: Colors.grey[600],
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(color: Colors.grey[600]),
             ),
             const SizedBox(height: 8),
             Text(
               'ترقب الأحداث الخاصة والمناسبات',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.grey[500],
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: Colors.grey[500]),
             ),
           ],
         ),
@@ -664,7 +644,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isActive 
+          color: isActive
               ? Colors.purple.withOpacity(0.3)
               : Colors.grey.withOpacity(0.2),
           width: 1,
@@ -689,7 +669,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: isActive 
+                    color: isActive
                         ? Colors.purple.withOpacity(0.1)
                         : Colors.grey.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(24),
@@ -711,10 +691,13 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                     children: [
                       Text(
                         event['title'] ?? 'حدث خاص',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: isActive ? Colors.purple : Colors.grey[600],
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: isActive
+                                  ? Colors.purple
+                                  : Colors.grey[600],
+                            ),
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -727,9 +710,12 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
-                    color: isActive 
+                    color: isActive
                         ? Colors.green.withOpacity(0.1)
                         : Colors.grey.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
@@ -749,7 +735,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
               ],
             ),
             const SizedBox(height: 16),
-            
+
             // Event details
             if (startDate != null && endDate != null) ...[
               Container(
@@ -761,11 +747,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                 ),
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.schedule,
-                      color: Colors.grey[600],
-                      size: 20,
-                    ),
+                    Icon(Icons.schedule, color: Colors.grey[600], size: 20),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -779,7 +761,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
                 ),
               ),
             ],
-            
+
             // Event rewards
             if (event['rewards'] != null) ...[
               const SizedBox(height: 12),
@@ -817,12 +799,15 @@ class _ChallengesScreenState extends State<ChallengesScreen>
     );
   }
 
-  Future<void> _completeChallenge(int challengeId, GameProvider gameProvider) async {
+  Future<void> _completeChallenge(
+    int challengeId,
+    GameProvider gameProvider,
+  ) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    
+
     if (authProvider.token != null) {
       await gameProvider.completeChallenge(challengeId, authProvider.token!);
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('تم إنجاز التحدي بنجاح!'),
@@ -858,10 +843,10 @@ class _ChallengesScreenState extends State<ChallengesScreen>
   String _formatCompletionTime(String timestamp) {
     final date = DateTime.tryParse(timestamp);
     if (date == null) return '';
-    
+
     final now = DateTime.now();
     final difference = now.difference(date);
-    
+
     if (difference.inHours < 1) {
       return 'منذ ${difference.inMinutes} دقيقة';
     } else if (difference.inDays < 1) {
@@ -873,10 +858,20 @@ class _ChallengesScreenState extends State<ChallengesScreen>
 
   String _formatEventDate(DateTime date) {
     final months = [
-      'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-      'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+      'يناير',
+      'فبراير',
+      'مارس',
+      'أبريل',
+      'مايو',
+      'يونيو',
+      'يوليو',
+      'أغسطس',
+      'سبتمبر',
+      'أكتوبر',
+      'نوفمبر',
+      'ديسمبر',
     ];
-    
+
     return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
 }

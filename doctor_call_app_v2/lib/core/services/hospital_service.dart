@@ -43,7 +43,10 @@ class HospitalService {
     }
   }
 
-  Future<Hospital> createHospital(Map<String, dynamic> hospitalData, String token) async {
+  Future<Hospital> createHospital(
+    Map<String, dynamic> hospitalData,
+    String token,
+  ) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/hospitals'),
@@ -62,7 +65,11 @@ class HospitalService {
     }
   }
 
-  Future<Hospital> updateHospital(int id, Map<String, dynamic> hospitalData, String token) async {
+  Future<Hospital> updateHospital(
+    int id,
+    Map<String, dynamic> hospitalData,
+    String token,
+  ) async {
     try {
       final response = await http.put(
         Uri.parse('$baseUrl/hospitals/$id'),
@@ -96,10 +103,17 @@ class HospitalService {
     }
   }
 
-  Future<List<Hospital>> getNearbyHospitals(double latitude, double longitude, double radius, String token) async {
+  Future<List<Hospital>> getNearbyHospitals(
+    double latitude,
+    double longitude,
+    double radius,
+    String token,
+  ) async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/hospitals/nearby?lat=$latitude&lng=$longitude&radius=$radius'),
+        Uri.parse(
+          '$baseUrl/hospitals/nearby?lat=$latitude&lng=$longitude&radius=$radius',
+        ),
         headers: ApiConstants.getAuthHeaders(token),
       );
 
@@ -108,7 +122,9 @@ class HospitalService {
         final List<dynamic> hospitalsJson = data['data'] ?? [];
         return hospitalsJson.map((json) => Hospital.fromJson(json)).toList();
       } else {
-        throw Exception('Failed to load nearby hospitals: ${response.statusCode}');
+        throw Exception(
+          'Failed to load nearby hospitals: ${response.statusCode}',
+        );
       }
     } catch (e) {
       throw Exception('Error loading nearby hospitals: $e');
@@ -125,14 +141,19 @@ class HospitalService {
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
-        throw Exception('Failed to load hospital stats: ${response.statusCode}');
+        throw Exception(
+          'Failed to load hospital stats: ${response.statusCode}',
+        );
       }
     } catch (e) {
       throw Exception('Error loading hospital stats: $e');
     }
   }
 
-  Future<Map<String, dynamic>> getHospitalDetailsWithStats(int id, String token) async {
+  Future<Map<String, dynamic>> getHospitalDetailsWithStats(
+    int id,
+    String token,
+  ) async {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/hospitals/$id/stats'),
@@ -142,17 +163,24 @@ class HospitalService {
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
-        throw Exception('Failed to load hospital details: ${response.statusCode}');
+        throw Exception(
+          'Failed to load hospital details: ${response.statusCode}',
+        );
       }
     } catch (e) {
       throw Exception('Error loading hospital details: $e');
     }
   }
 
-  Future<List<Hospital>> getHospitalsBySpecialization(String specialization, String token) async {
+  Future<List<Hospital>> getHospitalsBySpecialization(
+    String specialization,
+    String token,
+  ) async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/hospitals/specialization/${Uri.encodeComponent(specialization)}'),
+        Uri.parse(
+          '$baseUrl/hospitals/specialization/${Uri.encodeComponent(specialization)}',
+        ),
         headers: ApiConstants.getAuthHeaders(token),
       );
 
@@ -161,7 +189,9 @@ class HospitalService {
         final List<dynamic> hospitalsJson = data['data'] ?? [];
         return hospitalsJson.map((json) => Hospital.fromJson(json)).toList();
       } else {
-        throw Exception('Failed to load hospitals by specialization: ${response.statusCode}');
+        throw Exception(
+          'Failed to load hospitals by specialization: ${response.statusCode}',
+        );
       }
     } catch (e) {
       throw Exception('Error loading hospitals by specialization: $e');
@@ -180,7 +210,9 @@ class HospitalService {
         final List<dynamic> hospitalsJson = data['data'] ?? [];
         return hospitalsJson.map((json) => Hospital.fromJson(json)).toList();
       } else {
-        throw Exception('Failed to load hospitals with available beds: ${response.statusCode}');
+        throw Exception(
+          'Failed to load hospitals with available beds: ${response.statusCode}',
+        );
       }
     } catch (e) {
       throw Exception('Error loading hospitals with available beds: $e');
@@ -206,7 +238,11 @@ class HospitalService {
     }
   }
 
-  Future<Map<String, dynamic>> updateHospitalStatus(int id, String status, String token) async {
+  Future<Map<String, dynamic>> updateHospitalStatus(
+    int id,
+    String status,
+    String token,
+  ) async {
     try {
       final response = await http.patch(
         Uri.parse('$baseUrl/hospitals/$id/status'),
@@ -217,14 +253,20 @@ class HospitalService {
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
-        throw Exception('Failed to update hospital status: ${response.statusCode}');
+        throw Exception(
+          'Failed to update hospital status: ${response.statusCode}',
+        );
       }
     } catch (e) {
       throw Exception('Error updating hospital status: $e');
     }
   }
 
-  Future<Map<String, dynamic>> updateBedCount(int id, int availableBeds, String token) async {
+  Future<Map<String, dynamic>> updateBedCount(
+    int id,
+    int availableBeds,
+    String token,
+  ) async {
     try {
       final response = await http.patch(
         Uri.parse('$baseUrl/hospitals/$id/beds'),
@@ -242,7 +284,10 @@ class HospitalService {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getHospitalDepartments(int hospitalId, String token) async {
+  Future<List<Map<String, dynamic>>> getHospitalDepartments(
+    int hospitalId,
+    String token,
+  ) async {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/hospitals/$hospitalId/departments'),
@@ -253,14 +298,19 @@ class HospitalService {
         final Map<String, dynamic> data = json.decode(response.body);
         return List<Map<String, dynamic>>.from(data['data'] ?? []);
       } else {
-        throw Exception('Failed to load hospital departments: ${response.statusCode}');
+        throw Exception(
+          'Failed to load hospital departments: ${response.statusCode}',
+        );
       }
     } catch (e) {
       throw Exception('Error loading hospital departments: $e');
     }
   }
 
-  Future<Map<String, dynamic>> getHospitalPerformanceMetrics(int id, String token) async {
+  Future<Map<String, dynamic>> getHospitalPerformanceMetrics(
+    int id,
+    String token,
+  ) async {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/hospitals/$id/performance'),
@@ -270,7 +320,9 @@ class HospitalService {
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
-        throw Exception('Failed to load hospital performance: ${response.statusCode}');
+        throw Exception(
+          'Failed to load hospital performance: ${response.statusCode}',
+        );
       }
     } catch (e) {
       throw Exception('Error loading hospital performance: $e');

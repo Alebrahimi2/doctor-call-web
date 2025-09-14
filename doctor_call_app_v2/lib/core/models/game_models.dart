@@ -34,8 +34,8 @@ class Achievement {
       requiredPoints: json['required_points'] ?? 0,
       category: json['category'] ?? '',
       requirements: Map<String, dynamic>.from(json['requirements'] ?? {}),
-      unlockedAt: json['unlocked_at'] != null 
-          ? DateTime.parse(json['unlocked_at']) 
+      unlockedAt: json['unlocked_at'] != null
+          ? DateTime.parse(json['unlocked_at'])
           : null,
       isUnlocked: json['is_unlocked'] ?? false,
       rarity: json['rarity'] ?? 'common',
@@ -130,9 +130,11 @@ class GameScore {
       experiencePoints: json['experience_points'] ?? 0,
       nextLevelPoints: json['next_level_points'] ?? 100,
       categoryPoints: Map<String, int>.from(json['category_points'] ?? {}),
-      unlockedAchievements: (json['unlocked_achievements'] as List<dynamic>?)
-          ?.map((a) => Achievement.fromJson(a))
-          .toList() ?? [],
+      unlockedAchievements:
+          (json['unlocked_achievements'] as List<dynamic>?)
+              ?.map((a) => Achievement.fromJson(a))
+              .toList() ??
+          [],
       rank: json['rank'] ?? 0,
       title: json['title'] ?? 'مبتدئ',
     );
@@ -145,7 +147,9 @@ class GameScore {
       'experience_points': experiencePoints,
       'next_level_points': nextLevelPoints,
       'category_points': categoryPoints,
-      'unlocked_achievements': unlockedAchievements.map((a) => a.toJson()).toList(),
+      'unlocked_achievements': unlockedAchievements
+          .map((a) => a.toJson())
+          .toList(),
       'rank': rank,
       'title': title,
     };
@@ -217,9 +221,11 @@ class LeaderboardEntry {
       rank: json['rank'] ?? 0,
       title: json['title'] ?? '',
       categoryPoints: Map<String, int>.from(json['category_points'] ?? {}),
-      recentAchievements: (json['recent_achievements'] as List<dynamic>?)
-          ?.map((a) => Achievement.fromJson(a))
-          .toList() ?? [],
+      recentAchievements:
+          (json['recent_achievements'] as List<dynamic>?)
+              ?.map((a) => Achievement.fromJson(a))
+              .toList() ??
+          [],
     );
   }
 
@@ -259,8 +265,8 @@ class GameAction {
       description: json['description'] ?? '',
       points: json['points'] ?? 0,
       metadata: Map<String, dynamic>.from(json['metadata'] ?? {}),
-      timestamp: json['timestamp'] != null 
-          ? DateTime.parse(json['timestamp']) 
+      timestamp: json['timestamp'] != null
+          ? DateTime.parse(json['timestamp'])
           : DateTime.now(),
     );
   }

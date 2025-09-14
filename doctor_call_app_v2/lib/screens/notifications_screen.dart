@@ -52,7 +52,9 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                     stream: _notificationService.notifications,
                     builder: (context, snapshot) {
                       final unreadCount = _notificationService.unreadCount;
-                      return Text('الكل ${unreadCount > 0 ? '($unreadCount)' : ''}');
+                      return Text(
+                        'الكل ${unreadCount > 0 ? '($unreadCount)' : ''}',
+                      );
                     },
                   ),
                 ],
@@ -150,7 +152,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
       stream: _notificationService.notifications,
       builder: (context, snapshot) {
         final notifications = _notificationService.allNotifications;
-        
+
         if (notifications.isEmpty) {
           return const Center(
             child: Column(
@@ -186,9 +188,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
             .toList();
 
         if (notifications.isEmpty) {
-          return const Center(
-            child: Text('لا توجد تحديثات للمرضى'),
-          );
+          return const Center(child: Text('لا توجد تحديثات للمرضى'));
         }
 
         return ListView.builder(
@@ -228,21 +228,19 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                       ),
                     ),
                     const SizedBox(height: 8),
-                    ...emergencyAlerts.take(3).map((alert) => 
-                      _buildEmergencyAlertCard(alert)
-                    ),
+                    ...emergencyAlerts
+                        .take(3)
+                        .map((alert) => _buildEmergencyAlertCard(alert)),
                   ],
                 ),
               ),
               const Divider(),
             ],
-            
+
             // Historical emergency notifications
             Expanded(
               child: emergencyNotifications.isEmpty
-                  ? const Center(
-                      child: Text('لا توجد تنبيهات طوارئ'),
-                    )
+                  ? const Center(child: Text('لا توجد تنبيهات طوارئ'))
                   : ListView.builder(
                       itemCount: emergencyNotifications.length,
                       itemBuilder: (context, index) {
@@ -283,21 +281,19 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                       ),
                     ),
                     const SizedBox(height: 8),
-                    ...systemMessages.take(3).map((message) => 
-                      _buildSystemMessageCard(message)
-                    ),
+                    ...systemMessages
+                        .take(3)
+                        .map((message) => _buildSystemMessageCard(message)),
                   ],
                 ),
               ),
               const Divider(),
             ],
-            
+
             // Historical system notifications
             Expanded(
               child: systemNotifications.isEmpty
-                  ? const Center(
-                      child: Text('لا توجد رسائل نظام'),
-                    )
+                  ? const Center(child: Text('لا توجد رسائل نظام'))
                   : ListView.builder(
                       itemCount: systemNotifications.length,
                       itemBuilder: (context, index) {
@@ -320,7 +316,9 @@ class _NotificationsScreenState extends State<NotificationsScreen>
         title: Text(
           notification.title,
           style: TextStyle(
-            fontWeight: notification.isRead ? FontWeight.normal : FontWeight.bold,
+            fontWeight: notification.isRead
+                ? FontWeight.normal
+                : FontWeight.bold,
           ),
         ),
         subtitle: Column(
@@ -333,8 +331,8 @@ class _NotificationsScreenState extends State<NotificationsScreen>
             ),
           ],
         ),
-        trailing: notification.isRead 
-            ? null 
+        trailing: notification.isRead
+            ? null
             : Container(
                 width: 8,
                 height: 8,

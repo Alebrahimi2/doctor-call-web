@@ -8,7 +8,7 @@ class UserModel {
   final DateTime? emailVerifiedAt;
   final DateTime createdAt;
   final DateTime updatedAt;
-  
+
   UserModel({
     required this.id,
     required this.name,
@@ -20,7 +20,7 @@ class UserModel {
     required this.createdAt,
     required this.updatedAt,
   });
-  
+
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       id: json['id'] as int,
@@ -29,14 +29,14 @@ class UserModel {
       phone: json['phone'] as String?,
       avatar: json['avatar'] as String?,
       role: json['role'] as String? ?? 'user',
-      emailVerifiedAt: json['email_verified_at'] != null 
+      emailVerifiedAt: json['email_verified_at'] != null
           ? DateTime.parse(json['email_verified_at'] as String)
           : null,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
     );
   }
-  
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -50,7 +50,7 @@ class UserModel {
       'updated_at': updatedAt.toIso8601String(),
     };
   }
-  
+
   UserModel copyWith({
     int? id,
     String? name,
@@ -74,28 +74,28 @@ class UserModel {
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
-  
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     return other is UserModel && other.id == id;
   }
-  
+
   @override
   int get hashCode => id.hashCode;
-  
+
   @override
   String toString() {
     return 'UserModel(id: $id, name: $name, email: $email, role: $role)';
   }
-  
+
   // Helper getters
   bool get isAdmin => role == 'admin';
   bool get isDoctor => role == 'doctor';
   bool get isNurse => role == 'nurse';
   bool get isUser => role == 'user';
   bool get isEmailVerified => emailVerifiedAt != null;
-  
+
   String get displayName => name;
   String get avatarUrl => avatar ?? '';
 }

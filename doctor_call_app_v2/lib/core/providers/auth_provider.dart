@@ -2,33 +2,28 @@ import 'package:flutter/foundation.dart';
 import '../models/user_model.dart';
 import '../services/auth_service.dart';
 
-enum AuthState {
-  initial,
-  loading,
-  authenticated,
-  unauthenticated,
-  error,
-}
+enum AuthState { initial, loading, authenticated, unauthenticated, error }
 
 class AuthProvider with ChangeNotifier {
   final AuthService _authService = AuthService();
-  
+
   AuthState _state = AuthState.initial;
   UserModel? _user;
   String? _error;
   bool _isLoading = false;
-  
+
   // Getters
   AuthState get state => _state;
   UserModel? get user => _user;
   String? get error => _error;
   bool get isLoading => _isLoading;
-  bool get isAuthenticated => _state == AuthState.authenticated && _user != null;
-  
+  bool get isAuthenticated =>
+      _state == AuthState.authenticated && _user != null;
+
   // Initialize auth state
   Future<void> initializeAuth() async {
     _setState(AuthState.loading);
-    
+
     try {
       // Check if user has stored authentication
       final isAuth = await _authService.isAuthenticated();
@@ -40,7 +35,7 @@ class AuthProvider with ChangeNotifier {
           return;
         }
       }
-      
+
       // Try to get stored user data
       final storedUser = await _authService.getStoredUser();
       if (storedUser != null) {
@@ -53,15 +48,15 @@ class AuthProvider with ChangeNotifier {
       _setError('Failed to initialize authentication: $e');
     }
   }
-  
+
   // Login
   Future<bool> login(String email, String password) async {
     _setLoading(true);
     _clearError();
-    
+
     try {
       final result = await _authService.login(email, password);
-      
+
       if (result.success && result.user != null) {
         _user = result.user;
         _setState(AuthState.authenticated);
@@ -77,7 +72,7 @@ class AuthProvider with ChangeNotifier {
       _setLoading(false);
     }
   }
-  
+
   // Register
   Future<bool> register({
     required String name,
@@ -89,7 +84,7 @@ class AuthProvider with ChangeNotifier {
   }) async {
     _setLoading(true);
     _clearError();
-    
+
     try {
       final result = await _authService.register(
         name: name,
@@ -99,7 +94,7 @@ class AuthProvider with ChangeNotifier {
         phone: phone,
         role: role,
       );
-      
+
       if (result.success && result.user != null) {
         _user = result.user;
         _setState(AuthState.authenticated);
@@ -115,11 +110,11 @@ class AuthProvider with ChangeNotifier {
       _setLoading(false);
     }
   }
-  
+
   // Logout
   Future<void> logout() async {
     _setLoading(true);
-    
+
     try {
       await _authService.logout();
     } catch (e) {
@@ -133,7 +128,7 @@ class AuthProvider with ChangeNotifier {
       _setLoading(false);
     }
   }
-  
+
   // Update profile
   Future<bool> updateProfile({
     String? name,
@@ -143,7 +138,7 @@ class AuthProvider with ChangeNotifier {
   }) async {
     _setLoading(true);
     _clearError();
-    
+
     try {
       final result = await _authService.updateProfile(
         name: name,
@@ -151,7 +146,7 @@ class AuthProvider with ChangeNotifier {
         phone: phone,
         avatar: avatar,
       );
-      
+
       if (result.success && result.user != null) {
         _user = result.user;
         notifyListeners();
@@ -167,7 +162,7 @@ class AuthProvider with ChangeNotifier {
       _setLoading(false);
     }
   }
-  
+
   // Change password
   Future<bool> changePassword({
     required String currentPassword,
@@ -176,14 +171,14 @@ class AuthProvider with ChangeNotifier {
   }) async {
     _setLoading(true);
     _clearError();
-    
+
     try {
       final success = await _authService.changePassword(
         currentPassword: currentPassword,
         newPassword: newPassword,
         passwordConfirmation: passwordConfirmation,
       );
-      
+
       if (success) {
         return true;
       } else {
@@ -197,11 +192,11 @@ class AuthProvider with ChangeNotifier {
       _setLoading(false);
     }
   }
-  
+
   // Refresh current user data
   Future<void> refreshUser() async {
     if (!isAuthenticated) return;
-    
+
     try {
       final user = await _authService.getCurrentUser();
       if (user != null) {
@@ -214,7 +209,7 @@ class AuthProvider with ChangeNotifier {
       }
     }
   }
-  
+
   // Private helper methods
   void _setState(AuthState newState) {
     if (_state != newState) {
@@ -222,26 +217,26 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
     }
   }
-  
+
   void _setLoading(bool loading) {
     if (_isLoading != loading) {
       _isLoading = loading;
       notifyListeners();
     }
   }
-  
+
   void _setError(String error) {
     _error = error;
     _setState(AuthState.error);
   }
-  
+
   void _clearError() {
     if (_error != null) {
       _error = null;
       notifyListeners();
     }
   }
-  
+
   // Clear all data (useful for testing or complete reset)
   void clearAll() {
     _user = null;

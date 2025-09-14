@@ -44,7 +44,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadAchievements();
     });
@@ -59,7 +59,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
   Future<void> _loadAchievements() async {
     final gameProvider = Provider.of<GameProvider>(context, listen: false);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    
+
     if (authProvider.token != null) {
       await gameProvider.loadAchievements(authProvider.token!);
     }
@@ -94,10 +94,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
       flexibleSpace: FlexibleSpaceBar(
         title: const Text(
           'الإنجازات',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         background: Container(
           decoration: BoxDecoration(
@@ -115,7 +112,9 @@ class _AchievementsScreenState extends State<AchievementsScreen>
       actions: [
         IconButton(
           icon: const Icon(Icons.refresh, color: Colors.white),
-          onPressed: gameProvider.isLoadingAchievements ? null : _loadAchievements,
+          onPressed: gameProvider.isLoadingAchievements
+              ? null
+              : _loadAchievements,
         ),
         PopupMenuButton<String>(
           icon: const Icon(Icons.filter_list, color: Colors.white),
@@ -181,9 +180,8 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                     children: [
                       Text(
                         'التقدم الإجمالي',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       Text(
                         '${gameProvider.totalUnlockedAchievements} من ${gameProvider.totalAvailableAchievements} إنجاز',
@@ -229,7 +227,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
           itemBuilder: (context, index) {
             final category = _categories[index];
             final isSelected = category == _selectedCategory;
-            
+
             return Container(
               margin: const EdgeInsets.only(right: 8),
               child: FilterChip(
@@ -246,7 +244,9 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                       _categoryNames[category] ?? category,
                       style: TextStyle(
                         color: isSelected ? Colors.white : Colors.grey[600],
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                       ),
                     ),
                   ],
@@ -285,18 +285,9 @@ class _AchievementsScreenState extends State<AchievementsScreen>
           labelColor: Colors.white,
           unselectedLabelColor: Colors.grey[600],
           tabs: const [
-            Tab(
-              icon: Icon(Icons.check_circle),
-              text: 'مكتملة',
-            ),
-            Tab(
-              icon: Icon(Icons.radio_button_unchecked),
-              text: 'قيد التقدم',
-            ),
-            Tab(
-              icon: Icon(Icons.star),
-              text: 'حديثة',
-            ),
+            Tab(icon: Icon(Icons.check_circle), text: 'مكتملة'),
+            Tab(icon: Icon(Icons.radio_button_unchecked), text: 'قيد التقدم'),
+            Tab(icon: Icon(Icons.star), text: 'حديثة'),
           ],
         ),
       ),
@@ -308,7 +299,10 @@ class _AchievementsScreenState extends State<AchievementsScreen>
       child: TabBarView(
         controller: _tabController,
         children: [
-          _buildAchievementsList(gameProvider.unlockedAchievements, gameProvider),
+          _buildAchievementsList(
+            gameProvider.unlockedAchievements,
+            gameProvider,
+          ),
           _buildAchievementsList(gameProvider.lockedAchievements, gameProvider),
           _buildAchievementsList(gameProvider.recentAchievements, gameProvider),
         ],
@@ -316,7 +310,10 @@ class _AchievementsScreenState extends State<AchievementsScreen>
     );
   }
 
-  Widget _buildAchievementsList(List<Achievement> achievements, GameProvider gameProvider) {
+  Widget _buildAchievementsList(
+    List<Achievement> achievements,
+    GameProvider gameProvider,
+  ) {
     // Filter by selected category
     List<Achievement> filteredAchievements = achievements;
     if (_selectedCategory != 'الكل') {
@@ -351,16 +348,16 @@ class _AchievementsScreenState extends State<AchievementsScreen>
             const SizedBox(height: 16),
             Text(
               'لا توجد إنجازات في هذه الفئة',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: Colors.grey[600],
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(color: Colors.grey[600]),
             ),
             const SizedBox(height: 8),
             Text(
               'ابدأ بتقديم الخدمات لكسب إنجازات جديدة',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.grey[500],
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: Colors.grey[500]),
             ),
           ],
         ),
@@ -380,14 +377,17 @@ class _AchievementsScreenState extends State<AchievementsScreen>
     );
   }
 
-  Widget _buildAchievementCard(Achievement achievement, GameProvider gameProvider) {
+  Widget _buildAchievementCard(
+    Achievement achievement,
+    GameProvider gameProvider,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: achievement.isUnlocked 
+          color: achievement.isUnlocked
               ? Theme.of(context).primaryColor.withOpacity(0.3)
               : Colors.grey.withOpacity(0.2),
           width: 1,
@@ -433,7 +433,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                 ),
               ),
               const SizedBox(width: 16),
-              
+
               // Achievement Info
               Expanded(
                 child: Column(
@@ -444,15 +444,21 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                         Expanded(
                           child: Text(
                             achievement.name,
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: achievement.isUnlocked ? Colors.black : Colors.grey[600],
-                            ),
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: achievement.isUnlocked
+                                      ? Colors.black
+                                      : Colors.grey[600],
+                                ),
                           ),
                         ),
                         if (achievement.isUnlocked) ...[
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: _getRarityColor(achievement.rarity),
                               borderRadius: BorderRadius.circular(12),
@@ -472,14 +478,14 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                     const SizedBox(height: 4),
                     Text(
                       achievement.description,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.grey[600],
-                      ),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 8),
-                    
+
                     // Progress or completion info
                     if (achievement.isUnlocked) ...[
                       Row(
@@ -492,25 +498,23 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                           const SizedBox(width: 4),
                           Text(
                             'مكتمل في ${_formatDate(achievement.unlockedAt!)}',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context).primaryColor,
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  color: Theme.of(context).primaryColor,
+                                  fontWeight: FontWeight.w500,
+                                ),
                           ),
                           const Spacer(),
                           if (achievement.points > 0) ...[
-                            Icon(
-                              Icons.stars,
-                              color: Colors.amber,
-                              size: 16,
-                            ),
+                            Icon(Icons.stars, color: Colors.amber, size: 16),
                             const SizedBox(width: 4),
                             Text(
                               '${achievement.points} نقطة',
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Colors.amber[700],
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    color: Colors.amber[700],
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                           ],
                         ],
@@ -523,9 +527,8 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                             children: [
                               Text(
                                 'المطلوب: ${achievement.requiredPoints} نقطة',
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: Colors.grey[600],
-                                ),
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(color: Colors.grey[600]),
                               ),
                               const Spacer(),
                               if (achievement.points > 0) ...[
@@ -537,16 +540,18 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                                 const SizedBox(width: 4),
                                 Text(
                                   '${achievement.points} نقطة',
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: Colors.grey[600],
-                                  ),
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(color: Colors.grey[600]),
                                 ),
                               ],
                             ],
                           ),
                           const SizedBox(height: 4),
                           LinearProgressIndicator(
-                            value: (achievement.currentProgress / achievement.requiredPoints).clamp(0.0, 1.0),
+                            value:
+                                (achievement.currentProgress /
+                                        achievement.requiredPoints)
+                                    .clamp(0.0, 1.0),
                             backgroundColor: Colors.grey[200],
                             valueColor: AlwaysStoppedAnimation<Color>(
                               Theme.of(context).primaryColor.withOpacity(0.7),
@@ -559,34 +564,30 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                   ],
                 ),
               ),
-              
+
               // Action button
               const SizedBox(width: 8),
-              if (achievement.isUnlocked && achievement.hasReward && !achievement.rewardClaimed) ...[
+              if (achievement.isUnlocked &&
+                  achievement.hasReward &&
+                  !achievement.rewardClaimed) ...[
                 ElevatedButton(
                   onPressed: () => _claimReward(achievement, gameProvider),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
-                  child: const Text(
-                    'استلام',
-                    style: TextStyle(fontSize: 12),
-                  ),
+                  child: const Text('استلام', style: TextStyle(fontSize: 12)),
                 ),
               ] else if (!achievement.isUnlocked) ...[
-                Icon(
-                  Icons.lock_outline,
-                  color: Colors.grey[400],
-                ),
+                Icon(Icons.lock_outline, color: Colors.grey[400]),
               ] else ...[
-                Icon(
-                  Icons.check_circle,
-                  color: Theme.of(context).primaryColor,
-                ),
+                Icon(Icons.check_circle, color: Theme.of(context).primaryColor),
               ],
             ],
           ),
@@ -595,7 +596,10 @@ class _AchievementsScreenState extends State<AchievementsScreen>
     );
   }
 
-  void _showAchievementDetails(Achievement achievement, GameProvider gameProvider) {
+  void _showAchievementDetails(
+    Achievement achievement,
+    GameProvider gameProvider,
+  ) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -627,7 +631,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                   ),
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Achievement header
                 Row(
                   children: [
@@ -636,7 +640,9 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                       height: 80,
                       decoration: BoxDecoration(
                         color: achievement.isUnlocked
-                            ? _getRarityColor(achievement.rarity).withOpacity(0.1)
+                            ? _getRarityColor(
+                                achievement.rarity,
+                              ).withOpacity(0.1)
                             : Colors.grey[100],
                         borderRadius: BorderRadius.circular(40),
                         border: Border.all(
@@ -661,15 +667,19 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                         children: [
                           Text(
                             achievement.name,
-                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: Theme.of(context).textTheme.headlineSmall
+                                ?.copyWith(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 4),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
-                              color: _getRarityColor(achievement.rarity).withOpacity(0.1),
+                              color: _getRarityColor(
+                                achievement.rarity,
+                              ).withOpacity(0.1),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
                                 color: _getRarityColor(achievement.rarity),
@@ -690,7 +700,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                   ],
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Description
                 Text(
                   'الوصف',
@@ -704,7 +714,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Requirements
                 Text(
                   'المتطلبات',
@@ -731,9 +741,8 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                           ),
                           Text(
                             '${achievement.requiredPoints}',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
@@ -748,16 +757,20 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                             ),
                             Text(
                               '${achievement.currentProgress}',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context).primaryColor,
-                              ),
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).primaryColor,
+                                  ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 12),
                         LinearProgressIndicator(
-                          value: (achievement.currentProgress / achievement.requiredPoints).clamp(0.0, 1.0),
+                          value:
+                              (achievement.currentProgress /
+                                      achievement.requiredPoints)
+                                  .clamp(0.0, 1.0),
                           backgroundColor: Colors.grey[200],
                           valueColor: AlwaysStoppedAnimation<Color>(
                             Theme.of(context).primaryColor,
@@ -768,7 +781,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                     ],
                   ),
                 ),
-                
+
                 // Rewards
                 if (achievement.points > 0 || achievement.hasReward) ...[
                   const SizedBox(height: 24),
@@ -788,24 +801,21 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                     ),
                     child: Row(
                       children: [
-                        Icon(
-                          Icons.stars,
-                          color: Colors.amber[700],
-                          size: 24,
-                        ),
+                        Icon(Icons.stars, color: Colors.amber[700], size: 24),
                         const SizedBox(width: 12),
                         Text(
                           '${achievement.points} نقطة',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: Colors.amber[700],
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
+                                color: Colors.amber[700],
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ],
                     ),
                   ),
                 ],
-                
+
                 // Status
                 const SizedBox(height: 24),
                 if (achievement.isUnlocked) ...[
@@ -831,16 +841,16 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                             children: [
                               Text(
                                 'تم إنجازه!',
-                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  color: Colors.green[600],
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(
+                                      color: Colors.green[600],
+                                      fontWeight: FontWeight.bold,
+                                    ),
                               ),
                               Text(
                                 'مكتمل في ${_formatDate(achievement.unlockedAt!)}',
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Colors.green[600],
-                                ),
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(color: Colors.green[600]),
                               ),
                             ],
                           ),
@@ -848,7 +858,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                       ],
                     ),
                   ),
-                  
+
                   // Claim reward button
                   if (achievement.hasReward && !achievement.rewardClaimed) ...[
                     const SizedBox(height: 16),
@@ -892,16 +902,16 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                             children: [
                               Text(
                                 'قيد التقدم',
-                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  color: Colors.orange[600],
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(
+                                      color: Colors.orange[600],
+                                      fontWeight: FontWeight.bold,
+                                    ),
                               ),
                               Text(
                                 'اكمل ${achievement.requiredPoints - achievement.currentProgress} نقطة إضافية',
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Colors.orange[600],
-                                ),
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(color: Colors.orange[600]),
                               ),
                             ],
                           ),
@@ -918,12 +928,18 @@ class _AchievementsScreenState extends State<AchievementsScreen>
     );
   }
 
-  Future<void> _claimReward(Achievement achievement, GameProvider gameProvider) async {
+  Future<void> _claimReward(
+    Achievement achievement,
+    GameProvider gameProvider,
+  ) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    
+
     if (authProvider.token != null) {
-      await gameProvider.claimAchievementReward(achievement.id, authProvider.token!);
-      
+      await gameProvider.claimAchievementReward(
+        achievement.id,
+        authProvider.token!,
+      );
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('تم استلام مكافأة "${achievement.name}"'),
@@ -982,7 +998,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
-    
+
     if (difference.inDays == 0) {
       return 'اليوم';
     } else if (difference.inDays == 1) {
