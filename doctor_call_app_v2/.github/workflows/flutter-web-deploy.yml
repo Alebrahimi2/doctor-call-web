@@ -31,7 +31,7 @@ jobs:
       
     - name: Build for web
       run: |
-        flutter build web --release --web-renderer html --base-href /doctor-call-app/
+        flutter build web --release --base-href /doctor-call-app/
         
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
