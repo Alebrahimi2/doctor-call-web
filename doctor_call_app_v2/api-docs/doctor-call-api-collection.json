@@ -1,0 +1,660 @@
+{
+  "info": {
+    "name": "Doctor Call App - Complete API Collection",
+    "description": "مجموعة شاملة لجميع API endpoints في تطبيق Doctor Call",
+    "version": "2.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "BASE_URL",
+      "value": "http://127.0.0.1:8000",
+      "type": "string"
+    },
+    {
+      "key": "API_URL",
+      "value": "{{BASE_URL}}/api",
+      "type": "string"
+    },
+    {
+      "key": "TOKEN",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{TOKEN}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "description": "نظام المصادقة وإدارة المستخدمين",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"اختبار المستخدم\",\n  \"email\": \"test@doctorcall.com\",\n  \"password\": \"password123\",\n  \"password_confirmation\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{API_URL}}/auth/register",
+              "host": ["{{API_URL}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.collectionVariables.set('TOKEN', responseJson.access_token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@doctorcall.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{API_URL}}/auth/login",
+              "host": ["{{API_URL}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get User Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/auth/me",
+              "host": ["{{API_URL}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"اسم محدث\",\n  \"email\": \"updated@doctorcall.com\"\n}"
+            },
+            "url": {
+              "raw": "{{API_URL}}/auth/profile",
+              "host": ["{{API_URL}}"],
+              "path": ["auth", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"current_password\": \"admin123\",\n  \"new_password\": \"newpassword123\",\n  \"new_password_confirmation\": \"newpassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{API_URL}}/auth/password",
+              "host": ["{{API_URL}}"],
+              "path": ["auth", "password"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/auth/logout",
+              "host": ["{{API_URL}}"],
+              "path": ["auth", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Hospitals",
+      "description": "إدارة المستشفيات والأقسام",
+      "item": [
+        {
+          "name": "Get All Hospitals",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/hospitals",
+              "host": ["{{API_URL}}"],
+              "path": ["hospitals"]
+            }
+          }
+        },
+        {
+          "name": "Get Hospital Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/hospitals/1",
+              "host": ["{{API_URL}}"],
+              "path": ["hospitals", "1"]
+            }
+          }
+        },
+        {
+          "name": "Get Hospital Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/hospitals/1/stats",
+              "host": ["{{API_URL}}"],
+              "path": ["hospitals", "1", "stats"]
+            }
+          }
+        },
+        {
+          "name": "Get My Hospital",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/hospital",
+              "host": ["{{API_URL}}"],
+              "path": ["hospital"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Patients",
+      "description": "إدارة المرضى والحالات الطبية",
+      "item": [
+        {
+          "name": "Get All Patients",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/patients",
+              "host": ["{{API_URL}}"],
+              "path": ["patients"]
+            }
+          }
+        },
+        {
+          "name": "Create New Patient",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"مريض جديد\",\n  \"age\": 35,\n  \"condition\": \"حمى وصداع\",\n  \"severity\": \"normal\",\n  \"status\": \"waiting\"\n}"
+            },
+            "url": {
+              "raw": "{{API_URL}}/patients",
+              "host": ["{{API_URL}}"],
+              "path": ["patients"]
+            }
+          }
+        },
+        {
+          "name": "Get Patient Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/patients/1",
+              "host": ["{{API_URL}}"],
+              "path": ["patients", "1"]
+            }
+          }
+        },
+        {
+          "name": "Update Patient Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"in_treatment\"\n}"
+            },
+            "url": {
+              "raw": "{{API_URL}}/patients/1/status",
+              "host": ["{{API_URL}}"],
+              "path": ["patients", "1", "status"]
+            }
+          }
+        },
+        {
+          "name": "Get Patients Queue",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/patients/queue",
+              "host": ["{{API_URL}}"],
+              "path": ["patients", "queue"]
+            }
+          }
+        },
+        {
+          "name": "Get Patients Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/patients/statistics",
+              "host": ["{{API_URL}}"],
+              "path": ["patients", "statistics"]
+            }
+          }
+        },
+        {
+          "name": "Get Real-time Patients",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/patients/realtime",
+              "host": ["{{API_URL}}"],
+              "path": ["patients", "realtime"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Missions & Game",
+      "description": "نظام المهام والألعاب",
+      "item": [
+        {
+          "name": "Get Active Missions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/missions/active",
+              "host": ["{{API_URL}}"],
+              "path": ["missions", "active"]
+            }
+          }
+        },
+        {
+          "name": "Accept Mission",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mission_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{API_URL}}/missions/accept",
+              "host": ["{{API_URL}}"],
+              "path": ["missions", "accept"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Game Avatars",
+      "description": "إدارة الشخصيات والعناصر",
+      "item": [
+        {
+          "name": "Get All Avatars",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/avatars",
+              "host": ["{{API_URL}}"],
+              "path": ["avatars"]
+            }
+          }
+        },
+        {
+          "name": "Create New Avatar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"طبيب جديد\",\n  \"type\": \"doctor\",\n  \"level\": 1\n}"
+            },
+            "url": {
+              "raw": "{{API_URL}}/avatars",
+              "host": ["{{API_URL}}"],
+              "path": ["avatars"]
+            }
+          }
+        },
+        {
+          "name": "Get Avatar Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/avatars/1",
+              "host": ["{{API_URL}}"],
+              "path": ["avatars", "1"]
+            }
+          }
+        },
+        {
+          "name": "Update Avatar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"طبيب محدث\",\n  \"level\": 2\n}"
+            },
+            "url": {
+              "raw": "{{API_URL}}/avatars/1",
+              "host": ["{{API_URL}}"],
+              "path": ["avatars", "1"]
+            }
+          }
+        },
+        {
+          "name": "Toggle Avatar Status",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/avatars/1/toggle-status",
+              "host": ["{{API_URL}}"],
+              "path": ["avatars", "1", "toggle-status"]
+            }
+          }
+        },
+        {
+          "name": "Get Avatar Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/avatars/statistics",
+              "host": ["{{API_URL}}"],
+              "path": ["avatars", "statistics"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard & Stats",
+      "description": "لوحة التحكم والإحصائيات",
+      "item": [
+        {
+          "name": "Get Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/dashboard/stats",
+              "host": ["{{API_URL}}"],
+              "path": ["dashboard", "stats"]
+            }
+          }
+        },
+        {
+          "name": "Get KPIs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/kpis",
+              "host": ["{{API_URL}}"],
+              "path": ["kpis"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "System",
+      "description": "نظام عام واختبارات",
+      "item": [
+        {
+          "name": "API Test",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{API_URL}}/test",
+              "host": ["{{API_URL}}"],
+              "path": ["test"]
+            }
+          }
+        },
+        {
+          "name": "Get Settings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/settings",
+              "host": ["{{API_URL}}"],
+              "path": ["settings"]
+            }
+          }
+        },
+        {
+          "name": "Run Tick System",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{API_URL}}/tick/run",
+              "host": ["{{API_URL}}"],
+              "path": ["tick", "run"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

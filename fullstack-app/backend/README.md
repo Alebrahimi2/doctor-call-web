@@ -1,52 +1,264 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🏥 Doctor Call App - Backend API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**نسخة Laravel**: 10.x  
+**نسخة PHP**: 8.1+  
+**قاعدة البيانات**: MySQL 8.0+  
+**المصادقة**: Laravel Sanctum  
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 📋 **وصف المشروع**
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+تطبيق **Doctor Call** هو لعبة محاكاة مستشفى تهدف إلى تدريب الأطباء والممرضين على إدارة المرضى والمهام الطبية. يتضمن النظام:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- 🎮 **نظام الألعاب**: مهام، نقاط، مستويات، إنجازات
+- 🏥 **إدارة المستشفيات**: أقسام، موظفين، مرضى
+- 👥 **إدارة المرضى**: فرز، علاج، متابعة
+- 📊 **نظام التقارير**: إحصائيات، KPIs، تحليلات
+- 🔐 **نظام المصادقة**: أدوار المستخدمين، صلاحيات
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 🚀 **التثبيت والإعداد**
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 1️⃣ **متطلبات النظام**
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```bash
+PHP >= 8.1
+Composer >= 2.0
+MySQL >= 8.0
+Node.js >= 16.0 (للfrontend)
+```
 
-## Laravel Sponsors
+### 2️⃣ **استنساخ المشروع**
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+git clone https://github.com/Alebrahimi2/doctor-call-app.git
+cd doctor-call-app/fullstack-app/backend
+```
 
-### Premium Partners
+### 3️⃣ **تثبيت التبعيات**
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```bash
+# تثبيت تبعيات PHP
+composer install
 
-## Contributing
+# نسخ ملف البيئة
+cp .env.example .env
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# إنشاء مفتاح التطبيق
+php artisan key:generate
+```
+
+### 4️⃣ **إعداد قاعدة البيانات**
+
+```bash
+# إنشاء قاعدة البيانات في MySQL
+mysql -u root -p
+CREATE DATABASE doctor_call_db;
+EXIT;
+
+# تحديث .env بمعلومات قاعدة البيانات
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=doctor_call_db
+DB_USERNAME=root
+DB_PASSWORD=your_password
+```
+
+### 5️⃣ **تشغيل Migrations والSeeders**
+
+```bash
+# تشغيل الهجرات
+php artisan migrate
+
+# تعبئة قاعدة البيانات بالبيانات التجريبية
+php artisan db:seed
+
+# أو تشغيل seeder معين
+php artisan db:seed --class=UsersSeeder
+```
+
+### 6️⃣ **تشغيل السيرفر**
+
+```bash
+# تشغيل سيرفر التطوير
+php artisan serve
+
+# السيرفر سيعمل على: http://127.0.0.1:8000
+```
+
+---
+
+## 🗄️ **هيكل قاعدة البيانات**
+
+### الجداول الرئيسية:
+
+| جدول | الوصف | السجلات |
+|------|--------|----------|
+| `users` | المستخدمين والأطباء | 31 |
+| `hospitals` | المستشفيات | 4 |
+| `departments` | الأقسام الطبية | متعدد |
+| `patients` | المرضى | 180 |
+| `missions` | المهام والتحديات | 152 |
+| `mission_templates` | قوالب المهام | 1+ |
+| `game_avatars` | شخصيات اللعبة | متعدد |
+| `staff` | الموظفين | متعدد |
+| `kpis` | مؤشرات الأداء | متعدد |
+
+### العلاقات الأساسية:
+- **Users** ↔ **Hospitals** (المستخدم ينتمي لمستشفى)
+- **Hospitals** ↔ **Departments** (المستشفى يحتوي على أقسام)
+- **Patients** ↔ **Hospitals** (المريض يُعالج في مستشفى)
+- **Missions** ↔ **Users** (المهام مرتبطة بالمستخدمين)
+
+---
+
+## 🔑 **نظام المصادقة**
+
+### أدوار المستخدمين:
+
+| الدور | الوصف | الصلاحيات |
+|-------|--------|-----------|
+| `system_admin` | مدير النظام | جميع الصلاحيات |
+| `hospital_admin` | مدير المستشفى | إدارة المستشفى والموظفين |
+| `doctor` | طبيب | إدارة المرضى والمهام |
+| `nurse` | ممرض/ة | مساعدة في العلاج |
+| `player` | لاعب | اللعب وإنجاز المهام |
+
+### الـ Tokens:
+```bash
+# إنشاء token للمستخدم
+$token = $user->createToken('doctor-call-app')->plainTextToken;
+
+# استخدام Token في الAPI
+Authorization: Bearer {token}
+```
+
+---
+
+## 📡 **API Endpoints**
+
+### 🔐 **المصادقة**
+- `POST /api/auth/register` - إنشاء حساب
+- `POST /api/auth/login` - تسجيل دخول
+- `GET /api/auth/me` - معلومات المستخدم
+- `PUT /api/auth/profile` - تحديث الملف
+- `POST /api/auth/logout` - تسجيل خروج
+
+### 🏥 **المستشفيات**
+- `GET /api/hospitals` - قائمة المستشفيات
+- `GET /api/hospitals/{id}` - تفاصيل مستشفى
+- `GET /api/hospitals/{id}/stats` - إحصائيات
+
+### 👥 **المرضى**
+- `GET /api/patients` - قائمة المرضى
+- `POST /api/patients` - إضافة مريض
+- `PUT /api/patients/{id}/status` - تحديث حالة
+
+### 🎮 **الألعاب والمهام**
+- `GET /api/missions/active` - المهام النشطة
+- `POST /api/missions/accept` - قبول مهمة
+- `GET /api/avatars` - الشخصيات
+
+### 📊 **الإحصائيات**
+- `GET /api/dashboard/stats` - إحصائيات عامة
+- `GET /api/kpis` - مؤشرات الأداء
+
+**📚 التوثيق الكامل**: [API Documentation](../../doctor_call_app_v2/api-docs/API_DOCUMENTATION.md)
+
+---
+
+## ⚙️ **إعدادات البيئة**
+
+### ملف `.env` الأساسي:
+
+```env
+APP_NAME="Doctor Call API"
+APP_ENV=local
+APP_KEY=base64:generated_key
+APP_DEBUG=true
+APP_URL=http://127.0.0.1:8000
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=doctor_call_db
+DB_USERNAME=root
+DB_PASSWORD=
+
+SANCTUM_STATEFUL_DOMAINS=localhost,127.0.0.1,doctorcall.com
+SESSION_DRIVER=database
+QUEUE_CONNECTION=database
+```
+
+---
+
+## 🧪 **الاختبار**
+
+### تشغيل الاختبارات:
+
+```bash
+# جميع الاختبارات
+php artisan test
+
+# اختبارات معينة
+php artisan test --filter=AuthTest
+
+# اختبار API مع Postman
+# استيراد: ../../doctor_call_app_v2/api-docs/doctor-call-api-collection.json
+```
+
+### اختبار سريع للAPI:
+
+```bash
+# اختبار الاتصال
+curl http://127.0.0.1:8000/api/test
+
+# تسجيل دخول
+curl -X POST http://127.0.0.1:8000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@doctorcall.com","password":"admin123"}'
+```
+
+---
+
+## 📊 **إدارة البيانات**
+
+### بيانات المصنع (Seeders):
+
+```bash
+# إعادة تعبئة قاعدة البيانات
+php artisan migrate:fresh --seed
+
+# seeders متاحة:
+php artisan db:seed --class=UsersSeeder        # المستخدمين
+php artisan db:seed --class=DemoHospitalSeeder # المستشفيات  
+php artisan db:seed --class=PatientsSeeder     # المرضى
+php artisan db:seed --class=MissionsSeeder     # المهام
+```
+
+### حسابات الاختبار:
+
+| البريد الإلكتروني | كلمة المرور | الدور |
+|-------------------|-------------|-------|
+| `admin@doctorcall.com` | `admin123` | system_admin |
+| `doctor@doctorcall.com` | `doctor123` | doctor |
+| `nurse@doctorcall.com` | `nurse123` | nurse |
+
+---
+
+## 📞 **الدعم والتواصل**
+
+- **المستودع**: https://github.com/Alebrahimi2/doctor-call-app
+- **الوثائق**: [API Documentation](../../doctor_call_app_v2/api-docs/)
+- **Postman Collection**: [doctor-call-api-collection.json](../../doctor_call_app_v2/api-docs/doctor-call-api-collection.json)
+
+---
+
+**آخر تحديث**: 15 سبتمبر 2025  
+**المطور**: Doctor Call Team
 
 ## Code of Conduct
 
