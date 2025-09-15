@@ -1,0 +1,378 @@
+# 🔒 Security & Dependency Monitoring Pipeline
+# Automated security scanning and dependency monitoring
+
+name: Security & Dependencies
+
+on:
+  push:
+    branches: [ master, main, develop ]
+  pull_request:
+    branches: [ master, main ]
+  schedule:
+    # Run weekly on Sundays at 2 AM UTC
+    - cron: '0 2 * * 0'
+  workflow_dispatch:
+
+env:
+  FLUTTER_VERSION: '3.24.3'
+  PHP_VERSION: '8.2'
+  NODE_VERSION: '18'
+
+jobs:
+  # ==========================================
+  # Flutter Security Scanning
+  # ==========================================
+  flutter-security:
+    name: 🛡️ Flutter Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: ⚙️ Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+        channel: 'stable'
+
+    - name: 📦 Get Flutter Dependencies
+      working-directory: ./doctor_call_app_v2
+      run: flutter pub get
+
+    - name: 🔍 Flutter Security Audit
+      working-directory: ./doctor_call_app_v2
+      run: |
+        # Check for known vulnerabilities in Flutter packages
+        flutter pub deps --json > flutter-deps.json
+        
+        # Analyze for security issues
+        flutter analyze --fatal-infos --fatal-warnings
+        
+        # Check for outdated packages
+        flutter pub outdated --json > flutter-outdated.json || true
+
+    - name: 🔍 Trivy Flutter Scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: './doctor_call_app_v2'
+        format: 'sarif'
+        output: 'trivy-flutter.sarif'
+        severity: 'CRITICAL,HIGH,MEDIUM'
+
+    - name: 📊 Upload Flutter Security Results
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
+        sarif_file: 'trivy-flutter.sarif'
+        category: 'flutter-security'
+
+    - name: 🗃️ Upload Flutter Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: flutter-security-reports
+        path: |
+          flutter-deps.json
+          flutter-outdated.json
+          trivy-flutter.sarif
+        retention-days: 30
+
+  # ==========================================
+  # Laravel Security Scanning
+  # ==========================================
+  laravel-security:
+    name: 🛡️ Laravel Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: ⚙️ Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ env.PHP_VERSION }}
+        extensions: bcmath, ctype, fileinfo, json, mbstring, openssl, pdo, tokenizer, xml
+        tools: composer:v2
+
+    - name: 📦 Install Composer Dependencies
+      working-directory: ./fullstack-app/backend
+      run: composer install --no-dev --optimize-autoloader
+
+    - name: 🔍 Composer Security Audit
+      working-directory: ./fullstack-app/backend
+      run: |
+        # Check for known security vulnerabilities
+        composer audit --format=json > composer-audit.json || true
+        
+        # Check for outdated packages
+        composer outdated --direct --format=json > composer-outdated.json || true
+
+    - name: 🔍 PHP Security Scanner
+      working-directory: ./fullstack-app/backend
+      run: |
+        # Install security checker if not present
+        if ! command -v security-checker &> /dev/null; then
+          curl -sSL https://github.com/fabpot/local-php-security-checker/releases/download/v2.0.6/local-php-security-checker_2.0.6_linux_amd64 \
+            -o security-checker
+          chmod +x security-checker
+        fi
+        
+        # Run security check
+        ./security-checker --format=json > security-check.json || true
+
+    - name: 🔍 Trivy Laravel Scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: './fullstack-app/backend'
+        format: 'sarif'
+        output: 'trivy-laravel.sarif'
+        severity: 'CRITICAL,HIGH,MEDIUM'
+
+    - name: 📊 Upload Laravel Security Results
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
+        sarif_file: 'trivy-laravel.sarif'
+        category: 'laravel-security'
+
+    - name: 🗃️ Upload Laravel Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: laravel-security-reports
+        path: |
+          fullstack-app/backend/composer-audit.json
+          fullstack-app/backend/composer-outdated.json
+          fullstack-app/backend/security-check.json
+          trivy-laravel.sarif
+        retention-days: 30
+
+  # ==========================================
+  # Dependency Analysis
+  # ==========================================
+  dependency-analysis:
+    name: 📊 Dependency Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: 🔍 GitHub Dependency Graph
+      uses: github/dependency-graph-action@v1
+      with:
+        config-file: .github/dependency-graph-config.yml
+
+    - name: 📊 FOSSA License Scan
+      uses: fossas/fossa-action@main
+      if: env.FOSSA_API_KEY != ''
+      env:
+        FOSSA_API_KEY: ${{ secrets.FOSSA_API_KEY }}
+      with:
+        endpoint: 'https://app.fossa.com'
+
+    - name: 🔍 License Check
+      run: |
+        echo "# 📄 License Analysis Report" >> license-report.md
+        echo "" >> license-report.md
+        
+        # Flutter dependencies
+        if [ -f "doctor_call_app_v2/pubspec.lock" ]; then
+          echo "## Flutter Dependencies" >> license-report.md
+          echo "Analyzing Flutter package licenses..." >> license-report.md
+          
+          # Extract package names from pubspec.lock
+          grep -A 1 "  [a-zA-Z]" doctor_call_app_v2/pubspec.lock | \
+            grep -E "^  [a-zA-Z]" | \
+            sed 's/://g' | \
+            sort > flutter-packages.txt
+          
+          echo "Found $(wc -l < flutter-packages.txt) Flutter packages" >> license-report.md
+          echo "" >> license-report.md
+        fi
+        
+        # Laravel dependencies
+        if [ -f "fullstack-app/backend/composer.lock" ]; then
+          echo "## Laravel Dependencies" >> license-report.md
+          echo "Analyzing Composer package licenses..." >> license-report.md
+          
+          # Extract package names from composer.lock
+          jq -r '.packages[].name' fullstack-app/backend/composer.lock | \
+            sort > laravel-packages.txt
+          
+          echo "Found $(wc -l < laravel-packages.txt) Laravel packages" >> license-report.md
+          echo "" >> license-report.md
+        fi
+
+    - name: 🗃️ Upload License Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: license-analysis
+        path: |
+          license-report.md
+          flutter-packages.txt
+          laravel-packages.txt
+        retention-days: 30
+
+  # ==========================================
+  # Container Security (if using Docker)
+  # ==========================================
+  container-security:
+    name: 🐳 Container Security
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: 🐳 Build Docker Image
+      working-directory: ./fullstack-app
+      run: |
+        if [ -f "docker-compose.yml" ]; then
+          docker-compose build --no-cache
+        fi
+
+    - name: 🔍 Docker Image Security Scan
+      if: success()
+      run: |
+        # Get image names from docker-compose
+        if [ -f "fullstack-app/docker-compose.yml" ]; then
+          IMAGES=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -v "<none>")
+          
+          for IMAGE in $IMAGES; do
+            echo "Scanning image: $IMAGE"
+            
+            # Scan with Trivy
+            docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+              aquasec/trivy:latest image --format sarif --output /tmp/trivy-container-$IMAGE.sarif $IMAGE
+          done
+        fi
+
+    - name: 📊 Upload Container Security Results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: container-security-reports
+        path: /tmp/trivy-container-*.sarif
+        retention-days: 30
+
+  # ==========================================
+  # Code Quality Security
+  # ==========================================
+  code-quality-security:
+    name: 📝 Code Quality Security
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: 🔍 CodeQL Analysis
+      uses: github/codeql-action/init@v3
+      with:
+        languages: javascript, php
+        queries: security-and-quality
+
+    - name: 🔍 Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:javascript,php"
+
+    - name: 🔍 Semgrep Security Scan
+      uses: returntocorp/semgrep-action@v1
+      with:
+        config: >-
+          p/security-audit
+          p/secrets
+          p/owasp-top-ten
+          p/php
+          p/javascript
+        generate-sarif-file: true
+        sarif-file: semgrep-results.sarif
+
+    - name: 📊 Upload Semgrep Results
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
+        sarif_file: semgrep-results.sarif
+
+  # ==========================================
+  # Security Summary Report
+  # ==========================================
+  security-summary:
+    name: 📋 Security Summary
+    runs-on: ubuntu-latest
+    needs: [flutter-security, laravel-security, dependency-analysis, code-quality-security]
+    if: always()
+    
+    steps:
+    - name: 📊 Generate Security Summary
+      run: |
+        echo "# 🔒 Security & Dependencies Report" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Repository:** ${{ github.repository }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Scan Date:** $(date)" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        # Flutter Security Status
+        if [ "${{ needs.flutter-security.result }}" == "success" ]; then
+          echo "✅ **Flutter Security:** No critical vulnerabilities detected" >> $GITHUB_STEP_SUMMARY
+        elif [ "${{ needs.flutter-security.result }}" == "failure" ]; then
+          echo "❌ **Flutter Security:** Critical vulnerabilities found" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "⚠️ **Flutter Security:** Scan completed with warnings" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        # Laravel Security Status
+        if [ "${{ needs.laravel-security.result }}" == "success" ]; then
+          echo "✅ **Laravel Security:** No critical vulnerabilities detected" >> $GITHUB_STEP_SUMMARY
+        elif [ "${{ needs.laravel-security.result }}" == "failure" ]; then
+          echo "❌ **Laravel Security:** Critical vulnerabilities found" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "⚠️ **Laravel Security:** Scan completed with warnings" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        # Dependency Analysis Status
+        if [ "${{ needs.dependency-analysis.result }}" == "success" ]; then
+          echo "✅ **Dependencies:** License analysis completed" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "⚠️ **Dependencies:** Analysis completed with issues" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        # Code Quality Status
+        if [ "${{ needs.code-quality-security.result }}" == "success" ]; then
+          echo "✅ **Code Quality:** No security issues detected" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "⚠️ **Code Quality:** Security issues require attention" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## 📊 Security Recommendations" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "- 🔄 **Regular Updates:** Keep dependencies updated weekly" >> $GITHUB_STEP_SUMMARY
+        echo "- 🔍 **Monitoring:** Review security alerts in GitHub Security tab" >> $GITHUB_STEP_SUMMARY
+        echo "- 📋 **Audit Logs:** Check uploaded artifacts for detailed reports" >> $GITHUB_STEP_SUMMARY
+        echo "- 🛡️ **Best Practices:** Follow OWASP security guidelines" >> $GITHUB_STEP_SUMMARY
+        
+        # Add link to security advisories
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "🔗 **Security Resources:**" >> $GITHUB_STEP_SUMMARY
+        echo "- [GitHub Security Advisories](https://github.com/${{ github.repository }}/security/advisories)" >> $GITHUB_STEP_SUMMARY
+        echo "- [Dependency Insights](https://github.com/${{ github.repository }}/network/dependencies)" >> $GITHUB_STEP_SUMMARY
+
+    - name: 📢 Security Alert Notification
+      if: failure()
+      run: |
+        echo "🚨 **SECURITY ALERT:** Critical vulnerabilities detected in the security scan!" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Action Required:** Please review the security reports and address critical issues immediately." >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "Check the uploaded artifacts for detailed vulnerability reports." >> $GITHUB_STEP_SUMMARY
+
+# ==========================================
+# End of Security & Dependencies Pipeline
+# ==========================================

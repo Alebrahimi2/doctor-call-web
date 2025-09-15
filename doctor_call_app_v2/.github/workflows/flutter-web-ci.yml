@@ -1,0 +1,379 @@
+# 🚀 Flutter Web CI/CD Pipeline
+# Automated build and deployment for Doctor Call App
+
+name: Flutter Web Build & Deploy
+
+on:
+  push:
+    branches: [ master, main, develop ]
+  pull_request:
+    branches: [ master, main ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment Environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+
+env:
+  FLUTTER_VERSION: '3.35.3'
+  NODE_VERSION: '18'
+
+jobs:
+  # ==========================================
+  # Pre-Build Checks & Validation
+  # ==========================================
+  validation:
+    name: 🔍 Code Validation & Analysis
+    runs-on: ubuntu-latest
+    outputs:
+      should-build: ${{ steps.changes.outputs.flutter }}
+      
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: 🔍 Detect Changes
+      uses: dorny/paths-filter@v3
+      id: changes
+      with:
+        filters: |
+          flutter:
+            - 'doctor_call_app_v2/**'
+            - '.github/workflows/**'
+          backend:
+            - 'fullstack-app/backend/**'
+          docs:
+            - '**/*.md'
+
+    - name: ✅ Setup Flutter
+      if: steps.changes.outputs.flutter == 'true'
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+        channel: 'stable'
+        cache: true
+
+    - name: 🔧 Flutter Doctor
+      if: steps.changes.outputs.flutter == 'true'
+      working-directory: ./doctor_call_app_v2
+      run: |
+        flutter doctor -v
+        flutter --version
+
+    - name: 📦 Get Dependencies
+      if: steps.changes.outputs.flutter == 'true'
+      working-directory: ./doctor_call_app_v2
+      run: flutter pub get
+
+    - name: 🔍 Analyze Code
+      if: steps.changes.outputs.flutter == 'true'
+      working-directory: ./doctor_call_app_v2
+      run: |
+        flutter analyze --fatal-infos
+        
+    - name: 🧪 Run Tests
+      if: steps.changes.outputs.flutter == 'true'
+      working-directory: ./doctor_call_app_v2
+      run: |
+        flutter test --coverage --reporter=github
+        
+    - name: 📊 Upload Coverage
+      if: steps.changes.outputs.flutter == 'true'
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./doctor_call_app_v2/coverage/lcov.info
+        flags: flutter
+        name: flutter-coverage
+
+  # ==========================================
+  # Build Flutter Web Application
+  # ==========================================
+  build-web:
+    name: 🌐 Build Flutter Web
+    runs-on: ubuntu-latest
+    needs: validation
+    if: needs.validation.outputs.should-build == 'true'
+    
+    strategy:
+      matrix:
+        build-mode: [release]
+        
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: ✅ Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+        channel: 'stable'
+        cache: true
+
+    - name: 🌐 Enable Web Platform
+      working-directory: ./doctor_call_app_v2
+      run: flutter config --enable-web
+
+    - name: 📦 Install Dependencies
+      working-directory: ./doctor_call_app_v2
+      run: |
+        flutter pub get
+        flutter pub deps
+
+    - name: 🔧 Pre-build Setup
+      working-directory: ./doctor_call_app_v2
+      run: |
+        # Clean previous builds
+        flutter clean
+        
+        # Verify web support
+        flutter devices
+        
+        # Check for any platform-specific issues
+        flutter doctor --verbose
+
+    - name: 🏗️ Build Web Application
+      working-directory: ./doctor_call_app_v2
+      run: |
+        flutter build web \
+          --${{ matrix.build-mode }} \
+          --web-renderer html \
+          --source-maps \
+          --dart-define=Dart2jsOptimization=O4 \
+          --dart-define=FLUTTER_WEB_USE_SKIA=false \
+          --base-href="/doctor-call-web/" \
+          --output="build/web"
+
+    - name: 📋 Build Information
+      working-directory: ./doctor_call_app_v2
+      run: |
+        echo "📊 Build Summary:" >> $GITHUB_STEP_SUMMARY
+        echo "- Flutter Version: ${{ env.FLUTTER_VERSION }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Build Mode: ${{ matrix.build-mode }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Web Renderer: HTML" >> $GITHUB_STEP_SUMMARY
+        echo "- Build Time: $(date)" >> $GITHUB_STEP_SUMMARY
+        
+        # Calculate build size
+        BUILD_SIZE=$(du -sh build/web | cut -f1)
+        echo "- Build Size: $BUILD_SIZE" >> $GITHUB_STEP_SUMMARY
+        
+        # List main files
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "📁 Build Contents:" >> $GITHUB_STEP_SUMMARY
+        ls -la build/web/ >> $GITHUB_STEP_SUMMARY
+
+    - name: 🧪 Test Build
+      working-directory: ./doctor_call_app_v2
+      run: |
+        # Verify essential files exist
+        test -f build/web/index.html || exit 1
+        test -f build/web/main.dart.js || exit 1
+        test -f build/web/flutter.js || exit 1
+        
+        # Check index.html content
+        grep -q "Doctor Call" build/web/index.html || echo "Warning: Title not found"
+        
+        echo "✅ Build verification completed"
+
+    - name: 📦 Create Build Artifact
+      working-directory: ./doctor_call_app_v2
+      run: |
+        # Create deployment package
+        cd build/web
+        tar -czf ../../doctor-call-web-${{ github.sha }}.tar.gz .
+        cd ../..
+        
+        # Create build info file
+        cat > build-info.json << EOF
+        {
+          "version": "${{ github.sha }}",
+          "build_time": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+          "flutter_version": "${{ env.FLUTTER_VERSION }}",
+          "build_mode": "${{ matrix.build-mode }}",
+          "branch": "${{ github.ref_name }}",
+          "commit_message": "${{ github.event.head_commit.message }}"
+        }
+        EOF
+
+    - name: 🗃️ Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: flutter-web-build-${{ matrix.build-mode }}
+        path: |
+          doctor_call_app_v2/build/web/
+          doctor_call_app_v2/build-info.json
+        retention-days: 30
+
+    - name: 📦 Upload Deployment Package
+      uses: actions/upload-artifact@v4
+      with:
+        name: deployment-package-${{ github.sha }}
+        path: doctor_call_app_v2/doctor-call-web-${{ github.sha }}.tar.gz
+        retention-days: 7
+
+  # ==========================================
+  # Deploy to GitHub Pages
+  # ==========================================
+  deploy-pages:
+    name: 🚀 Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: [validation, build-web]
+    if: |
+      needs.validation.outputs.should-build == 'true' && 
+      (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main') &&
+      github.event_name == 'push'
+    
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+      
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+      
+    concurrency:
+      group: "pages"
+      cancel-in-progress: false
+
+    steps:
+    - name: 📥 Download Build Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: flutter-web-build-release
+        path: ./build
+
+    - name: 📄 Setup Pages
+      uses: actions/configure-pages@v4
+
+    - name: 🔧 Prepare Deployment
+      run: |
+        # Ensure proper file permissions
+        find ./build -type f -name "*.html" -exec chmod 644 {} \;
+        find ./build -type f -name "*.js" -exec chmod 644 {} \;
+        find ./build -type f -name "*.css" -exec chmod 644 {} \;
+        
+        # Add custom 404 page if not exists
+        if [ ! -f ./build/404.html ]; then
+          cp ./build/index.html ./build/404.html
+        fi
+        
+        # Add robots.txt
+        cat > ./build/robots.txt << EOF
+        User-agent: *
+        Allow: /
+        
+        Sitemap: https://alebrahimi2.github.io/doctor-call-web/sitemap.xml
+        EOF
+
+    - name: 📦 Upload to Pages
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: './build'
+
+    - name: 🚀 Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
+
+    - name: ✅ Deployment Success
+      run: |
+        echo "🎉 Deployment Successful!" >> $GITHUB_STEP_SUMMARY
+        echo "🔗 Live URL: ${{ steps.deployment.outputs.page_url }}" >> $GITHUB_STEP_SUMMARY
+        echo "⏰ Deployed at: $(date)" >> $GITHUB_STEP_SUMMARY
+
+  # ==========================================
+  # Notify Deployment Status
+  # ==========================================
+  notify:
+    name: 📢 Notify Deployment Status
+    runs-on: ubuntu-latest
+    needs: [build-web, deploy-pages]
+    if: always()
+    
+    steps:
+    - name: 📊 Create Deployment Report
+      run: |
+        echo "# 🚀 Doctor Call App Deployment Report" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Repository:** ${{ github.repository }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Trigger:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ "${{ needs.build-web.result }}" == "success" ]; then
+          echo "✅ **Build Status:** Success" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ **Build Status:** Failed" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        if [ "${{ needs.deploy-pages.result }}" == "success" ]; then
+          echo "✅ **Deployment Status:** Success" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 **Live URL:** https://alebrahimi2.github.io/doctor-call-web/" >> $GITHUB_STEP_SUMMARY
+        elif [ "${{ needs.deploy-pages.result }}" == "skipped" ]; then
+          echo "⏭️ **Deployment Status:** Skipped (not master branch)" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ **Deployment Status:** Failed" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "📅 **Completed at:** $(date)" >> $GITHUB_STEP_SUMMARY
+
+  # ==========================================
+  # Security & Performance Scans
+  # ==========================================
+  security-scan:
+    name: 🔒 Security & Performance Analysis
+    runs-on: ubuntu-latest
+    needs: build-web
+    if: needs.build-web.result == 'success'
+    
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: 📥 Download Build Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: flutter-web-build-release
+        path: ./build
+
+    - name: 🔍 Security Scan
+      run: |
+        echo "🔒 Running Security Analysis..." >> $GITHUB_STEP_SUMMARY
+        
+        # Check for sensitive data in build
+        if grep -r "api_key\|password\|secret" ./build/ 2>/dev/null; then
+          echo "⚠️ **Warning:** Potential sensitive data found in build" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "✅ **Security:** No sensitive data detected" >> $GITHUB_STEP_SUMMARY
+        fi
+
+    - name: 📊 Performance Analysis
+      run: |
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "📊 **Performance Metrics:**" >> $GITHUB_STEP_SUMMARY
+        
+        # Analyze bundle size
+        MAIN_JS_SIZE=$(stat -c%s "./build/main.dart.js" 2>/dev/null || echo "0")
+        MAIN_JS_SIZE_MB=$(echo "scale=2; $MAIN_JS_SIZE / 1024 / 1024" | bc 2>/dev/null || echo "0")
+        echo "- Main Bundle: ${MAIN_JS_SIZE_MB}MB" >> $GITHUB_STEP_SUMMARY
+        
+        # Total build size
+        TOTAL_SIZE=$(du -sb ./build | cut -f1)
+        TOTAL_SIZE_MB=$(echo "scale=2; $TOTAL_SIZE / 1024 / 1024" | bc 2>/dev/null || echo "0")
+        echo "- Total Size: ${TOTAL_SIZE_MB}MB" >> $GITHUB_STEP_SUMMARY
+        
+        # Count assets
+        ASSET_COUNT=$(find ./build -name "*.png" -o -name "*.jpg" -o -name "*.svg" | wc -l)
+        echo "- Asset Files: $ASSET_COUNT" >> $GITHUB_STEP_SUMMARY
+
+# ==========================================
+# Workflow Completion
+# ==========================================

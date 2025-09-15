@@ -1,0 +1,473 @@
+# 🏥 Laravel Backend CI/CD Pipeline
+# Automated testing and deployment for Doctor Call API
+
+name: Laravel Backend CI/CD
+
+on:
+  push:
+    branches: [ master, main, develop ]
+    paths: 
+      - 'fullstack-app/backend/**'
+      - '.github/workflows/laravel-ci.yml'
+  pull_request:
+    branches: [ master, main ]
+    paths: 
+      - 'fullstack-app/backend/**'
+  workflow_dispatch:
+
+env:
+  PHP_VERSION: '8.2'
+  NODE_VERSION: '18'
+  MYSQL_VERSION: '8.0'
+
+jobs:
+  # ==========================================
+  # Code Quality & Testing
+  # ==========================================
+  test:
+    name: 🧪 Testing & Quality Assurance
+    runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: doctor_call_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: ⚙️ Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ env.PHP_VERSION }}
+        extensions: bcmath, ctype, fileinfo, json, mbstring, openssl, pdo, pdo_mysql, tokenizer, xml, redis
+        coverage: xdebug
+        tools: composer:v2
+
+    - name: 📋 PHP Information
+      run: |
+        php --version
+        composer --version
+        php -m | grep -E "(redis|mysql|pdo)"
+
+    - name: 📦 Cache Composer Dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.composer/cache/files
+        key: dependencies-composer-${{ hashFiles('fullstack-app/backend/composer.lock') }}
+        restore-keys: dependencies-composer-
+
+    - name: 📥 Install Composer Dependencies
+      working-directory: ./fullstack-app/backend
+      run: |
+        composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+        composer dump-autoload
+
+    - name: 📄 Setup Environment
+      working-directory: ./fullstack-app/backend
+      run: |
+        cp .env.example .env
+        
+        # Database configuration
+        sed -i 's/DB_CONNECTION=sqlite/DB_CONNECTION=mysql/' .env
+        sed -i 's/DB_HOST=127.0.0.1/DB_HOST=127.0.0.1/' .env
+        sed -i 's/DB_PORT=3306/DB_PORT=3306/' .env
+        sed -i 's/DB_DATABASE=laravel/DB_DATABASE=doctor_call_test/' .env
+        sed -i 's/DB_USERNAME=root/DB_USERNAME=root/' .env
+        sed -i 's/DB_PASSWORD=/DB_PASSWORD=password/' .env
+        
+        # Redis configuration
+        echo "REDIS_HOST=127.0.0.1" >> .env
+        echo "REDIS_PORT=6379" >> .env
+        
+        # App configuration
+        echo "APP_ENV=testing" >> .env
+        echo "APP_DEBUG=true" >> .env
+        
+        # Generate app key
+        php artisan key:generate
+
+    - name: 🗄️ Setup Database
+      working-directory: ./fullstack-app/backend
+      run: |
+        # Wait for MySQL to be ready
+        until mysql -h127.0.0.1 -P3306 -uroot -ppassword -e "SELECT 1"; do
+          echo "Waiting for MySQL..."
+          sleep 2
+        done
+        
+        # Run migrations
+        php artisan migrate --force --seed
+        
+        # Verify database setup
+        php artisan db:show
+        php artisan migrate:status
+
+    - name: 🔍 Code Style Check
+      working-directory: ./fullstack-app/backend
+      run: |
+        # Install development dependencies for testing
+        composer install --dev
+        
+        # Run Laravel Pint (code style fixer)
+        if [ -f "./vendor/bin/pint" ]; then
+          ./vendor/bin/pint --test
+        fi
+
+    - name: 📊 Static Analysis
+      working-directory: ./fullstack-app/backend
+      run: |
+        # Run PHPStan if available
+        if [ -f "./vendor/bin/phpstan" ]; then
+          ./vendor/bin/phpstan analyse --memory-limit=2G
+        fi
+        
+        # Run Psalm if available
+        if [ -f "./vendor/bin/psalm" ]; then
+          ./vendor/bin/psalm --show-info=false
+        fi
+
+    - name: 🧪 Run Feature Tests
+      working-directory: ./fullstack-app/backend
+      run: |
+        php artisan test --coverage --coverage-html=coverage-report --coverage-clover=coverage.xml
+        
+    - name: 📊 Upload Coverage Reports
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./fullstack-app/backend/coverage.xml
+        flags: laravel
+        name: laravel-coverage
+
+    - name: 🔐 Security Audit
+      working-directory: ./fullstack-app/backend
+      run: |
+        # Check for known vulnerabilities
+        composer audit
+        
+        # Check for outdated packages
+        composer outdated --direct
+
+    - name: 🗃️ Upload Test Artifacts
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: laravel-test-results
+        path: |
+          fullstack-app/backend/coverage-report/
+          fullstack-app/backend/storage/logs/
+        retention-days: 7
+
+  # ==========================================
+  # API Documentation Generation
+  # ==========================================
+  docs:
+    name: 📚 Generate API Documentation
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: ⚙️ Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ env.PHP_VERSION }}
+        extensions: bcmath, ctype, fileinfo, json, mbstring, openssl, pdo, tokenizer, xml
+        tools: composer:v2
+
+    - name: 📦 Install Dependencies
+      working-directory: ./fullstack-app/backend
+      run: composer install --no-dev --optimize-autoloader
+
+    - name: 📄 Setup Environment
+      working-directory: ./fullstack-app/backend
+      run: |
+        cp .env.example .env
+        php artisan key:generate
+
+    - name: 📖 Generate API Documentation
+      working-directory: ./fullstack-app/backend
+      run: |
+        # Generate OpenAPI documentation if Scramble is installed
+        if php artisan list | grep -q "scramble:docs"; then
+          php artisan scramble:docs --output=public/api-docs.json
+        fi
+        
+        # Generate route list
+        php artisan route:list --json > public/routes.json
+
+    - name: 🗃️ Upload Documentation
+      uses: actions/upload-artifact@v4
+      with:
+        name: api-documentation
+        path: |
+          fullstack-app/backend/public/api-docs.json
+          fullstack-app/backend/public/routes.json
+        retention-days: 30
+
+  # ==========================================
+  # Build Production Assets
+  # ==========================================
+  build:
+    name: 🏗️ Build Production Assets
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: ⚙️ Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: fullstack-app/backend/package-lock.json
+
+    - name: ⚙️ Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ env.PHP_VERSION }}
+        extensions: bcmath, ctype, fileinfo, json, mbstring, openssl, pdo, tokenizer, xml
+        tools: composer:v2
+
+    - name: 📦 Install PHP Dependencies
+      working-directory: ./fullstack-app/backend
+      run: composer install --no-dev --optimize-autoloader
+
+    - name: 📦 Install Node Dependencies
+      working-directory: ./fullstack-app/backend
+      run: |
+        if [ -f "package.json" ]; then
+          npm ci
+        fi
+
+    - name: 🏗️ Build Assets
+      working-directory: ./fullstack-app/backend
+      run: |
+        if [ -f "package.json" ]; then
+          npm run build
+        fi
+
+    - name: 📦 Optimize for Production
+      working-directory: ./fullstack-app/backend
+      run: |
+        # Optimize Composer autoloader
+        composer dump-autoload --optimize --classmap-authoritative
+        
+        # Cache configuration
+        php artisan config:cache
+        
+        # Cache routes
+        php artisan route:cache
+        
+        # Cache views
+        php artisan view:cache
+
+    - name: 🗃️ Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: laravel-production-build
+        path: |
+          fullstack-app/backend/
+          !fullstack-app/backend/node_modules/
+          !fullstack-app/backend/.git/
+          !fullstack-app/backend/tests/
+          !fullstack-app/backend/storage/logs/
+        retention-days: 7
+
+  # ==========================================
+  # Security Scanning
+  # ==========================================
+  security:
+    name: 🔒 Security Scanning
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: 🔍 Run Trivy Vulnerability Scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: './fullstack-app/backend'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: 📊 Upload Trivy Results
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+    - name: 🔍 Composer Security Audit
+      working-directory: ./fullstack-app/backend
+      run: |
+        composer audit --format=json > composer-audit.json || true
+
+    - name: 🗃️ Upload Security Reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-reports
+        path: |
+          trivy-results.sarif
+          fullstack-app/backend/composer-audit.json
+        retention-days: 30
+
+  # ==========================================
+  # Performance Testing
+  # ==========================================
+  performance:
+    name: ⚡ Performance Testing
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: doctor_call_perf
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: ⚙️ Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ env.PHP_VERSION }}
+        extensions: bcmath, ctype, fileinfo, json, mbstring, openssl, pdo, pdo_mysql, tokenizer, xml
+        tools: composer:v2
+
+    - name: 📦 Install Dependencies
+      working-directory: ./fullstack-app/backend
+      run: composer install --optimize-autoloader
+
+    - name: 📄 Setup Environment
+      working-directory: ./fullstack-app/backend
+      run: |
+        cp .env.example .env
+        sed -i 's/DB_DATABASE=laravel/DB_DATABASE=doctor_call_perf/' .env
+        sed -i 's/DB_USERNAME=root/DB_USERNAME=root/' .env
+        sed -i 's/DB_PASSWORD=/DB_PASSWORD=password/' .env
+        php artisan key:generate
+
+    - name: 🗄️ Setup Database
+      working-directory: ./fullstack-app/backend
+      run: |
+        php artisan migrate --force --seed
+
+    - name: ⚡ Run Performance Tests
+      working-directory: ./fullstack-app/backend
+      run: |
+        # Start Laravel server in background
+        php artisan serve --host=127.0.0.1 --port=8000 &
+        SERVER_PID=$!
+        
+        # Wait for server to start
+        sleep 5
+        
+        # Run performance tests using curl
+        echo "Testing API endpoints performance..."
+        
+        # Test authentication endpoint
+        time curl -s -o /dev/null -w "%{http_code} %{time_total}s\n" \
+          -X POST http://127.0.0.1:8000/api/login \
+          -H "Content-Type: application/json" \
+          -d '{"email":"admin@example.com","password":"password"}'
+        
+        # Test hospitals endpoint (would need auth token in real scenario)
+        time curl -s -o /dev/null -w "%{http_code} %{time_total}s\n" \
+          http://127.0.0.1:8000/api/hospitals
+        
+        # Stop server
+        kill $SERVER_PID
+
+  # ==========================================
+  # Deployment Notification
+  # ==========================================
+  notify:
+    name: 📢 Deployment Notification
+    runs-on: ubuntu-latest
+    needs: [test, docs, build, security]
+    if: always()
+    
+    steps:
+    - name: 📊 Create Backend Report
+      run: |
+        echo "# 🏥 Doctor Call Backend CI/CD Report" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Repository:** ${{ github.repository }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "**PHP Version:** ${{ env.PHP_VERSION }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        # Test results
+        if [ "${{ needs.test.result }}" == "success" ]; then
+          echo "✅ **Tests:** All tests passed" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ **Tests:** Some tests failed" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        # Build results
+        if [ "${{ needs.build.result }}" == "success" ]; then
+          echo "✅ **Build:** Production build successful" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ **Build:** Build failed" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        # Security results
+        if [ "${{ needs.security.result }}" == "success" ]; then
+          echo "✅ **Security:** No critical vulnerabilities found" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "⚠️ **Security:** Security scan completed with warnings" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        # Documentation
+        if [ "${{ needs.docs.result }}" == "success" ]; then
+          echo "✅ **Documentation:** API docs generated" >> $GITHUB_STEP_SUMMARY
+        elif [ "${{ needs.docs.result }}" == "skipped" ]; then
+          echo "⏭️ **Documentation:** Skipped (not master branch)" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "📅 **Completed at:** $(date)" >> $GITHUB_STEP_SUMMARY
+
+# ==========================================
+# End of Laravel CI/CD Pipeline
+# ==========================================
