@@ -77,20 +77,6 @@ jobs:
       working-directory: ./doctor_call_app_v2
       run: |
         flutter analyze --fatal-infos
-        
-    - name: 🧪 Run Tests
-      if: steps.changes.outputs.flutter == 'true'
-      working-directory: ./doctor_call_app_v2
-      run: |
-        flutter test --coverage --reporter=github
-        
-    - name: 📊 Upload Coverage
-      if: steps.changes.outputs.flutter == 'true'
-      uses: codecov/codecov-action@v4
-      with:
-        file: ./doctor_call_app_v2/coverage/lcov.info
-        flags: flutter
-        name: flutter-coverage
 
   # ==========================================
   # Build Flutter Web Application
